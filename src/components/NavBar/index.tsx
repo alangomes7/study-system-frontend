@@ -1,9 +1,11 @@
 import Link from 'next/link';
+import { ButtonTheme } from '../ButtonTheme';
 
 export default function NavBar() {
   return (
     <nav className='flex items-center justify-between p-4 bg-background border-b border-gray-200 dark:border-gray-800'>
       <div className='flex items-center space-x-4'>
+        <ButtonTheme />
         <Link href='/' className='text-lg font-bold'>
           StudySystem
         </Link>

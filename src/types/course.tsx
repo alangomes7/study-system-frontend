@@ -1,8 +1,5 @@
-import { StudyClass } from './study-class';
-
 export interface Course {
-  id: string;
+  id: number;
   name: string;
   description: string;
-  studyClasses: StudyClass[];
 }

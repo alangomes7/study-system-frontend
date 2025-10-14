@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 
 // Using inline SVGs for the icons to remove the dependency on 'phosphor-react'
@@ -46,34 +48,42 @@ const MoonIcon = () => (
  * The selected theme is persisted in localStorage.
  */
 export function ButtonTheme() {
-  // Initialize state from localStorage or system preference
-  const [theme, setTheme] = useState(() => {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) {
-      return savedTheme;
-    }
-    // If no saved theme, check the user's system preference
-    return window.matchMedia('(prefers-color-scheme: dark)').matches
-      ? 'dark'
-      : 'light';
-  });
+  const [mounted, setMounted] = useState(false);
+  const [theme, setTheme] = useState('light');
 
-  // Effect to apply the theme to the <html> element
   useEffect(() => {
-    const root = window.document.documentElement;
-    if (theme === 'dark') {
-      root.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      root.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
+    setMounted(true);
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia(
+      '(prefers-color-scheme: dark)',
+    ).matches;
+    if (savedTheme) {
+      setTheme(savedTheme);
+    } else if (prefersDark) {
+      setTheme('dark');
     }
-  }, [theme]);
+  }, []);
 
-  // Function to toggle the theme
+  useEffect(() => {
+    if (mounted) {
+      const root = window.document.documentElement;
+      if (theme === 'dark') {
+        root.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        root.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      }
+    }
+  }, [theme, mounted]);
+
   const handleThemeSwitch = () => {
     setTheme(prevTheme => (prevTheme === 'dark' ? 'light' : 'dark'));
   };
+
+  if (!mounted) {
+    return null; // Don't render anything on the server
+  }
 
   return (
     <button
