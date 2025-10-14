@@ -67,42 +67,40 @@ export default async function StudyClassDetailsPage({
           </Link>
         </div>
 
-        <div className='overflow-x-auto'>
-          <table className='min-w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700'>
-            <thead>
-              <tr className='bg-gray-100 dark:bg-gray-700'>
-                <th className='py-2 px-4 border-b'>Student Name</th>
-                <th className='py-2 px-4 border-b'>Subscription Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {subscriptions.length > 0 ? (
-                subscriptions.map(subscription => (
+        {/*-- Conditionally render table or message --*/}
+        {subscriptions.length > 0 ? (
+          <div className='overflow-x-auto'>
+            <table className='min-w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700'>
+              <thead>
+                <tr className='bg-gray-100 dark:bg-gray-700'>
+                  <th className='py-2 px-4 border-b'>Student Name</th>
+                  <th className='py-2 px-4 border-b'>Subscription Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {subscriptions.map(subscription => (
                   <tr
                     key={subscription.id}
                     className='hover:bg-gray-100 dark:hover:bg-gray-700'
                   >
                     <td className='py-2 px-4 border-b text-center'>
-                      {subscription.student.name}
+                      {subscription.studentName}
                     </td>
                     <td className='py-2 px-4 border-b text-center'>
                       {new Date(subscription.date).toLocaleDateString()}
                     </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td
-                    colSpan={2}
-                    className='py-4 px-4 text-center text-gray-500'
-                  >
-                    No students are enrolled in this class.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className='bg-white dark:bg-gray-800 shadow-md rounded-lg p-6 text-center'>
+            <p className='text-gray-500 dark:text-gray-400'>
+              No students enrolled in this class.
+            </p>
+          </div>
+        )}
       </div>
     );
   } catch (error) {
