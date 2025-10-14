@@ -59,12 +59,20 @@ export default async function StudyClassDetailsPage({
 
         <div className='flex justify-between items-center mb-4'>
           <h2 className='text-2xl font-semibold'>Enrolled Students</h2>
-          <Link
-            href='/subscriptions'
-            className='bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded'
-          >
-            Enroll Student
-          </Link>
+          <div className='flex gap-4'>
+            <Link
+              href='/subscriptions'
+              className='bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded'
+            >
+              Enroll Student
+            </Link>
+            <Link
+              href={`/study-classes/${id}/enroll-professor`}
+              className='bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded'
+            >
+              Enroll Professor
+            </Link>
+          </div>
         </div>
 
         {/*-- Conditionally render table or message --*/}

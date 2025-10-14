@@ -1,4 +1,4 @@
-'use client'; // This directive is necessary for using hooks like useState.
+'use client';
 
 import Link from 'next/link';
 import { useState } from 'react';
@@ -7,6 +7,7 @@ import { ButtonTheme } from '../ButtonTheme';
 export default function NavBar() {
   // State to manage whether the mobile menu is open or not
   const [isOpen, setIsOpen] = useState(false);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   return (
     <nav className='relative bg-background border-b border-gray-200 dark:border-gray-800'>
@@ -24,6 +25,42 @@ export default function NavBar() {
           <Link href='/courses' className='text-foreground hover:text-gray-500'>
             Courses
           </Link>
+          <div className='relative'>
+            <button
+              onClick={() => setIsCreateOpen(!isCreateOpen)}
+              className='text-foreground hover:text-gray-500'
+            >
+              Create
+            </button>
+            {isCreateOpen && (
+              <div className='absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1'>
+                <Link
+                  href='/students/create'
+                  className='block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
+                >
+                  Create Student
+                </Link>
+                <Link
+                  href='/professors/create'
+                  className='block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
+                >
+                  Create Professor
+                </Link>
+                <Link
+                  href='/courses/create'
+                  className='block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
+                >
+                  Create Course
+                </Link>
+                <Link
+                  href='/study-classes/create'
+                  className='block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
+                >
+                  Create Study Class
+                </Link>
+              </div>
+            )}
+          </div>
           <Link href='/about' className='text-foreground hover:text-gray-500'>
             About
           </Link>
@@ -90,6 +127,40 @@ export default function NavBar() {
           >
             Courses
           </Link>
+          <button
+            onClick={() => setIsCreateOpen(!isCreateOpen)}
+            className='block w-full text-left px-2 py-1 rounded text-foreground hover:bg-gray-200 dark:hover:bg-gray-800'
+          >
+            Create
+          </button>
+          {isCreateOpen && (
+            <div className='pl-4'>
+              <Link
+                href='/students/create'
+                className='block px-2 py-1 rounded text-foreground hover:bg-gray-200 dark:hover:bg-gray-800'
+              >
+                Create Student
+              </Link>
+              <Link
+                href='/professors/create'
+                className='block px-2 py-1 rounded text-foreground hover:bg-gray-200 dark:hover:bg-gray-800'
+              >
+                Create Professor
+              </Link>
+              <Link
+                href='/courses/create'
+                className='block px-2 py-1 rounded text-foreground hover:bg-gray-200 dark:hover:bg-gray-800'
+              >
+                Create Course
+              </Link>
+              <Link
+                href='/study-classes/create'
+                className='block px-2 py-1 rounded text-foreground hover:bg-gray-200 dark:hover:bg-gray-800'
+              >
+                Create Study Class
+              </Link>
+            </div>
+          )}
           <Link
             href='/about'
             className='block px-2 py-1 rounded text-foreground hover:bg-gray-200 dark:hover:bg-gray-800'
