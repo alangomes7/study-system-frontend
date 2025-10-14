@@ -83,7 +83,7 @@ export default async function StudyClassDetailsPage({
                     className='hover:bg-gray-100 dark:hover:bg-gray-700'
                   >
                     <td className='py-2 px-4 border-b text-center'>
-                      {subscription.studentName}
+                      {subscription.student.name}
                     </td>
                     <td className='py-2 px-4 border-b text-center'>
                       {new Date(subscription.date).toLocaleDateString()}

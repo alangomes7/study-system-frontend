@@ -1,8 +1,9 @@
+import { Student } from './student';
+
 export interface Subscription {
   id: number;
   date: string;
-  studentId: number;
-  studentName: string;
+  student: Student;
   studyClassId: number;
   classCode: string;
 }
