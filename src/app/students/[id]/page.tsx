@@ -1,4 +1,6 @@
 import { Student } from '@/types/student';
+// The 'use' hook is no longer needed here
+// import { use } from 'react';
 
 async function getStudent(id: string): Promise<Student> {
   const response = await fetch(`http://localhost:8080/students/${id}`, {
@@ -13,8 +15,10 @@ async function getStudent(id: string): Promise<Student> {
 export default async function StudentDetailsPage({
   params,
 }: {
+  // The 'params' prop is a promise
   params: { id: string };
 }) {
+  // ✨ Simply await the params promise directly instead of using the 'use' hook
   const { id } = params;
 
   try {
@@ -29,10 +33,10 @@ export default async function StudentDetailsPage({
               <strong>Email:</strong> {student.email}
             </p>
             <p>
-              <strong>CPF:</strong> {student.cpf}
+              <strong>CPF:</strong> {student.register}
             </p>
             <p>
-              <strong>Phone Number:</strong> {student.phoneNumber}
+              <strong>Phone Number:</strong> {student.phone}
             </p>
           </div>
         </div>

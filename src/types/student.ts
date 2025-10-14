@@ -1,7 +1,7 @@
 export interface Student {
   id: number;
   name: string;
+  phone: string;
   email: string;
-  cpf: string;
-  phoneNumber: string;
+  register: string;
 }
