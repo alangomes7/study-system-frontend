@@ -65,7 +65,7 @@ export default function CreateStudyClassPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          classCode,
+          '': classCode,
           year,
           semester,
           courseId,
@@ -96,21 +96,6 @@ export default function CreateStudyClassPage() {
         onSubmit={handleSubmit}
         className='bg-white dark:bg-gray-800 shadow-md rounded-lg p-6'
       >
-        <div className='mb-4'>
-          <label
-            htmlFor='classCode'
-            className='block text-gray-700 dark:text-gray-300 font-bold mb-2'
-          >
-            Class Code
-          </label>
-          <input
-            type='text'
-            id='classCode'
-            value={classCode}
-            onChange={e => setClassCode(e.target.value)}
-            className='border rounded-lg p-2 w-full'
-          />
-        </div>
         <div className='mb-4'>
           <label
             htmlFor='year'

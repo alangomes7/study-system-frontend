@@ -3,7 +3,7 @@
 import { Professor } from '@/types/professor';
 import { StudyClass } from '@/types/study-class';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 
 async function getProfessors(): Promise<Professor[]> {
   const response = await fetch('http://localhost:8080/professors', {
@@ -30,7 +30,7 @@ export default function EnrollProfessorPage({
 }: {
   params: { id: string };
 }) {
-  const { id } = params;
+  const { id } = use(params);
   const [professors, setProfessors] = useState<Professor[]>([]);
   const [studyClass, setStudyClass] = useState<StudyClass | null>(null);
   const [selectedProfessor, setSelectedProfessor] = useState<string>('');

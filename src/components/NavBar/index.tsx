@@ -5,7 +5,6 @@ import { useState } from 'react';
 import { ButtonTheme } from '../ButtonTheme';
 
 export default function NavBar() {
-  // State to manage whether the mobile menu is open or not
   const [isOpen, setIsOpen] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 

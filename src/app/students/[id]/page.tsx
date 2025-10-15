@@ -1,6 +1,4 @@
 import { Student } from '@/types/student';
-// The 'use' hook is no longer needed here
-// import { use } from 'react';
 
 async function getStudent(id: string): Promise<Student> {
   const response = await fetch(`http://localhost:8080/students/${id}`, {

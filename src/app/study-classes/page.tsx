@@ -1,39 +1,17 @@
 'use client';
 
-import { Course } from '@/types/course';
 import { StudyClass } from '@/types/study-class';
 import { Subscription } from '@/types/subscription';
 import { Student } from '@/types/student';
 import clsx from 'clsx';
-
 import Link from 'next/link';
-import { useState, useEffect, use } from 'react'; // 👈 1. Import 'use'
+import { useState, useEffect } from 'react';
 
-async function getCourse(id: string): Promise<Course> {
-  const response = await fetch(`http://localhost:8080/courses/${id}`, {
+// API Functions
+async function getAllStudyClasses(): Promise<StudyClass[]> {
+  const response = await fetch('http://localhost:8080/study-classes', {
     cache: 'no-store',
   });
-  if (!response.ok) {
-    console.error('API Error Status:', response.status, response.statusText);
-    const errorBody = await response.text();
-    console.error('API Error Body:', errorBody);
-
-    if (response.status === 404) {
-      throw new Error('Course not found');
-    }
-
-    throw new Error('Failed to fetch course details');
-  }
-  return response.json();
-}
-
-async function getStudyClasses(courseId: string): Promise<StudyClass[]> {
-  const response = await fetch(
-    `http://localhost:8080/study-classes/course/${courseId}`,
-    {
-      cache: 'no-store',
-    },
-  );
   if (!response.ok) {
     throw new Error('Failed to fetch study classes');
   }
@@ -66,7 +44,7 @@ async function getStudent(id: number): Promise<Student> {
 async function getStudentsInBatches(
   subscriptions: Subscription[],
   batchSize = 20,
-) {
+): Promise<Student[]> {
   const studentIds = [
     ...new Set(
       subscriptions
@@ -76,75 +54,53 @@ async function getStudentsInBatches(
   ];
 
   const allStudents: Student[] = [];
-
   for (let i = 0; i < studentIds.length; i += batchSize) {
     const batchIds = studentIds.slice(i, i + batchSize);
     const studentPromises = batchIds.map(id => getStudent(id));
     const studentsInBatch = await Promise.all(studentPromises);
     allStudents.push(...studentsInBatch);
   }
-
   return allStudents;
 }
 
-export default function CourseDetailsPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const { id } = params;
-  const [course, setCourse] = useState<Course | null>(null);
+// Main Component
+export default function StudyClassesPage() {
   const [studyClasses, setStudyClasses] = useState<StudyClass[]>([]);
   const [selectedStudyClass, setSelectedStudyClass] =
     useState<StudyClass | null>(null);
   const [students, setStudents] = useState<Student[]>([]);
   const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [studentSearchTerm, setStudentSearchTerm] = useState('');
   const [studyClassSearchTerm, setStudyClassSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [paginationLength, setPaginationLength] = useState(10);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [isStudentsLoading, setIsStudentsLoading] = useState(false);
 
+  // Effect to fetch all study classes on initial load
   useEffect(() => {
     async function fetchData() {
       setIsLoading(true);
-      setError(null);
       try {
-        const courseData = await getCourse(id);
-        setCourse(courseData);
-        const studyClassesData = await getStudyClasses(id);
+        const studyClassesData = await getAllStudyClasses();
         setStudyClasses(studyClassesData);
         if (studyClassesData.length > 0) {
           setSelectedStudyClass(studyClassesData[0]);
         }
-      } catch (err: any) {
-        console.error(err);
-        setError(err.message || 'Failed to fetch course data');
+      } catch (error) {
+        console.error('Failed to fetch study classes:', error);
       } finally {
         setIsLoading(false);
       }
     }
     fetchData();
-  }, [id]);
+  }, []);
 
-  const filteredStudyClasses = studyClasses.filter(studyClass =>
-    studyClass.classCode
-      .toLowerCase()
-      .includes(studyClassSearchTerm.toLowerCase()),
+  const filteredStudyClasses = studyClasses.filter(sc =>
+    sc.classCode.toLowerCase().includes(studyClassSearchTerm.toLowerCase()),
   );
 
-  useEffect(() => {
-    if (
-      filteredStudyClasses.length > 0 &&
-      !filteredStudyClasses.find(sc => sc.id === selectedStudyClass?.id)
-    ) {
-      setSelectedStudyClass(filteredStudyClasses[0]);
-    } else if (filteredStudyClasses.length === 0) {
-      setSelectedStudyClass(null);
-    }
-  }, [studyClassSearchTerm, studyClasses]);
-
+  // Effect to fetch students when a study class is selected
   useEffect(() => {
     if (!selectedStudyClass) {
       setStudents([]);
@@ -152,6 +108,7 @@ export default function CourseDetailsPage({
     }
 
     async function fetchStudents() {
+      setIsStudentsLoading(true);
       try {
         const subscriptions = await getSubscriptions(selectedStudyClass!.id);
         const studentData = await getStudentsInBatches(subscriptions);
@@ -159,19 +116,22 @@ export default function CourseDetailsPage({
       } catch (error) {
         console.error('Failed to fetch students:', error);
         setStudents([]);
+      } finally {
+        setIsStudentsLoading(false);
       }
     }
 
     fetchStudents();
   }, [selectedStudyClass]);
 
+  // Effect to filter students based on search term
   useEffect(() => {
     const results = students.filter(student =>
-      student.name.toLowerCase().includes(searchTerm.toLowerCase()),
+      student.name.toLowerCase().includes(studentSearchTerm.toLowerCase()),
     );
     setFilteredStudents(results);
     setCurrentPage(1);
-  }, [searchTerm, students]);
+  }, [studentSearchTerm, students]);
 
   const handleStudyClassClick = (studyClass: StudyClass) => {
     setSelectedStudyClass(studyClass);
@@ -193,38 +153,18 @@ export default function CourseDetailsPage({
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
-  // 🧠 Conditional rendering
   if (isLoading) {
-    return <div className='text-center mt-8'>Loading course details...</div>;
-  }
-
-  if (error) {
-    return (
-      <div className='text-center mt-8 text-red-600 dark:text-red-400'>
-        {error}
-      </div>
-    );
-  }
-
-  if (!course) {
-    return (
-      <div className='text-center mt-8 text-gray-500 dark:text-gray-400'>
-        Course not found.
-      </div>
-    );
+    return <div className='text-center mt-8'>Loading study classes...</div>;
   }
 
   return (
     <div className='container mx-auto px-4 py-8'>
-      <h1 className='text-2xl font-bold md:text-3xl mb-2'>{course?.name}</h1>
-      <p className='text-gray-600 dark:text-gray-400 mb-6'>
-        {course?.description}
-      </p>
+      <h1 className='text-2xl font-bold md:text-3xl mb-6'>Study Classes</h1>
 
       <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
         {/* Study Classes Column */}
         <div className='md:col-span-1'>
-          <h2 className='text-xl md:text-2xl font-bold mb-4'>Study Classes</h2>
+          <h2 className='text-xl md:text-2xl font-bold mb-4'>Class List</h2>
           <input
             type='text'
             placeholder='Search by class code...'
@@ -234,27 +174,27 @@ export default function CourseDetailsPage({
           />
           <div className='overflow-x-auto'>
             {filteredStudyClasses.length > 0 ? (
-              <table className='min-w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700'>
+              <table className='min-w-full bg-white dark:bg-gray-800 border'>
                 <thead>
                   <tr>
-                    <th className='py-2 px-4 border-b'>Study Class</th>
+                    <th className='py-2 px-4 border-b'>Class Code</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredStudyClasses.map(studyClass => (
+                  {filteredStudyClasses.map(sc => (
                     <tr
-                      key={studyClass.id}
+                      key={sc.id}
                       className={clsx(
                         'hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer',
                         {
                           'bg-blue-200 dark:bg-blue-800':
-                            selectedStudyClass?.id === studyClass.id,
+                            selectedStudyClass?.id === sc.id,
                         },
                       )}
-                      onClick={() => handleStudyClassClick(studyClass)}
+                      onClick={() => handleStudyClassClick(sc)}
                     >
                       <td className='py-2 px-4 border-b text-center'>
-                        {studyClass.classCode}
+                        {sc.classCode}
                       </td>
                     </tr>
                   ))}
@@ -273,15 +213,15 @@ export default function CourseDetailsPage({
           {selectedStudyClass ? (
             <div>
               <h2 className='text-xl md:text-2xl font-bold mb-4'>
-                Study Class Details
+                Class Details
               </h2>
               <div className='bg-white dark:bg-gray-800 shadow-md rounded-lg p-6 mb-8'>
                 <p>
-                  <strong>Year/Semester:</strong> {selectedStudyClass.year}/
-                  {selectedStudyClass.semester}
+                  <strong>Course:</strong> {selectedStudyClass.courseName}
                 </p>
                 <p>
-                  <strong>Code:</strong> {selectedStudyClass.classCode}
+                  <strong>Year/Semester:</strong> {selectedStudyClass.year}/
+                  {selectedStudyClass.semester}
                 </p>
                 <p>
                   <strong>Professor:</strong>{' '}
@@ -291,12 +231,11 @@ export default function CourseDetailsPage({
 
               <div className='flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-4'>
                 <h2 className='text-xl md:text-2xl font-semibold'>Students</h2>
-                <div className='flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto'>
+                <div className='flex items-center gap-4 w-full md:w-auto'>
                   <select
-                    id='pagination-length'
                     value={paginationLength}
                     onChange={handlePaginationLengthChange}
-                    className='border rounded-lg p-2 bg-white dark:bg-gray-700 w-full sm:w-auto'
+                    className='border rounded-lg p-2 bg-white dark:bg-gray-700'
                   >
                     <option value={5}>5 per page</option>
                     <option value={10}>10 per page</option>
@@ -306,23 +245,25 @@ export default function CourseDetailsPage({
                     type='text'
                     placeholder='Search by student name'
                     className='border rounded-lg p-2 w-full sm:w-auto'
-                    value={searchTerm}
-                    onChange={e => setSearchTerm(e.target.value)}
+                    value={studentSearchTerm}
+                    onChange={e => setStudentSearchTerm(e.target.value)}
                   />
                 </div>
               </div>
 
-              {filteredStudents.length > 0 ? (
+              {isStudentsLoading ? (
+                <div className='text-center p-6'>Loading students...</div>
+              ) : filteredStudents.length > 0 ? (
                 <>
+                  {/* Desktop Table */}
                   <div className='hidden md:block overflow-x-auto'>
-                    <table className='min-w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700'>
+                    <table className='min-w-full bg-white dark:bg-gray-800 border'>
                       <thead>
                         <tr>
                           <th className='py-2 px-4 border-b'>ID</th>
                           <th className='py-2 px-4 border-b'>Name</th>
-                          <th className='py-2 px-4 border-b'>Phone Number</th>
+                          <th className='py-2 px-4 border-b'>Phone</th>
                           <th className='py-2 px-4 border-b'>E-mail</th>
-                          <th className='py-2 px-4 border-b'>CPF</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -360,14 +301,6 @@ export default function CourseDetailsPage({
                                 href={`/students/${student.id}`}
                                 className='block w-full h-full'
                               >
-                                {student.email}
-                              </Link>
-                            </td>
-                            <td className='py-2 px-4 border-b text-center'>
-                              <Link
-                                href={`/students/${student.id}`}
-                                className='block w-full h-full'
-                              >
                                 {student.register}
                               </Link>
                             </td>
@@ -377,39 +310,31 @@ export default function CourseDetailsPage({
                     </table>
                   </div>
 
+                  {/* Mobile Cards */}
                   <div className='grid grid-cols-1 gap-4 md:hidden'>
                     {currentStudents.map(student => (
                       <Link
                         key={student.id}
                         href={`/students/${student.id}`}
-                        className='block bg-white dark:bg-gray-800 p-4 rounded-lg shadow hover:bg-gray-50 dark:hover:bg-gray-700'
+                        className='block bg-white dark:bg-gray-800 p-4 rounded-lg shadow'
                       >
-                        <div className='font-bold text-lg text-blue-500'>
+                        <div className='font-bold text-blue-500'>
                           {student.name}
                         </div>
-                        <div className='text-sm text-gray-600 dark:text-gray-400 mt-2 space-y-1'>
-                          <p>
-                            <strong>ID:</strong> {student.id}
-                          </p>
-                          <p>
-                            <strong>Phone:</strong> {student.phone}
-                          </p>
-                          <p>
-                            <strong>Email:</strong> {student.email}
-                          </p>
-                          <p>
-                            <strong>CPF:</strong> {student.register}
-                          </p>
+                        <div className='text-sm text-gray-600 dark:text-gray-400 mt-2'>
+                          <p>ID: {student.id}</p>
+                          <p>Phone: {student.phone}</p>
                         </div>
                       </Link>
                     ))}
                   </div>
 
+                  {/* Pagination */}
                   <div className='flex justify-center mt-4'>
                     <button
                       onClick={() => paginate(currentPage - 1)}
                       disabled={currentPage === 1}
-                      className='px-4 py-2 mx-1 rounded-lg bg-gray-200 dark:bg-gray-700 disabled:opacity-50'
+                      className='px-4 py-2 mx-1 rounded bg-gray-200 dark:bg-gray-700 disabled:opacity-50'
                     >
                       &lt;
                     </button>
@@ -423,7 +348,7 @@ export default function CourseDetailsPage({
                         <button
                           key={i + 1}
                           onClick={() => paginate(i + 1)}
-                          className={`px-4 py-2 mx-1 rounded-lg ${
+                          className={`px-4 py-2 mx-1 rounded ${
                             currentPage === i + 1
                               ? 'bg-blue-500 text-white'
                               : 'bg-gray-200 dark:bg-gray-700'
@@ -439,7 +364,7 @@ export default function CourseDetailsPage({
                         currentPage ===
                         Math.ceil(filteredStudents.length / paginationLength)
                       }
-                      className='px-4 py-2 mx-1 rounded-lg bg-gray-200 dark:bg-gray-700 disabled:opacity-50'
+                      className='px-4 py-2 mx-1 rounded bg-gray-200 dark:bg-gray-700 disabled:opacity-50'
                     >
                       &gt;
                     </button>
@@ -447,9 +372,7 @@ export default function CourseDetailsPage({
                 </>
               ) : (
                 <div className='bg-white dark:bg-gray-800 shadow-md rounded-lg p-6 text-center'>
-                  <p className='text-gray-500 dark:text-gray-400'>
-                    No students found for this class.
-                  </p>
+                  <p>No students found for this class.</p>
                 </div>
               )}
             </div>

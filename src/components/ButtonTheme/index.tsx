@@ -1,62 +1,31 @@
 'use client';
 
+import { ContrastIcon, MoonIcon, SunIcon } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
-// Using inline SVGs for the icons to remove the dependency on 'phosphor-react'
-const SunIcon = () => (
-  <svg
-    xmlns='http://www.w3.org/2000/svg'
-    width='24'
-    height='24'
-    viewBox='0 0 24 24'
-    fill='none'
-    stroke='currentColor'
-    strokeWidth='2'
-    strokeLinecap='round'
-    strokeLinejoin='round'
-  >
-    <circle cx='12' cy='12' r='5'></circle>
-    <line x1='12' y1='1' x2='12' y2='3'></line>
-    <line x1='12' y1='21' x2='12' y2='23'></line>
-    <line x1='4.22' y1='4.22' x2='5.64' y2='5.64'></line>
-    <line x1='18.36' y1='18.36' x2='19.78' y2='19.78'></line>
-    <line x1='1' y1='12' x2='3' y2='12'></line>
-    <line x1='21' y1='12' x2='23' y2='12'></line>
-    <line x1='4.22' y1='19.78' x2='5.64' y2='18.36'></line>
-    <line x1='18.36' y1='5.64' x2='19.78' y2='4.22'></line>
-  </svg>
-);
-
-const MoonIcon = () => (
-  <svg
-    xmlns='http://www.w3.org/2000/svg'
-    width='24'
-    height='24'
-    viewBox='0 0 24 24'
-    fill='none'
-    stroke='currentColor'
-    strokeWidth='2'
-    strokeLinecap='round'
-    strokeLinejoin='round'
-  >
-    <path d='M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z'></path>
-  </svg>
-);
+// Define the available theme types
+type Theme = 'light' | 'dark' | 'off-white';
 
 /**
- * A button component that allows users to toggle between light and dark themes.
- * The selected theme is persisted in localStorage.
+ * A button component that allows users to cycle between light, dark, and off-white themes.
+ * The selected theme is persisted in localStorage to remember the user's choice.
  */
 export function ButtonTheme() {
+  // State to prevent SSR hydration errors by ensuring rendering only happens on the client
   const [mounted, setMounted] = useState(false);
-  const [theme, setTheme] = useState('light');
 
+  // State to hold the current theme. Defaults to 'light'.
+  const [theme, setTheme] = useState<Theme>('light');
+
+  // Effect to run only on the client after the component mounts
   useEffect(() => {
     setMounted(true);
-    const savedTheme = localStorage.getItem('theme');
+    // Retrieve the saved theme from localStorage or detect the user's system preference
+    const savedTheme = localStorage.getItem('theme') as Theme;
     const prefersDark = window.matchMedia(
       '(prefers-color-scheme: dark)',
     ).matches;
+
     if (savedTheme) {
       setTheme(savedTheme);
     } else if (prefersDark) {
@@ -64,26 +33,36 @@ export function ButtonTheme() {
     }
   }, []);
 
+  // Effect to apply the theme to the document and save it to localStorage
   useEffect(() => {
     if (mounted) {
       const root = window.document.documentElement;
-      if (theme === 'dark') {
-        root.classList.add('dark');
-        localStorage.setItem('theme', 'dark');
-      } else {
-        root.classList.remove('dark');
-        localStorage.setItem('theme', 'light');
-      }
+      // Use data-theme attribute for easier CSS targeting
+      root.setAttribute('data-theme', theme);
+      localStorage.setItem('theme', theme);
     }
   }, [theme, mounted]);
 
+  // Handler to cycle through the available themes
   const handleThemeSwitch = () => {
-    setTheme(prevTheme => (prevTheme === 'dark' ? 'light' : 'dark'));
+    setTheme(prevTheme => {
+      if (prevTheme === 'light') return 'dark';
+      if (prevTheme === 'dark') return 'off-white';
+      return 'light'; // Cycles back to light from off-white
+    });
   };
 
+  // Don't render the button on the server to avoid theme mismatch on the client
   if (!mounted) {
-    return null; // Don't render anything on the server
+    return null;
   }
+
+  // Helper function to render the correct icon based on the current theme
+  const renderIcon = () => {
+    if (theme === 'light') return <MoonIcon />;
+    if (theme === 'dark') return <SunIcon />;
+    return <ContrastIcon />; // For 'off-white' theme
+  };
 
   return (
     <button
@@ -91,7 +70,7 @@ export function ButtonTheme() {
       className='p-2 rounded-full text-gray-800 dark:text-yellow-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800'
       aria-label='Toggle theme'
     >
-      {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
+      {renderIcon()}
     </button>
   );
 }

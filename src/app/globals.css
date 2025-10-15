@@ -1,26 +1,27 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Define CSS variables for each theme using the data-theme attribute */
+@layer base {
+  /* Default theme (light) */
+  :root,
+  [data-theme='light'] {
+    --background: 0 0% 100%; /* White */
+    --foreground: 0 0% 9%; /* Near Black */
   }
-}
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  [data-theme='dark'] {
+    --background: 0 0% 4%; /* Near Black */
+    --foreground: 0 0% 95%; /* Light Gray */
+  }
+
+  [data-theme='off-white'] {
+    --background: 30 29% 96%; /* Off-White */
+    --foreground: 0 0% 9%; /* Near Black */
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: Arial, Helvetica, sans-serif;
+  }
 }
