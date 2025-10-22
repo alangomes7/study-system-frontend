@@ -25,3 +25,42 @@
     font-family: Arial, Helvetica, sans-serif;
   }
 }
+
+@layer components {
+  .btn {
+    @apply font-bold py-2 px-4 rounded;
+  }
+  .btn-blue {
+    @apply bg-blue-500 hover:bg-blue-600 text-white;
+  }
+  .btn-green {
+    @apply bg-green-500 hover:bg-green-600 text-white;
+  }
+  .card {
+    /* ✨ FIX: Use the CSS variable directly instead of @apply */
+    background-color: hsl(var(--background));
+    @apply shadow-md rounded-lg p-6;
+  }
+  .input {
+    @apply border rounded-lg p-2 w-full;
+  }
+  .nav-link {
+    /* ✨ FIX: Use the CSS variable directly instead of @apply */
+    color: hsl(var(--foreground));
+    @apply hover:text-gray-500;
+  }
+  .table {
+    /* ✨ FIX: Use the CSS variable directly instead of @apply */
+    background-color: hsl(var(--background));
+    @apply min-w-full border;
+  }
+  .table-header {
+    @apply py-2 px-4 border-b;
+  }
+  .table-row {
+    @apply hover:bg-gray-100 dark:hover:bg-gray-700;
+  }
+  .table-cell {
+    @apply py-2 px-4 border-b text-center;
+  }
+}

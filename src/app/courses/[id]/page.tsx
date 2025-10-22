@@ -90,9 +90,9 @@ async function getStudentsInBatches(
 export default function CourseDetailsPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const { id } = params;
+  const { id } = use(params);
   const [course, setCourse] = useState<Course | null>(null);
   const [studyClasses, setStudyClasses] = useState<StudyClass[]>([]);
   const [selectedStudyClass, setSelectedStudyClass] =

@@ -13,10 +13,8 @@ async function getStudent(id: string): Promise<Student> {
 export default async function StudentDetailsPage({
   params,
 }: {
-  // The 'params' prop is a promise
   params: { id: string };
 }) {
-  // ✨ Simply await the params promise directly instead of using the 'use' hook
   const { id } = params;
 
   try {

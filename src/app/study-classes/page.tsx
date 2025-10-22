@@ -84,9 +84,6 @@ export default function StudyClassesPage() {
       try {
         const studyClassesData = await getAllStudyClasses();
         setStudyClasses(studyClassesData);
-        if (studyClassesData.length > 0) {
-          setSelectedStudyClass(studyClassesData[0]);
-        }
       } catch (error) {
         console.error('Failed to fetch study classes:', error);
       } finally {
@@ -96,9 +93,15 @@ export default function StudyClassesPage() {
     fetchData();
   }, []);
 
-  const filteredStudyClasses = studyClasses.filter(sc =>
-    sc.classCode.toLowerCase().includes(studyClassSearchTerm.toLowerCase()),
-  );
+  // Only show classes if a search term is entered
+  const filteredStudyClasses =
+    studyClassSearchTerm.trim() === ''
+      ? []
+      : studyClasses.filter(sc =>
+          sc.classCode
+            .toLowerCase()
+            .includes(studyClassSearchTerm.toLowerCase().trim()),
+        );
 
   // Effect to fetch students when a study class is selected
   useEffect(() => {
@@ -134,7 +137,20 @@ export default function StudyClassesPage() {
   }, [studentSearchTerm, students]);
 
   const handleStudyClassClick = (studyClass: StudyClass) => {
+    // Prevent refetch if clicking the same class
+    if (selectedStudyClass?.id === studyClass.id) return;
+
     setSelectedStudyClass(studyClass);
+    // Reset student search and pagination when new class is clicked
+    setStudentSearchTerm('');
+    setCurrentPage(1);
+  };
+
+  // MODIFICATION: Add handler to deselect class
+  const handleStudyClassDeselect = () => {
+    setSelectedStudyClass(null);
+    setStudentSearchTerm('');
+    setCurrentPage(1);
   };
 
   const handlePaginationLengthChange = (
@@ -192,6 +208,8 @@ export default function StudyClassesPage() {
                         },
                       )}
                       onClick={() => handleStudyClassClick(sc)}
+                      // MODIFICATION: Add double-click handler
+                      onDoubleClick={handleStudyClassDeselect}
                     >
                       <td className='py-2 px-4 border-b text-center'>
                         {sc.classCode}
@@ -202,7 +220,9 @@ export default function StudyClassesPage() {
               </table>
             ) : (
               <div className='text-center p-4 bg-white dark:bg-gray-800 rounded-lg shadow'>
-                No study classes found.
+                {studyClassSearchTerm.trim() === ''
+                  ? 'Please enter a class code to search.'
+                  : 'No study classes found.'}
               </div>
             )}
           </div>
