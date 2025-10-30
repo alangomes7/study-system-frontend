@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { ButtonTheme } from '../ButtonTheme';
+import { MenuIcon, XIcon } from 'lucide-react'; // <-- 1. Import icons
 
 export default function NavBar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -78,7 +79,12 @@ export default function NavBar() {
             onClick={() => setIsOpen(!isOpen)}
             className='text-foreground focus:outline-none'
           >
-            {/* ... (SVG icons) */}
+            {/* <-- 2. Add conditional icon logic here --> */}
+            {isOpen ? (
+              <XIcon className='h-6 w-6' />
+            ) : (
+              <MenuIcon className='h-6 w-6' />
+            )}
           </button>
         </div>
       </div>
@@ -89,7 +95,6 @@ export default function NavBar() {
           <Link href='/courses' className='block px-2 py-1 rounded nav-link'>
             Courses
           </Link>
-          {/* ... (rest of the mobile menu) */}
         </div>
       )}
     </nav>
