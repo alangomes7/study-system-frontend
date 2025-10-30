@@ -6,3 +6,8 @@ export interface Subscription {
   studyClassId: number;
   classCode: string;
 }
+
+export type SubscriptionCreationData = {
+  studentId: number;
+  studyClassId: number;
+};

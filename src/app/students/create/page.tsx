@@ -1,38 +1,21 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useCreateStudent } from '@/hooks/useStudents';
 
 export default function CreateStudentPage() {
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
-  const [register, setRegister] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const response = await fetch('http://localhost:8080/students', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name, phone, email, register }),
-      });
-      if (!response.ok) {
-        throw new Error('Failed to create student');
-      }
-      router.push('/students');
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('An unknown error occurred');
-      }
-    }
-  };
+  const {
+    name,
+    setName,
+    phone,
+    setPhone,
+    email,
+    setEmail,
+    register,
+    setRegister,
+    error,
+    isSubmitting,
+    handleSubmit,
+  } = useCreateStudent();
 
   return (
     <div className='container mx-auto px-4 py-8'>
@@ -42,6 +25,7 @@ export default function CreateStudentPage() {
         onSubmit={handleSubmit}
         className='bg-white dark:bg-gray-800 shadow-md rounded-lg p-6'
       >
+        {/* ... (form inputs) ... */}
         <div className='mb-4'>
           <label
             htmlFor='name'
@@ -55,6 +39,7 @@ export default function CreateStudentPage() {
             value={name}
             onChange={e => setName(e.target.value)}
             className='border rounded-lg p-2 w-full'
+            disabled={isSubmitting}
           />
         </div>
         <div className='mb-4'>
@@ -70,6 +55,7 @@ export default function CreateStudentPage() {
             value={phone}
             onChange={e => setPhone(e.target.value)}
             className='border rounded-lg p-2 w-full'
+            disabled={isSubmitting}
           />
         </div>
         <div className='mb-4'>
@@ -85,6 +71,7 @@ export default function CreateStudentPage() {
             value={email}
             onChange={e => setEmail(e.target.value)}
             className='border rounded-lg p-2 w-full'
+            disabled={isSubmitting}
           />
         </div>
         <div className='mb-4'>
@@ -100,13 +87,15 @@ export default function CreateStudentPage() {
             value={register}
             onChange={e => setRegister(e.target.value)}
             className='border rounded-lg p-2 w-full'
+            disabled={isSubmitting}
           />
         </div>
         <button
           type='submit'
-          className='bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded'
+          className='bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded disabled:opacity-50'
+          disabled={isSubmitting}
         >
-          Create
+          {isSubmitting ? 'Creating...' : 'Create'}
         </button>
       </form>
     </div>

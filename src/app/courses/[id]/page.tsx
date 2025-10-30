@@ -1,91 +1,10 @@
+// src/app/courses/[id]/page.tsx
 'use client';
 
-import { Course } from '@/types/course';
-import { StudyClass } from '@/types/study-class';
-import { Subscription } from '@/types/subscription';
-import { Student } from '@/types/student';
+import { useCourses } from '@/hooks/useCourses';
 import clsx from 'clsx';
-
 import Link from 'next/link';
-import { useState, useEffect, use } from 'react'; // 👈 1. Import 'use'
-
-async function getCourse(id: string): Promise<Course> {
-  const response = await fetch(`http://localhost:8080/courses/${id}`, {
-    cache: 'no-store',
-  });
-  if (!response.ok) {
-    console.error('API Error Status:', response.status, response.statusText);
-    const errorBody = await response.text();
-    console.error('API Error Body:', errorBody);
-
-    if (response.status === 404) {
-      throw new Error('Course not found');
-    }
-
-    throw new Error('Failed to fetch course details');
-  }
-  return response.json();
-}
-
-async function getStudyClasses(courseId: string): Promise<StudyClass[]> {
-  const response = await fetch(
-    `http://localhost:8080/study-classes/course/${courseId}`,
-    {
-      cache: 'no-store',
-    },
-  );
-  if (!response.ok) {
-    throw new Error('Failed to fetch study classes');
-  }
-  return response.json();
-}
-
-async function getSubscriptions(studyClassId: number): Promise<Subscription[]> {
-  const response = await fetch(
-    `http://localhost:8080/subscriptions?studyClassId=${studyClassId}`,
-    {
-      cache: 'no-store',
-    },
-  );
-  if (!response.ok) {
-    throw new Error('Failed to fetch subscriptions');
-  }
-  return response.json();
-}
-
-async function getStudent(id: number): Promise<Student> {
-  const response = await fetch(`http://localhost:8080/students/${id}`, {
-    cache: 'no-store',
-  });
-  if (!response.ok) {
-    throw new Error(`Failed to fetch student with id ${id}`);
-  }
-  return response.json();
-}
-
-async function getStudentsInBatches(
-  subscriptions: Subscription[],
-  batchSize = 20,
-) {
-  const studentIds = [
-    ...new Set(
-      subscriptions
-        .filter(sub => sub && sub.studentId)
-        .map(sub => sub.studentId),
-    ),
-  ];
-
-  const allStudents: Student[] = [];
-
-  for (let i = 0; i < studentIds.length; i += batchSize) {
-    const batchIds = studentIds.slice(i, i + batchSize);
-    const studentPromises = batchIds.map(id => getStudent(id));
-    const studentsInBatch = await Promise.all(studentPromises);
-    allStudents.push(...studentsInBatch);
-  }
-
-  return allStudents;
-}
+import { use } from 'react';
 
 export default function CourseDetailsPage({
   params,
@@ -93,107 +12,26 @@ export default function CourseDetailsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const [course, setCourse] = useState<Course | null>(null);
-  const [studyClasses, setStudyClasses] = useState<StudyClass[]>([]);
-  const [selectedStudyClass, setSelectedStudyClass] =
-    useState<StudyClass | null>(null);
-  const [students, setStudents] = useState<Student[]>([]);
-  const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [studyClassSearchTerm, setStudyClassSearchTerm] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [paginationLength, setPaginationLength] = useState(10);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function fetchData() {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const courseData = await getCourse(id);
-        setCourse(courseData);
-        const studyClassesData = await getStudyClasses(id);
-        setStudyClasses(studyClassesData);
-        if (studyClassesData.length > 0) {
-          setSelectedStudyClass(studyClassesData[0]);
-        }
-      } catch (err: any) {
-        console.error(err);
-        setError(err.message || 'Failed to fetch course data');
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    fetchData();
-  }, [id]);
+  const {
+    isLoading,
+    error,
+    course,
+    selectedStudyClass,
+    studyClassSearchTerm,
+    setStudyClassSearchTerm,
+    filteredStudyClasses,
+    handleStudyClassClick,
+    filteredStudents,
+    currentStudents,
+    currentPage,
+    paginationLength,
+    searchTerm,
+    setSearchTerm,
+    handlePaginationLengthChange,
+    paginate,
+  } = useCourses(id);
 
-  const filteredStudyClasses = studyClasses.filter(studyClass =>
-    studyClass.classCode
-      .toLowerCase()
-      .includes(studyClassSearchTerm.toLowerCase()),
-  );
-
-  useEffect(() => {
-    if (
-      filteredStudyClasses.length > 0 &&
-      !filteredStudyClasses.find(sc => sc.id === selectedStudyClass?.id)
-    ) {
-      setSelectedStudyClass(filteredStudyClasses[0]);
-    } else if (filteredStudyClasses.length === 0) {
-      setSelectedStudyClass(null);
-    }
-  }, [studyClassSearchTerm, studyClasses]);
-
-  useEffect(() => {
-    if (!selectedStudyClass) {
-      setStudents([]);
-      return;
-    }
-
-    async function fetchStudents() {
-      try {
-        const subscriptions = await getSubscriptions(selectedStudyClass!.id);
-        const studentData = await getStudentsInBatches(subscriptions);
-        setStudents(studentData);
-      } catch (error) {
-        console.error('Failed to fetch students:', error);
-        setStudents([]);
-      }
-    }
-
-    fetchStudents();
-  }, [selectedStudyClass]);
-
-  useEffect(() => {
-    const results = students.filter(student =>
-      student.name.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
-    setFilteredStudents(results);
-    setCurrentPage(1);
-  }, [searchTerm, students]);
-
-  const handleStudyClassClick = (studyClass: StudyClass) => {
-    setSelectedStudyClass(studyClass);
-  };
-
-  const handlePaginationLengthChange = (
-    e: React.ChangeEvent<HTMLSelectElement>,
-  ) => {
-    setPaginationLength(Number(e.target.value));
-    setCurrentPage(1);
-  };
-
-  const indexOfLastStudent = currentPage * paginationLength;
-  const indexOfFirstStudent = indexOfLastStudent - paginationLength;
-  const currentStudents = filteredStudents.slice(
-    indexOfFirstStudent,
-    indexOfLastStudent,
-  );
-
-  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
-
-  // 🧠 Conditional rendering
   if (isLoading) {
     return <div className='text-center mt-8'>Loading course details...</div>;
   }

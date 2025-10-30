@@ -8,3 +8,8 @@ export interface StudyClass {
   professorId: number | null;
   professorName: string | null;
 }
+
+export type StudyClassCreationData = Omit<
+  StudyClass,
+  'id' | 'courseName' | 'professorName'
+>;

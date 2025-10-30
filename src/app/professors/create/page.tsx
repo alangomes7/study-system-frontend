@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { createProfessor } from '@/lib/api';
 
 export default function CreateProfessorPage() {
   const [name, setName] = useState('');
@@ -10,17 +11,11 @@ export default function CreateProfessorPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+
     try {
-      const response = await fetch('http://localhost:8080/professors', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name }),
-      });
-      if (!response.ok) {
-        throw new Error('Failed to create professor');
-      }
+      await createProfessor(name);
+
       router.push('/professors');
     } catch (err) {
       if (err instanceof Error) {

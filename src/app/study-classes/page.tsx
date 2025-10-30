@@ -1,173 +1,30 @@
+// src/app/study-classes/page.tsx (Updated)
 'use client';
 
-import { StudyClass } from '@/types/study-class';
-import { Subscription } from '@/types/subscription';
 import { Student } from '@/types/student';
 import clsx from 'clsx';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useStudyClasses } from '@/hooks/useStudyClasses';
 
-// API Functions
-async function getAllStudyClasses(): Promise<StudyClass[]> {
-  const response = await fetch('http://localhost:8080/study-classes', {
-    cache: 'no-store',
-  });
-  if (!response.ok) {
-    throw new Error('Failed to fetch study classes');
-  }
-  return response.json();
-}
-
-async function getSubscriptions(studyClassId: number): Promise<Subscription[]> {
-  const response = await fetch(
-    `http://localhost:8080/subscriptions?studyClassId=${studyClassId}`,
-    {
-      cache: 'no-store',
-    },
-  );
-  if (!response.ok) {
-    throw new Error('Failed to fetch subscriptions');
-  }
-  return response.json();
-}
-
-async function getStudent(id: number): Promise<Student> {
-  const response = await fetch(`http://localhost:8080/students/${id}`, {
-    cache: 'no-store',
-  });
-  if (!response.ok) {
-    throw new Error(`Failed to fetch student with id ${id}`);
-  }
-  return response.json();
-}
-
-async function getStudentsInBatches(
-  subscriptions: Subscription[],
-  batchSize = 20,
-): Promise<Student[]> {
-  const studentIds = [
-    ...new Set(
-      subscriptions
-        .filter(sub => sub && sub.studentId)
-        .map(sub => sub.studentId),
-    ),
-  ];
-
-  const allStudents: Student[] = [];
-  for (let i = 0; i < studentIds.length; i += batchSize) {
-    const batchIds = studentIds.slice(i, i + batchSize);
-    const studentPromises = batchIds.map(id => getStudent(id));
-    const studentsInBatch = await Promise.all(studentPromises);
-    allStudents.push(...studentsInBatch);
-  }
-  return allStudents;
-}
-
-// Main Component
 export default function StudyClassesPage() {
-  const [studyClasses, setStudyClasses] = useState<StudyClass[]>([]);
-  const [selectedStudyClass, setSelectedStudyClass] =
-    useState<StudyClass | null>(null);
-  const [students, setStudents] = useState<Student[]>([]);
-  const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
-  const [studentSearchTerm, setStudentSearchTerm] = useState('');
-  const [studyClassSearchTerm, setStudyClassSearchTerm] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [paginationLength, setPaginationLength] = useState(10);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isStudentsLoading, setIsStudentsLoading] = useState(false);
-
-  // Effect to fetch all study classes on initial load
-  useEffect(() => {
-    async function fetchData() {
-      setIsLoading(true);
-      try {
-        const studyClassesData = await getAllStudyClasses();
-        setStudyClasses(studyClassesData);
-      } catch (error) {
-        console.error('Failed to fetch study classes:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    fetchData();
-  }, []);
-
-  // Only show classes if a search term is entered
-  const filteredStudyClasses =
-    studyClassSearchTerm.trim() === ''
-      ? []
-      : studyClasses.filter(sc =>
-          sc.classCode
-            .toLowerCase()
-            .includes(studyClassSearchTerm.toLowerCase().trim()),
-        );
-
-  // Effect to fetch students when a study class is selected
-  useEffect(() => {
-    if (!selectedStudyClass) {
-      setStudents([]);
-      return;
-    }
-
-    async function fetchStudents() {
-      setIsStudentsLoading(true);
-      try {
-        const subscriptions = await getSubscriptions(selectedStudyClass!.id);
-        const studentData = await getStudentsInBatches(subscriptions);
-        setStudents(studentData);
-      } catch (error) {
-        console.error('Failed to fetch students:', error);
-        setStudents([]);
-      } finally {
-        setIsStudentsLoading(false);
-      }
-    }
-
-    fetchStudents();
-  }, [selectedStudyClass]);
-
-  // Effect to filter students based on search term
-  useEffect(() => {
-    const results = students.filter(student =>
-      student.name.toLowerCase().includes(studentSearchTerm.toLowerCase()),
-    );
-    setFilteredStudents(results);
-    setCurrentPage(1);
-  }, [studentSearchTerm, students]);
-
-  const handleStudyClassClick = (studyClass: StudyClass) => {
-    // Prevent refetch if clicking the same class
-    if (selectedStudyClass?.id === studyClass.id) return;
-
-    setSelectedStudyClass(studyClass);
-    // Reset student search and pagination when new class is clicked
-    setStudentSearchTerm('');
-    setCurrentPage(1);
-  };
-
-  // MODIFICATION: Add handler to deselect class
-  const handleStudyClassDeselect = () => {
-    setSelectedStudyClass(null);
-    setStudentSearchTerm('');
-    setCurrentPage(1);
-  };
-
-  const handlePaginationLengthChange = (
-    e: React.ChangeEvent<HTMLSelectElement>,
-  ) => {
-    setPaginationLength(Number(e.target.value));
-    setCurrentPage(1);
-  };
-
-  const indexOfLastStudent = currentPage * paginationLength;
-  const indexOfFirstStudent = indexOfLastStudent - paginationLength;
-  const currentStudents = filteredStudents.slice(
-    indexOfFirstStudent,
-    indexOfLastStudent,
-  );
-
-  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+  const {
+    isLoading,
+    isStudentsLoading,
+    selectedStudyClass,
+    filteredStudyClasses,
+    currentStudents,
+    studentSearchTerm,
+    setStudentSearchTerm,
+    studyClassSearchTerm,
+    setStudyClassSearchTerm,
+    currentPage,
+    paginationLength,
+    filteredStudents,
+    handleStudyClassClick,
+    handleStudyClassDeselect,
+    handlePaginationLengthChange,
+    paginate,
+  } = useStudyClasses();
 
   if (isLoading) {
     return <div className='text-center mt-8'>Loading study classes...</div>;
@@ -208,7 +65,6 @@ export default function StudyClassesPage() {
                         },
                       )}
                       onClick={() => handleStudyClassClick(sc)}
-                      // MODIFICATION: Add double-click handler
                       onDoubleClick={handleStudyClassDeselect}
                     >
                       <td className='py-2 px-4 border-b text-center'>

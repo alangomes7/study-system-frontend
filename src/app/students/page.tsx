@@ -1,80 +1,29 @@
 'use client';
 
-import { Student } from '@/types/student';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation'; // Import useRouter
-import { useState, useEffect } from 'react';
+import { useStudents } from '@/hooks/useStudents';
 
-// API Function
-async function getAllStudents(): Promise<Student[]> {
-  const response = await fetch('http://localhost:8080/students', {
-    cache: 'no-store',
-  });
-  if (!response.ok) {
-    throw new Error('Failed to fetch students');
-  }
-  return response.json();
-}
-
-// Main Component
 export default function StudentsPage() {
-  const router = useRouter(); // Initialize the router
-  const [students, setStudents] = useState<Student[]>([]);
-  const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [paginationLength, setPaginationLength] = useState(10);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Effect to fetch all students on component mount
-  useEffect(() => {
-    async function fetchData() {
-      setIsLoading(true);
-      try {
-        const studentsData = await getAllStudents();
-        setStudents(studentsData);
-        setFilteredStudents(studentsData);
-      } catch (error) {
-        console.error('Failed to fetch students:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    fetchData();
-  }, []);
-
-  // Effect to filter students when search term changes
-  useEffect(() => {
-    const results = students.filter(student =>
-      student.name.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
-    setFilteredStudents(results);
-    setCurrentPage(1);
-  }, [searchTerm, students]);
-
-  const handlePaginationLengthChange = (
-    e: React.ChangeEvent<HTMLSelectElement>,
-  ) => {
-    setPaginationLength(Number(e.target.value));
-    setCurrentPage(1);
-  };
-
-  const handleRowClick = (studentId: number) => {
-    router.push(`/students/${studentId}`);
-  };
-
-  // Pagination logic
-  const indexOfLastStudent = currentPage * paginationLength;
-  const indexOfFirstStudent = indexOfLastStudent - paginationLength;
-  const currentStudents = filteredStudents.slice(
-    indexOfFirstStudent,
-    indexOfLastStudent,
-  );
-
-  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+  const {
+    isLoading,
+    error,
+    filteredStudents,
+    currentStudents,
+    currentPage,
+    paginationLength,
+    searchTerm,
+    setSearchTerm,
+    handlePaginationLengthChange,
+    handleRowClick,
+    paginate,
+  } = useStudents();
 
   if (isLoading) {
     return <div className='text-center mt-8'>Loading students...</div>;
+  }
+
+  if (error) {
+    return <p className='text-center mt-8 text-red-500'>Error: {error}</p>;
   }
 
   return (
@@ -121,7 +70,7 @@ export default function StudentsPage() {
                   <tr
                     key={student.id}
                     className='hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-200 dark:border-gray-700 cursor-pointer'
-                    onClick={() => handleRowClick(student.id)} // ✨ Add onClick to the row
+                    onClick={() => handleRowClick(student.id)}
                   >
                     <td className='py-3 px-4'>{student.id}</td>
                     <td className='py-3 px-4'>{student.name}</td>
@@ -142,7 +91,6 @@ export default function StudentsPage() {
                 href={`/students/${student.id}`}
                 className='block bg-white dark:bg-gray-800 p-4 rounded-lg shadow hover:bg-gray-50 dark:hover:bg-gray-700'
               >
-                {/* ✨ FIX: Removed nested Link component */}
                 <div className='font-bold text-lg text-blue-500'>
                   {student.name}
                 </div>

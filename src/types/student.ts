@@ -5,3 +5,5 @@ export interface Student {
   email: string;
   register: string;
 }
+
+export type StudentCreationData = Omit<Student, 'id'>;

@@ -1,18 +1,9 @@
 'use client';
 
+import { getCourses } from '@/lib/api';
 import { Course } from '@/types/course';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-
-async function getCourses(): Promise<Course[]> {
-  const response = await fetch('http://localhost:8080/courses', {
-    cache: 'no-store',
-  });
-  if (!response.ok) {
-    throw new Error('Failed to fetch courses');
-  }
-  return response.json();
-}
 
 export default function CoursesPage() {
   const [courses, setCourses] = useState<Course[]>([]);
