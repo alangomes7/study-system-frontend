@@ -18,7 +18,7 @@ export default function EnrollStudentPage() {
 
   if (isLoading) {
     return (
-      <div className='text-center mt-8'>
+      <div className='text-center mt-8 text-foreground'>
         Loading students and study classes...
       </div>
     );
@@ -26,17 +26,15 @@ export default function EnrollStudentPage() {
 
   return (
     <div className='container mx-auto px-4 py-8'>
-      <h1 className='text-3xl font-bold mb-6'>Enroll Student</h1>
-      {/* 👈 4. Show submission error */}
+      <h1 className='text-3xl font-bold mb-6 text-foreground'>
+        Enroll Student
+      </h1>
       {error && <p className='text-center mb-4 text-red-500'>{error}</p>}
-      <form
-        onSubmit={handleSubmit}
-        className='bg-white dark:bg-gray-800 shadow-md rounded-lg p-6'
-      >
+      <form onSubmit={handleSubmit} className='card p-6'>
         <div className='mb-4'>
           <label
             htmlFor='student'
-            className='block text-gray-700 dark:text-gray-300 font-bold mb-2'
+            className='block text-foreground font-bold mb-2'
           >
             Student
           </label>
@@ -44,7 +42,7 @@ export default function EnrollStudentPage() {
             id='student'
             value={selectedStudent}
             onChange={e => setSelectedStudent(e.target.value)}
-            className='border rounded-lg p-2 w-full bg-white dark:bg-gray-700'
+            className='input'
             disabled={isSubmitting}
             required
           >
@@ -59,7 +57,7 @@ export default function EnrollStudentPage() {
         <div className='mb-4'>
           <label
             htmlFor='studyClass'
-            className='block text-gray-700 dark:text-gray-300 font-bold mb-2'
+            className='block text-foreground font-bold mb-2'
           >
             Study Class
           </label>
@@ -67,7 +65,7 @@ export default function EnrollStudentPage() {
             id='studyClass'
             value={selectedStudyClass}
             onChange={e => setSelectedStudyClass(e.target.value)}
-            className='border rounded-lg p-2 w-full bg-white dark:bg-gray-700'
+            className='input'
             disabled={isSubmitting}
             required
           >
@@ -81,7 +79,7 @@ export default function EnrollStudentPage() {
         </div>
         <button
           type='submit'
-          className='bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded disabled:opacity-50'
+          className='btn btn-primary disabled:opacity-50'
           disabled={isSubmitting}
         >
           {isSubmitting ? 'Enrolling...' : 'Enroll'}

@@ -11,5 +11,5 @@ export interface StudyClass {
 
 export type StudyClassCreationData = Omit<
   StudyClass,
-  'id' | 'courseName' | 'professorName'
+  'id' | 'classCode' | 'courseName' | 'professorName'
 >;

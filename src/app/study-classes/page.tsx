@@ -1,7 +1,5 @@
-// src/app/study-classes/page.tsx (Updated)
 'use client';
 
-import { Student } from '@/types/student';
 import clsx from 'clsx';
 import Link from 'next/link';
 import { useStudyClasses } from '@/hooks/useStudyClasses';
@@ -27,47 +25,58 @@ export default function StudyClassesPage() {
   } = useStudyClasses();
 
   if (isLoading) {
-    return <div className='text-center mt-8'>Loading study classes...</div>;
+    return (
+      <div className='text-center mt-8 text-foreground'>
+        Loading study classes...
+      </div>
+    );
   }
 
   return (
     <div className='container mx-auto px-4 py-8'>
-      <h1 className='text-2xl font-bold md:text-3xl mb-6'>Study Classes</h1>
+      <div className='flex justify-between items-center mb-6'>
+        <h1 className='text-2xl font-bold md:text-3xl text-foreground'>
+          Study Classes
+        </h1>
+        <Link href='/study-classes/create' className='btn btn-primary'>
+          Create New Class
+        </Link>
+      </div>
 
       <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
-        {/* Study Classes Column */}
         <div className='md:col-span-1'>
-          <h2 className='text-xl md:text-2xl font-bold mb-4'>Class List</h2>
+          <h2 className='text-xl md:text-2xl font-bold mb-4 text-foreground'>
+            Class List
+          </h2>
           <input
             type='text'
             placeholder='Search by class code...'
-            className='border rounded-lg p-2 w-full mb-4'
+            className='input mb-4'
             value={studyClassSearchTerm}
             onChange={e => setStudyClassSearchTerm(e.target.value)}
           />
-          <div className='overflow-x-auto'>
+          <div className='overflow-x-auto bg-card-background rounded-lg border border-border'>
             {filteredStudyClasses.length > 0 ? (
-              <table className='min-w-full bg-white dark:bg-gray-800 border'>
+              <table className='min-w-full'>
                 <thead>
                   <tr>
-                    <th className='py-2 px-4 border-b'>Class Code</th>
+                    <th className='py-2 px-4 border-b border-border text-foreground/80'>
+                      Class Code
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredStudyClasses.map(sc => (
                     <tr
                       key={sc.id}
-                      className={clsx(
-                        'hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer',
-                        {
-                          'bg-blue-200 dark:bg-blue-800':
-                            selectedStudyClass?.id === sc.id,
-                        },
-                      )}
+                      className={clsx('hover:bg-foreground/5 cursor-pointer', {
+                        'bg-primary/20 text-primary-foreground':
+                          selectedStudyClass?.id === sc.id,
+                      })}
                       onClick={() => handleStudyClassClick(sc)}
                       onDoubleClick={handleStudyClassDeselect}
                     >
-                      <td className='py-2 px-4 border-b text-center'>
+                      <td className='py-2 px-4 border-b border-border text-center text-foreground'>
                         {sc.classCode}
                       </td>
                     </tr>
@@ -75,7 +84,7 @@ export default function StudyClassesPage() {
                 </tbody>
               </table>
             ) : (
-              <div className='text-center p-4 bg-white dark:bg-gray-800 rounded-lg shadow'>
+              <div className='text-center p-4 card'>
                 {studyClassSearchTerm.trim() === ''
                   ? 'Please enter a class code to search.'
                   : 'No study classes found.'}
@@ -88,30 +97,32 @@ export default function StudyClassesPage() {
         <div className='md:col-span-2'>
           {selectedStudyClass ? (
             <div>
-              <h2 className='text-xl md:text-2xl font-bold mb-4'>
+              <h2 className='text-xl md:text-2xl font-bold mb-4 text-foreground'>
                 Class Details
               </h2>
-              <div className='bg-white dark:bg-gray-800 shadow-md rounded-lg p-6 mb-8'>
-                <p>
+              <div className='card p-6 mb-8'>
+                <p className='text-foreground'>
                   <strong>Course:</strong> {selectedStudyClass.courseName}
                 </p>
-                <p>
+                <p className='text-foreground'>
                   <strong>Year/Semester:</strong> {selectedStudyClass.year}/
                   {selectedStudyClass.semester}
                 </p>
-                <p>
+                <p className='text-foreground'>
                   <strong>Professor:</strong>{' '}
                   {selectedStudyClass.professorName || 'Not Assigned'}
                 </p>
               </div>
 
               <div className='flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-4'>
-                <h2 className='text-xl md:text-2xl font-semibold'>Students</h2>
+                <h2 className='text-xl md:text-2xl font-semibold text-foreground'>
+                  Students
+                </h2>
                 <div className='flex items-center gap-4 w-full md:w-auto'>
                   <select
                     value={paginationLength}
                     onChange={handlePaginationLengthChange}
-                    className='border rounded-lg p-2 bg-white dark:bg-gray-700'
+                    className='input'
                   >
                     <option value={5}>5 per page</option>
                     <option value={10}>10 per page</option>
@@ -120,7 +131,7 @@ export default function StudyClassesPage() {
                   <input
                     type='text'
                     placeholder='Search by student name'
-                    className='border rounded-lg p-2 w-full sm:w-auto'
+                    className='input w-full sm:w-auto'
                     value={studentSearchTerm}
                     onChange={e => setStudentSearchTerm(e.target.value)}
                   />
@@ -128,27 +139,37 @@ export default function StudyClassesPage() {
               </div>
 
               {isStudentsLoading ? (
-                <div className='text-center p-6'>Loading students...</div>
+                <div className='text-center p-6 text-foreground'>
+                  Loading students...
+                </div>
               ) : filteredStudents.length > 0 ? (
                 <>
                   {/* Desktop Table */}
-                  <div className='hidden md:block overflow-x-auto'>
-                    <table className='min-w-full bg-white dark:bg-gray-800 border'>
+                  <div className='hidden md:block overflow-x-auto bg-card-background rounded-lg border border-border'>
+                    <table className='min-w-full'>
                       <thead>
-                        <tr>
-                          <th className='py-2 px-4 border-b'>ID</th>
-                          <th className='py-2 px-4 border-b'>Name</th>
-                          <th className='py-2 px-4 border-b'>Phone</th>
-                          <th className='py-2 px-4 border-b'>E-mail</th>
+                        <tr className='border-b border-border'>
+                          <th className='py-2 px-4 border-b border-border text-left text-foreground/80'>
+                            ID
+                          </th>
+                          <th className='py-2 px-4 border-b border-border text-left text-foreground/80'>
+                            Name
+                          </th>
+                          <th className='py-2 px-4 border-b border-border text-left text-foreground/80'>
+                            Phone
+                          </th>
+                          <th className='py-2 px-4 border-b border-border text-left text-foreground/80'>
+                            Register
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
                         {currentStudents.map(student => (
                           <tr
                             key={student.id}
-                            className='hover:bg-gray-100 dark:hover:bg-gray-700'
+                            className='hover:bg-foreground/5 border-b border-border'
                           >
-                            <td className='py-2 px-4 border-b text-center'>
+                            <td className='py-2 px-4 text-center text-foreground'>
                               <Link
                                 href={`/students/${student.id}`}
                                 className='block w-full h-full'
@@ -156,7 +177,7 @@ export default function StudyClassesPage() {
                                 {student.id}
                               </Link>
                             </td>
-                            <td className='py-2 px-4 border-b text-center'>
+                            <td className='py-2 px-4 text-center text-foreground'>
                               <Link
                                 href={`/students/${student.id}`}
                                 className='block w-full h-full'
@@ -164,7 +185,7 @@ export default function StudyClassesPage() {
                                 {student.name}
                               </Link>
                             </td>
-                            <td className='py-2 px-4 border-b text-center'>
+                            <td className='py-2 px-4 text-center text-foreground'>
                               <Link
                                 href={`/students/${student.id}`}
                                 className='block w-full h-full'
@@ -172,7 +193,7 @@ export default function StudyClassesPage() {
                                 {student.phone}
                               </Link>
                             </td>
-                            <td className='py-2 px-4 border-b text-center'>
+                            <td className='py-2 px-4 text-center text-foreground'>
                               <Link
                                 href={`/students/${student.id}`}
                                 className='block w-full h-full'
@@ -192,12 +213,12 @@ export default function StudyClassesPage() {
                       <Link
                         key={student.id}
                         href={`/students/${student.id}`}
-                        className='block bg-white dark:bg-gray-800 p-4 rounded-lg shadow'
+                        className='card'
                       >
-                        <div className='font-bold text-blue-500'>
+                        <div className='font-bold text-primary'>
                           {student.name}
                         </div>
-                        <div className='text-sm text-gray-600 dark:text-gray-400 mt-2'>
+                        <div className='text-sm text-foreground/80 mt-2'>
                           <p>ID: {student.id}</p>
                           <p>Phone: {student.phone}</p>
                         </div>
@@ -210,7 +231,7 @@ export default function StudyClassesPage() {
                     <button
                       onClick={() => paginate(currentPage - 1)}
                       disabled={currentPage === 1}
-                      className='px-4 py-2 mx-1 rounded bg-gray-200 dark:bg-gray-700 disabled:opacity-50'
+                      className='btn border border-border bg-card-background hover:bg-foreground/5 disabled:opacity-50'
                     >
                       &lt;
                     </button>
@@ -224,10 +245,10 @@ export default function StudyClassesPage() {
                         <button
                           key={i + 1}
                           onClick={() => paginate(i + 1)}
-                          className={`px-4 py-2 mx-1 rounded ${
+                          className={`btn mx-1 ${
                             currentPage === i + 1
-                              ? 'bg-blue-500 text-white'
-                              : 'bg-gray-200 dark:bg-gray-700'
+                              ? 'btn-primary'
+                              : 'border border-border bg-card-background hover:bg-foreground/5'
                           }`}
                         >
                           {i + 1}
@@ -240,20 +261,22 @@ export default function StudyClassesPage() {
                         currentPage ===
                         Math.ceil(filteredStudents.length / paginationLength)
                       }
-                      className='px-4 py-2 mx-1 rounded bg-gray-200 dark:bg-gray-700 disabled:opacity-50'
+                      className='btn border border-border bg-card-background hover:bg-foreground/5 disabled:opacity-50'
                     >
                       &gt;
                     </button>
                   </div>
                 </>
               ) : (
-                <div className='bg-white dark:bg-gray-800 shadow-md rounded-lg p-6 text-center'>
-                  <p>No students found for this class.</p>
+                <div className='card p-6 text-center'>
+                  <p className='text-foreground/80'>
+                    No students found for this class.
+                  </p>
                 </div>
               )}
             </div>
           ) : (
-            <div className='text-center p-4 bg-white dark:bg-gray-800 rounded-lg shadow'>
+            <div className='card text-center p-4'>
               Select a study class to see details.
             </div>
           )}

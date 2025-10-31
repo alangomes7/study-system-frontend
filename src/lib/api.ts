@@ -1,4 +1,4 @@
-import { Course } from '@/types/course';
+import { Course, CourseCreationData } from '@/types/course';
 import { Professor } from '@/types/professor';
 import { Student, StudentCreationData } from '@/types/student';
 import { StudyClass, StudyClassCreationData } from '@/types/study-class';
@@ -41,6 +41,27 @@ export async function getCourse(id: string): Promise<Course> {
   return response.json();
 }
 
+/**
+ * Creates a new course.
+ * @param courseData An object containing the new course's details.
+ * @returns A promise that resolves to the newly created Course object.
+ */
+export async function createCourse(
+  courseData: CourseCreationData,
+): Promise<Course> {
+  const response = await fetch(`${API_BASE_URL}/courses`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(courseData),
+  });
+
+  if (!response.ok) {
+    // You could add more detailed error handling here
+    throw new Error('Failed to create course');
+  }
+  return response.json();
+}
+
 /* -------------------------------------------------------------------------- */
 /* STUDY CLASSES                               */
 /* -------------------------------------------------------------------------- */
@@ -54,6 +75,26 @@ export async function getAllStudyClasses(): Promise<StudyClass[]> {
     cache: 'no-store',
   });
   if (!response.ok) throw new Error('Failed to fetch study classes');
+  return response.json();
+}
+
+/**
+ * Fetches a single study class by its unique identifier.
+ *
+ * This function bypasses the cache (`'no-store'`) to ensure fresh data
+ * is retrieved from the API upon every call.
+ *
+ * @param id - The numerical ID of the study class to retrieve.
+ * @returns A Promise that resolves to the {@link StudyClass} object.
+ * @throws Will throw an Error if the fetch response is not 'ok' (e.g., 404, 500).
+ */
+export async function getStudyClass(id: number): Promise<StudyClass> {
+  const response = await fetch(`${API_BASE_URL}/study-classes/${id}`, {
+    cache: 'no-store',
+  });
+  if (!response.ok) {
+    throw new Error('Failed to fetch study class details');
+  }
   return response.json();
 }
 
@@ -91,6 +132,38 @@ export async function createStudyClass(
 
   if (!response.ok) throw new Error('Failed to create study class');
   return response.json();
+}
+
+/**
+ * Enrolls a professor in a specific study class via an API POST request.
+ *
+ * @param studyClassId - The ID of the study class (from URL params).
+ * @param professorId - The ID of the professor to enroll (from form state).
+ * @returns A Promise that resolves to void on success.
+ * @throws Will throw an Error if the fetch response is not 'ok'.
+ */
+export async function enrollProfessorInStudyClass(
+  studyClassId: string | number,
+  professorId: string | number,
+): Promise<void> {
+  const response = await fetch(
+    `${API_BASE_URL}/study-classes/${studyClassId}/enroll-professor`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      // Ensure the key 'professorId' matches what your API expects
+      body: JSON.stringify({
+        professorId: professorId,
+      }),
+    },
+  );
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Failed to enroll professor');
+  }
 }
 
 /* -------------------------------------------------------------------------- */
@@ -211,7 +284,7 @@ export async function getStudentsInBatches(
  * @param studyClassId The ID of the study class.
  * @returns A promise that resolves to an array of Subscription objects.
  */
-export async function getSubscriptions(
+export async function getSubscriptionsByStudyClass(
   studyClassId: number,
 ): Promise<Subscription[]> {
   const response = await fetch(

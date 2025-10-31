@@ -3,3 +3,8 @@ export interface Course {
   name: string;
   description: string;
 }
+
+export type CourseCreationData = {
+  name: string;
+  description: string;
+};

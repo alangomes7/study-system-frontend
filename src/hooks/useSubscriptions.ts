@@ -4,7 +4,11 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Student } from '@/types/student';
 import { StudyClass } from '@/types/study-class';
-import { createSubscription, getStudents, getStudyClasses } from '@/lib/api';
+import {
+  createSubscription,
+  getAllStudents,
+  getAllStudyClasses,
+} from '@/lib/api';
 
 export function useEnrollStudent() {
   const [students, setStudents] = useState<Student[]>([]);
@@ -24,8 +28,8 @@ export function useEnrollStudent() {
       try {
         // Fetch in parallel
         const [studentsData, studyClassesData] = await Promise.all([
-          getStudents(),
-          getStudyClasses(),
+          getAllStudents(),
+          getAllStudyClasses(),
         ]);
         setStudents(studentsData);
         setStudyClasses(studyClassesData);

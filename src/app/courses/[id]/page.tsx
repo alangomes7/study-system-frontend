@@ -1,4 +1,3 @@
-// src/app/courses/[id]/page.tsx
 'use client';
 
 import { useCourses } from '@/hooks/useCourses';
@@ -33,20 +32,20 @@ export default function CourseDetailsPage({
   } = useCourses(id);
 
   if (isLoading) {
-    return <div className='text-center mt-8'>Loading course details...</div>;
-  }
-
-  if (error) {
     return (
-      <div className='text-center mt-8 text-red-600 dark:text-red-400'>
-        {error}
+      <div className='text-center mt-8 text-foreground'>
+        Loading course details...
       </div>
     );
   }
 
+  if (error) {
+    return <div className='text-center mt-8 text-red-500'>{error}</div>;
+  }
+
   if (!course) {
     return (
-      <div className='text-center mt-8 text-gray-500 dark:text-gray-400'>
+      <div className='text-center mt-8 text-foreground/80'>
         Course not found.
       </div>
     );
@@ -54,44 +53,44 @@ export default function CourseDetailsPage({
 
   return (
     <div className='container mx-auto px-4 py-8'>
-      <h1 className='text-2xl font-bold md:text-3xl mb-2'>{course?.name}</h1>
-      <p className='text-gray-600 dark:text-gray-400 mb-6'>
-        {course?.description}
-      </p>
+      <h1 className='text-2xl font-bold md:text-3xl mb-2 text-foreground'>
+        {course?.name}
+      </h1>
+      <p className='text-foreground/80 mb-6'>{course?.description}</p>
 
       <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
-        {/* Study Classes Column */}
         <div className='md:col-span-1'>
-          <h2 className='text-xl md:text-2xl font-bold mb-4'>Study Classes</h2>
+          <h2 className='text-xl md:text-2xl font-bold mb-4 text-foreground'>
+            Study Classes
+          </h2>
           <input
             type='text'
             placeholder='Search by class code...'
-            className='border rounded-lg p-2 w-full mb-4'
+            className='input w-full mb-4'
             value={studyClassSearchTerm}
             onChange={e => setStudyClassSearchTerm(e.target.value)}
           />
           <div className='overflow-x-auto'>
             {filteredStudyClasses.length > 0 ? (
-              <table className='min-w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700'>
+              <table className='min-w-full bg-card-background border border-border rounded-lg shadow-sm'>
                 <thead>
                   <tr>
-                    <th className='py-2 px-4 border-b'>Study Class</th>
+                    <th className='py-2 px-4 border-b border-border text-foreground/80 font-semibold'>
+                      Study Class
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredStudyClasses.map(studyClass => (
                     <tr
                       key={studyClass.id}
-                      className={clsx(
-                        'hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer',
-                        {
-                          'bg-blue-200 dark:bg-blue-800':
-                            selectedStudyClass?.id === studyClass.id,
-                        },
-                      )}
+                      className={clsx('hover:bg-foreground/10 cursor-pointer', {
+                        'bg-primary/20':
+                          selectedStudyClass?.id === studyClass.id,
+                      })}
                       onClick={() => handleStudyClassClick(studyClass)}
                     >
-                      <td className='py-2 px-4 border-b text-center'>
+                      <td className='py-2 px-4 border-b border-border text-center text-foreground'>
                         {studyClass.classCode}
                       </td>
                     </tr>
@@ -99,7 +98,7 @@ export default function CourseDetailsPage({
                 </tbody>
               </table>
             ) : (
-              <div className='text-center p-4 bg-white dark:bg-gray-800 rounded-lg shadow'>
+              <div className='card text-center text-foreground/80'>
                 No study classes found.
               </div>
             )}
@@ -110,10 +109,10 @@ export default function CourseDetailsPage({
         <div className='md:col-span-2'>
           {selectedStudyClass ? (
             <div>
-              <h2 className='text-xl md:text-2xl font-bold mb-4'>
+              <h2 className='text-xl md:text-2xl font-bold mb-4 text-foreground'>
                 Study Class Details
               </h2>
-              <div className='bg-white dark:bg-gray-800 shadow-md rounded-lg p-6 mb-8'>
+              <div className='bg-card-background border border-border shadow-md rounded-lg p-6 mb-8 text-foreground'>
                 <p>
                   <strong>Year/Semester:</strong> {selectedStudyClass.year}/
                   {selectedStudyClass.semester}
@@ -128,13 +127,15 @@ export default function CourseDetailsPage({
               </div>
 
               <div className='flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-4'>
-                <h2 className='text-xl md:text-2xl font-semibold'>Students</h2>
+                <h2 className='text-xl md:text-2xl font-semibold text-foreground'>
+                  Students
+                </h2>
                 <div className='flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto'>
                   <select
                     id='pagination-length'
                     value={paginationLength}
                     onChange={handlePaginationLengthChange}
-                    className='border rounded-lg p-2 bg-white dark:bg-gray-700 w-full sm:w-auto'
+                    className='input w-full sm:w-auto'
                   >
                     <option value={5}>5 per page</option>
                     <option value={10}>10 per page</option>
@@ -143,7 +144,7 @@ export default function CourseDetailsPage({
                   <input
                     type='text'
                     placeholder='Search by student name'
-                    className='border rounded-lg p-2 w-full sm:w-auto'
+                    className='input w-full sm:w-auto'
                     value={searchTerm}
                     onChange={e => setSearchTerm(e.target.value)}
                   />
@@ -153,58 +154,68 @@ export default function CourseDetailsPage({
               {filteredStudents.length > 0 ? (
                 <>
                   <div className='hidden md:block overflow-x-auto'>
-                    <table className='min-w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700'>
+                    <table className='min-w-full bg-card-background border border-border rounded-lg shadow-sm'>
                       <thead>
                         <tr>
-                          <th className='py-2 px-4 border-b'>ID</th>
-                          <th className='py-2 px-4 border-b'>Name</th>
-                          <th className='py-2 px-4 border-b'>Phone Number</th>
-                          <th className='py-2 px-4 border-b'>E-mail</th>
-                          <th className='py-2 px-4 border-b'>CPF</th>
+                          <th className='py-2 px-4 border-b border-border text-foreground/80 font-semibold'>
+                            ID
+                          </th>
+                          <th className='py-2 px-4 border-b border-border text-foreground/80 font-semibold'>
+                            Name
+                          </th>
+                          <th className='py-2 px-4 border-b border-border text-foreground/80 font-semibold'>
+                            Phone Number
+                          </th>
+                          <th className='py-2 px-4 border-b border-border text-foreground/80 font-semibold'>
+                            E-mail
+                          </th>
+                          <th className='py-2 px-4 border-b border-border text-foreground/80 font-semibold'>
+                            CPF
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
                         {currentStudents.map(student => (
                           <tr
                             key={student.id}
-                            className='hover:bg-gray-100 dark:hover:bg-gray-700'
+                            className='hover:bg-foreground/10'
                           >
-                            <td className='py-2 px-4 border-b text-center'>
+                            <td className='py-2 px-4 border-b border-border text-center'>
                               <Link
                                 href={`/students/${student.id}`}
-                                className='block w-full h-full'
+                                className='block w-full h-full text-foreground hover:text-primary'
                               >
                                 {student.id}
                               </Link>
                             </td>
-                            <td className='py-2 px-4 border-b text-center'>
+                            <td className='py-2 px-4 border-b border-border text-center'>
                               <Link
                                 href={`/students/${student.id}`}
-                                className='block w-full h-full'
+                                className='block w-full h-full text-foreground hover:text-primary'
                               >
                                 {student.name}
                               </Link>
                             </td>
-                            <td className='py-2 px-4 border-b text-center'>
+                            <td className='py-2 px-4 border-b border-border text-center'>
                               <Link
                                 href={`/students/${student.id}`}
-                                className='block w-full h-full'
+                                className='block w-full h-full text-foreground hover:text-primary'
                               >
                                 {student.phone}
                               </Link>
                             </td>
-                            <td className='py-2 px-4 border-b text-center'>
+                            <td className='py-2 px-4 border-b border-border text-center'>
                               <Link
                                 href={`/students/${student.id}`}
-                                className='block w-full h-full'
+                                className='block w-full h-full text-foreground hover:text-primary'
                               >
                                 {student.email}
                               </Link>
                             </td>
-                            <td className='py-2 px-4 border-b text-center'>
+                            <td className='py-2 px-4 border-b border-border text-center'>
                               <Link
                                 href={`/students/${student.id}`}
-                                className='block w-full h-full'
+                                className='block w-full h-full text-foreground hover:text-primary'
                               >
                                 {student.register}
                               </Link>
@@ -220,12 +231,12 @@ export default function CourseDetailsPage({
                       <Link
                         key={student.id}
                         href={`/students/${student.id}`}
-                        className='block bg-white dark:bg-gray-800 p-4 rounded-lg shadow hover:bg-gray-50 dark:hover:bg-gray-700'
+                        className='card block'
                       >
-                        <div className='font-bold text-lg text-blue-500'>
+                        <div className='font-bold text-lg text-primary'>
                           {student.name}
                         </div>
-                        <div className='text-sm text-gray-600 dark:text-gray-400 mt-2 space-y-1'>
+                        <div className='text-sm text-foreground/80 mt-2 space-y-1'>
                           <p>
                             <strong>ID:</strong> {student.id}
                           </p>
@@ -247,7 +258,7 @@ export default function CourseDetailsPage({
                     <button
                       onClick={() => paginate(currentPage - 1)}
                       disabled={currentPage === 1}
-                      className='px-4 py-2 mx-1 rounded-lg bg-gray-200 dark:bg-gray-700 disabled:opacity-50'
+                      className='btn bg-foreground/10 text-foreground hover:bg-foreground/20 disabled:opacity-50 mx-1'
                     >
                       &lt;
                     </button>
@@ -261,10 +272,10 @@ export default function CourseDetailsPage({
                         <button
                           key={i + 1}
                           onClick={() => paginate(i + 1)}
-                          className={`px-4 py-2 mx-1 rounded-lg ${
+                          className={`btn mx-1 ${
                             currentPage === i + 1
-                              ? 'bg-blue-500 text-white'
-                              : 'bg-gray-200 dark:bg-gray-700'
+                              ? 'btn-primary'
+                              : 'bg-foreground/10 text-foreground hover:bg-foreground/20'
                           }`}
                         >
                           {i + 1}
@@ -277,22 +288,22 @@ export default function CourseDetailsPage({
                         currentPage ===
                         Math.ceil(filteredStudents.length / paginationLength)
                       }
-                      className='px-4 py-2 mx-1 rounded-lg bg-gray-200 dark:bg-gray-700 disabled:opacity-50'
+                      className='btn bg-foreground/10 text-foreground hover:bg-foreground/20 disabled:opacity-50 mx-1'
                     >
                       &gt;
                     </button>
                   </div>
                 </>
               ) : (
-                <div className='bg-white dark:bg-gray-800 shadow-md rounded-lg p-6 text-center'>
-                  <p className='text-gray-500 dark:text-gray-400'>
+                <div className='bg-card-background border border-border shadow-md rounded-lg p-6 text-center'>
+                  <p className='text-foreground/80'>
                     No students found for this class.
                   </p>
                 </div>
               )}
             </div>
           ) : (
-            <div className='text-center p-4 bg-white dark:bg-gray-800 rounded-lg shadow'>
+            <div className='card text-center text-foreground/80'>
               Select a study class to see details.
             </div>
           )}

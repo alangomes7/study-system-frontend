@@ -1,5 +1,6 @@
 'use client';
 
+import { createCourse } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -11,17 +12,10 @@ export default function CreateCoursePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+
     try {
-      const response = await fetch('http://localhost:8080/courses', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name, description }),
-      });
-      if (!response.ok) {
-        throw new Error('Failed to create course');
-      }
+      await createCourse({ name, description });
       router.push('/courses');
     } catch (err) {
       if (err instanceof Error) {
@@ -34,16 +28,15 @@ export default function CreateCoursePage() {
 
   return (
     <div className='container mx-auto px-4 py-8'>
-      <h1 className='text-3xl font-bold mb-6'>Create Course</h1>
+      <h1 className='text-3xl font-bold mb-6 text-foreground'>Create Course</h1>
+
       {error && <p className='text-red-500 mb-4'>{error}</p>}
-      <form
-        onSubmit={handleSubmit}
-        className='bg-white dark:bg-gray-800 shadow-md rounded-lg p-6'
-      >
+
+      <form onSubmit={handleSubmit} className='card p-6'>
         <div className='mb-4'>
           <label
             htmlFor='name'
-            className='block text-gray-700 dark:text-gray-300 font-bold mb-2'
+            className='block text-foreground font-bold mb-2'
           >
             Name
           </label>
@@ -52,13 +45,15 @@ export default function CreateCoursePage() {
             id='name'
             value={name}
             onChange={e => setName(e.target.value)}
-            className='border rounded-lg p-2 w-full'
+            className='input'
+            required
           />
         </div>
+
         <div className='mb-4'>
           <label
             htmlFor='description'
-            className='block text-gray-700 dark:text-gray-300 font-bold mb-2'
+            className='block text-foreground font-bold mb-2'
           >
             Description
           </label>
@@ -66,13 +61,12 @@ export default function CreateCoursePage() {
             id='description'
             value={description}
             onChange={e => setDescription(e.target.value)}
-            className='border rounded-lg p-2 w-full'
+            className='input min-h-[100px]'
+            required
           />
         </div>
-        <button
-          type='submit'
-          className='bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded'
-        >
+
+        <button type='submit' className='btn btn-primary'>
           Create
         </button>
       </form>

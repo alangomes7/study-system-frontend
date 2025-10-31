@@ -19,7 +19,11 @@ export default function StudentsPage() {
   } = useStudents();
 
   if (isLoading) {
-    return <div className='text-center mt-8'>Loading students...</div>;
+    return (
+      <div className='text-center mt-8 text-foreground'>
+        Loading students...
+      </div>
+    );
   }
 
   if (error) {
@@ -29,13 +33,15 @@ export default function StudentsPage() {
   return (
     <div className='container mx-auto px-4 py-8'>
       <div className='flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6'>
-        <h1 className='text-2xl font-bold md:text-3xl'>Students</h1>
+        <h1 className='text-2xl font-bold md:text-3xl text-foreground'>
+          Students
+        </h1>
         <div className='flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto'>
           <select
             id='pagination-length'
             value={paginationLength}
             onChange={handlePaginationLengthChange}
-            className='border rounded-lg p-2 bg-white dark:bg-gray-700 w-full sm:w-auto'
+            className='input w-full sm:w-auto'
           >
             <option value={10}>10 per page</option>
             <option value={20}>20 per page</option>
@@ -44,7 +50,7 @@ export default function StudentsPage() {
           <input
             type='text'
             placeholder='Search by student name...'
-            className='border rounded-lg p-2 w-full sm:w-auto'
+            className='input w-full sm:w-auto'
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
           />
@@ -54,29 +60,45 @@ export default function StudentsPage() {
       {filteredStudents.length > 0 ? (
         <>
           {/* Desktop Table View */}
-          <div className='hidden md:block overflow-x-auto bg-white dark:bg-gray-800 rounded-lg shadow'>
+          <div className='hidden md:block overflow-x-auto bg-card-background rounded-lg border border-border shadow'>
             <table className='min-w-full border-collapse'>
               <thead>
-                <tr className='border-b border-gray-200 dark:border-gray-700'>
-                  <th className='py-3 px-4 text-left'>ID</th>
-                  <th className='py-3 px-4 text-left'>Name</th>
-                  <th className='py-3 px-4 text-left'>Phone</th>
-                  <th className='py-3 px-4 text-left'>E-mail</th>
-                  <th className='py-3 px-4 text-left'>CPF</th>
+                <tr className='border-b border-border'>
+                  <th className='py-3 px-4 text-left text-foreground/80'>ID</th>
+                  <th className='py-3 px-4 text-left text-foreground/80'>
+                    Name
+                  </th>
+                  <th className='py-3 px-4 text-left text-foreground/80'>
+                    Phone
+                  </th>
+                  <th className='py-3 px-4 text-left text-foreground/80'>
+                    E-mail
+                  </th>
+                  <th className='py-3 px-4 text-left text-foreground/80'>
+                    CPF
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {currentStudents.map(student => (
                   <tr
                     key={student.id}
-                    className='hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-200 dark:border-gray-700 cursor-pointer'
+                    className='hover:bg-foreground/5 border-b border-border cursor-pointer'
                     onClick={() => handleRowClick(student.id)}
                   >
-                    <td className='py-3 px-4'>{student.id}</td>
-                    <td className='py-3 px-4'>{student.name}</td>
-                    <td className='py-3 px-4'>{student.phone}</td>
-                    <td className='py-3 px-4'>{student.email}</td>
-                    <td className='py-3 px-4'>{student.register}</td>
+                    <td className='py-3 px-4 text-foreground'>{student.id}</td>
+                    <td className='py-3 px-4 text-foreground'>
+                      {student.name}
+                    </td>
+                    <td className='py-3 px-4 text-foreground'>
+                      {student.phone}
+                    </td>
+                    <td className='py-3 px-4 text-foreground'>
+                      {student.email}
+                    </td>
+                    <td className='py-3 px-4 text-foreground'>
+                      {student.register}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -89,12 +111,12 @@ export default function StudentsPage() {
               <Link
                 key={student.id}
                 href={`/students/${student.id}`}
-                className='block bg-white dark:bg-gray-800 p-4 rounded-lg shadow hover:bg-gray-50 dark:hover:bg-gray-700'
+                className='card'
               >
-                <div className='font-bold text-lg text-blue-500'>
+                <div className='font-bold text-lg text-primary'>
                   {student.name}
                 </div>
-                <div className='text-sm text-gray-600 dark:text-gray-400 mt-2 space-y-1'>
+                <div className='text-sm text-foreground/80 mt-2 space-y-1'>
                   <p>
                     <strong>ID:</strong> {student.id}
                   </p>
@@ -117,7 +139,7 @@ export default function StudentsPage() {
             <button
               onClick={() => paginate(currentPage - 1)}
               disabled={currentPage === 1}
-              className='px-4 py-2 mx-1 rounded-lg bg-gray-200 dark:bg-gray-700 disabled:opacity-50'
+              className='btn border border-border bg-card-background hover:bg-foreground/5 disabled:opacity-50'
             >
               &lt;
             </button>
@@ -129,10 +151,10 @@ export default function StudentsPage() {
                 <button
                   key={i + 1}
                   onClick={() => paginate(i + 1)}
-                  className={`px-4 py-2 mx-1 rounded-lg ${
+                  className={`btn mx-1 ${
                     currentPage === i + 1
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-200 dark:bg-gray-700'
+                      ? 'btn-primary'
+                      : 'border border-border bg-card-background hover:bg-foreground/5'
                   }`}
                 >
                   {i + 1}
@@ -145,15 +167,15 @@ export default function StudentsPage() {
                 currentPage ===
                 Math.ceil(filteredStudents.length / paginationLength)
               }
-              className='px-4 py-2 mx-1 rounded-lg bg-gray-200 dark:bg-gray-700 disabled:opacity-50'
+              className='btn border border-border bg-card-background hover:bg-foreground/5 disabled:opacity-50'
             >
               &gt;
             </button>
           </div>
         </>
       ) : (
-        <div className='text-center p-6 bg-white dark:bg-gray-800 rounded-lg shadow'>
-          <p className='text-gray-500 dark:text-gray-400'>No students found.</p>
+        <div className='card text-center p-6'>
+          <p className='text-foreground/70'>No students found.</p>
         </div>
       )}
     </div>

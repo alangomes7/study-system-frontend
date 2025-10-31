@@ -1,73 +1,67 @@
 'use client';
 
-// Import the hook you just created
-import { useEnrollProfessor } from '@/hooks/useStudyClasses';
+// Import the hook you will create
+import { useEnrollStudent } from '@/hooks/useStudyClasses';
 import Link from 'next/link';
 
-// All other imports (useState, useEffect, api, types) are no longer needed
-// as the hook handles all of that.
-
-export default function EnrollProfessorPage({
+export default function EnrollStudentPage({
   params,
 }: {
   params: { id: string };
 }) {
-  // 1. Get the id from params
+  // 1. Get the study class id from params
   const { id } = params;
 
-  // 2. Call the hook, which provides all the state and logic
+  // 2. Call the new hook for enrolling students
   const {
-    professors,
+    students,
     studyClass,
-    selectedProfessor,
-    setSelectedProfessor,
+    selectedStudent,
+    setSelectedStudent,
     error,
     isLoading,
     isSubmitting,
     handleSubmit,
-  } = useEnrollProfessor(id);
-
-  // 3. All the previous logic (useState, useEffect, handleSubmit) is gone!
-
-  // The JSX remains exactly the same, as the hook provides
-  // all the same-named variables.
+  } = useEnrollStudent(id);
 
   if (isLoading) {
     return <div className='text-center mt-8 text-foreground'>Loading...</div>;
   }
 
-  // Page-level error (e.g., class not found)
+  // 4. Page-level error (e.g., class not found)
   if (error && !isSubmitting) {
     return <p className='text-center mt-8 text-red-500'>Error: {error}</p>;
   }
 
+  // 5. Render the form
   return (
     <div className='container mx-auto px-4 py-8 max-w-lg'>
       <h1 className='text-2xl md:text-3xl font-bold mb-6 text-foreground'>
-        Enroll Professor in {studyClass?.classCode || 'Class'}
+        {/* CHANGED: Title text */}
+        Enroll Student in {studyClass?.classCode || 'Class'}
       </h1>
 
       <form onSubmit={handleSubmit} className='card p-6 space-y-4'>
         <div className='mb-4'>
           <label
-            htmlFor='professor'
+            htmlFor='student'
             className='block text-sm font-medium text-foreground/80 mb-1'
           >
-            Professor
+            Student
           </label>
           <select
-            id='professor'
-            value={selectedProfessor}
-            onChange={e => setSelectedProfessor(e.target.value)}
+            id='student'
+            value={selectedStudent}
+            onChange={e => setSelectedStudent(e.target.value)}
             className='input'
             required
           >
             <option value='' disabled>
-              Select a professor
+              Select a student
             </option>
-            {professors.map(professor => (
-              <option key={professor.id} value={professor.id}>
-                {professor.name}
+            {students.map(student => (
+              <option key={student.id} value={student.id}>
+                {student.name}
               </option>
             ))}
           </select>

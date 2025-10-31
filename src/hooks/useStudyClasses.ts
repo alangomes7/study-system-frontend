@@ -4,14 +4,18 @@ import { useState, useEffect, useMemo } from 'react';
 import { StudyClass } from '@/types/study-class';
 import { Student } from '@/types/student';
 import {
-  getStudyClasses,
+  getAllStudyClasses,
   getStudentsInBatches,
-  getSubscriptions,
+  getSubscriptionsByStudyClass,
   createStudyClass,
   getProfessors,
   getCourses,
+  getStudyClass,
+  enrollProfessorInStudyClass,
+  getAllStudents,
+  createSubscription,
 } from '@/lib/api';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { Course } from '@/types/course';
 import { Professor } from '@/types/professor';
 
@@ -32,7 +36,7 @@ export function useStudyClasses() {
     async function fetchData() {
       setIsLoading(true);
       try {
-        const studyClassesData = await getStudyClasses();
+        const studyClassesData = await getAllStudyClasses();
         setStudyClasses(studyClassesData);
       } catch (error) {
         console.error('Failed to fetch study classes:', error);
@@ -66,7 +70,9 @@ export function useStudyClasses() {
     async function fetchStudents() {
       setIsStudentsLoading(true);
       try {
-        const subscriptions = await getSubscriptions(selectedStudyClass!.id);
+        const subscriptions = await getSubscriptionsByStudyClass(
+          selectedStudyClass!.id,
+        );
         const studentData = await getStudentsInBatches(subscriptions);
         setStudents(studentData);
       } catch (error) {
@@ -151,7 +157,7 @@ export function useStudyClasses() {
 export function useCreateStudyClass() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [professors, setProfessors] = useState<Professor[]>([]);
-  const [classCode, setClassCode] = useState('');
+  // const [classCode, setClassCode] = useState(''); // <-- REMOVED
   const [year, setYear] = useState<number>(new Date().getFullYear());
   const [semester, setSemester] = useState<number>(1);
   const [courseId, setCourseId] = useState<string>(''); // Form state is string
@@ -197,11 +203,10 @@ export function useCreateStudyClass() {
 
     try {
       await createStudyClass({
-        classCode,
         year,
         semester,
-        courseId: Number(courseId), // Convert string from form to number
-        professorId: professorId ? Number(professorId) : null, // Handle optional/null
+        courseId: Number(courseId),
+        professorId: professorId ? Number(professorId) : null,
       });
       router.push('/study-classes'); // Navigate on success
     } catch (err) {
@@ -216,8 +221,8 @@ export function useCreateStudyClass() {
   return {
     courses,
     professors,
-    classCode,
-    setClassCode,
+    // classCode, // <-- REMOVED
+    // setClassCode, // <-- REMOVED
     year,
     setYear,
     semester,
@@ -226,6 +231,164 @@ export function useCreateStudyClass() {
     setCourseId,
     professorId,
     setProfessorId,
+    error,
+    isLoading,
+    isSubmitting,
+    handleSubmit,
+  };
+}
+
+/**
+ * Hook for managing the professor enrollment page.
+ * @param studyClassId The ID of the study class to enroll a professor into.
+ */
+export function useEnrollProfessor(studyClassId: string | number) {
+  const [professors, setProfessors] = useState<Professor[]>([]);
+  const [studyClass, setStudyClass] = useState<StudyClass | null>(null);
+  const [selectedProfessor, setSelectedProfessor] = useState<string>('');
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
+
+  // Effect to fetch study class and professor list
+  useEffect(() => {
+    // Ensure ID is valid before fetching
+    if (!studyClassId) {
+      setIsLoading(false);
+      setError('No Study Class ID provided.');
+      return;
+    }
+
+    async function fetchData() {
+      setIsLoading(true);
+      setError(null);
+      try {
+        // Fetch professors and the specific study class concurrently
+        const [professorsData, studyClassData] = await Promise.all([
+          getProfessors(),
+          getStudyClass(Number(studyClassId)), // Ensure ID is a number
+        ]);
+        setProfessors(professorsData);
+        setStudyClass(studyClassData);
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : 'An unknown error occurred';
+        setError(message);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchData();
+  }, [studyClassId]);
+
+  // Form submission handler
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedProfessor) {
+      setError('Please select a professor to enroll.');
+      return;
+    }
+
+    setError(null);
+    setIsSubmitting(true);
+
+    try {
+      await enrollProfessorInStudyClass(studyClassId, selectedProfessor);
+      router.push(`/study-classes/${studyClassId}`); // Navigate on success
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : 'An unknown error occurred';
+      setError(message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return {
+    professors,
+    studyClass,
+    selectedProfessor,
+    setSelectedProfessor,
+    error,
+    isLoading,
+    isSubmitting,
+    handleSubmit,
+  };
+}
+
+/**
+ * Hook for managing the student enrollment page.
+ * @param studyClassId The ID of the study class to enroll a student into.
+ */
+export function useEnrollStudent(studyClassId: string | number) {
+  const [students, setStudents] = useState<Student[]>([]);
+  const [studyClass, setStudyClass] = useState<StudyClass | null>(null);
+  const [selectedStudent, setSelectedStudent] = useState<string>('');
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
+
+  // Effect to fetch study class and student list
+  useEffect(() => {
+    if (!studyClassId) {
+      setIsLoading(false);
+      setError('No Study Class ID provided.');
+      return;
+    }
+
+    async function fetchData() {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const [studentsData, studyClassData] = await Promise.all([
+          getAllStudents(),
+          getStudyClass(Number(studyClassId)),
+        ]);
+        setStudents(studentsData);
+        setStudyClass(studyClassData);
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : 'An unknown error occurred';
+        setError(message);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchData();
+  }, [studyClassId]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedStudent) {
+      setError('Please select a student to enroll.');
+      return;
+    }
+
+    setError(null);
+    setIsSubmitting(true);
+
+    try {
+      await createSubscription({
+        studentId: Number(selectedStudent),
+        studyClassId: Number(studyClassId),
+      });
+      router.push(`/study-classes/${studyClassId}`);
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : 'An unknown error occurred';
+      setError(message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return {
+    students,
+    studyClass,
+    selectedStudent,
+    setSelectedStudent,
     error,
     isLoading,
     isSubmitting,

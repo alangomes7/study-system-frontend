@@ -42,11 +42,11 @@ export default function CoursesPage() {
   return (
     <div className='container mx-auto px-4 py-8'>
       <div className='flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4'>
-        <h1 className='text-3xl font-bold'>Courses</h1>
+        <h1 className='text-3xl font-bold text-foreground'>Courses</h1>
         <input
           type='text'
           placeholder='Search by course name...'
-          className='border rounded-lg p-2 w-full md:w-1/3'
+          className='input w-full md:w-1/3'
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}
         />
@@ -56,12 +56,12 @@ export default function CoursesPage() {
           <Link
             href={`/courses/${course.id}`}
             key={course.id}
-            className='block border rounded-lg p-4 shadow-md hover:shadow-lg transition-shadow bg-white dark:bg-gray-800'
+            className='card block'
           >
-            <h2 className='text-xl font-semibold mb-2'>{course.name}</h2>
-            <p className='text-gray-700 dark:text-gray-300'>
-              {course.description}
-            </p>
+            <h2 className='text-xl font-semibold mb-2 text-foreground'>
+              {course.name}
+            </h2>
+            <p className='text-foreground/80'>{course.description}</p>
           </Link>
         ))}
       </div>

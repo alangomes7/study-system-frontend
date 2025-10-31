@@ -8,7 +8,7 @@ import {
   getCourse,
   getStudentsInBatches,
   getStudyClassesByCourse,
-  getSubscriptions,
+  getSubscriptionsByStudyClass,
 } from '@/lib/api';
 import { get } from 'http';
 
@@ -38,9 +38,8 @@ export function useCourses(id: string) {
         if (studyClassesData.length > 0) {
           setSelectedStudyClass(studyClassesData[0]);
         }
-      } catch (err: any) {
-        console.error(err);
-        setError(err.message || 'Failed to fetch course data');
+      } catch {
+        setError('Failed to fetch course data');
       } finally {
         setIsLoading(false);
       }
@@ -83,7 +82,9 @@ export function useCourses(id: string) {
 
     async function fetchStudents() {
       try {
-        const subscriptions = await getSubscriptions(selectedStudyClass!.id);
+        const subscriptions = await getSubscriptionsByStudyClass(
+          selectedStudyClass!.id,
+        );
         const studentData = await getStudentsInBatches(subscriptions);
         setStudents(studentData);
       } catch (error) {

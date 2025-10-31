@@ -14,8 +14,8 @@ export function ButtonTheme() {
   // State to prevent SSR hydration errors by ensuring rendering only happens on the client
   const [mounted, setMounted] = useState(false);
 
-  // State to hold the current theme. Defaults to 'light'.
-  const [theme, setTheme] = useState<Theme>('light');
+  // State to hold the current theme. Defaults to 'off-white'.
+  const [theme, setTheme] = useState<Theme>('off-white');
 
   // Effect to run only on the client after the component mounts
   useEffect(() => {
@@ -57,17 +57,23 @@ export function ButtonTheme() {
     return null;
   }
 
-  // Helper function to render the correct icon based on the current theme
+  // Helper function to render the correct icon based on the *next* theme
   const renderIcon = () => {
-    if (theme === 'light') return <MoonIcon />;
-    if (theme === 'dark') return <SunIcon />;
-    return <ContrastIcon />; // For 'off-white' theme
+    // Current: light -> Next: dark
+    if (theme === 'light') return <MoonIcon className='h-5 w-5' />;
+    // Current: dark -> Next: off-white
+    if (theme === 'dark') return <ContrastIcon className='h-5 w-5' />;
+    // Current: off-white -> Next: light
+    return <SunIcon className='h-5 w-5' />;
   };
 
   return (
     <button
       onClick={handleThemeSwitch}
-      className='p-2 rounded-full text-gray-800 dark:text-yellow-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800'
+      className='p-2 rounded-full bg-card-background text-foreground border border-border 
+                 hover:bg-border transition-all duration-300 
+                 focus:outline-none focus:ring-2 focus:ring-offset-2 
+                 focus:ring-primary focus:ring-offset-background'
       aria-label='Toggle theme'
     >
       {renderIcon()}

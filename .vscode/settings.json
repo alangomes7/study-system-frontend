@@ -1,25 +1,32 @@
 {
+  // 🪟 UI & Window
   "window.zoomLevel": 1,
-  "breadcrumbs.enabled": false,
+  "workbench.activityBar.visible": true,
+  "workbench.activityBar.location": "left",
+  "workbench.editor.labelFormat": "short",
+  "explorer.compactFolders": false,
+  "breadcrumbs.enabled": true,
+
+  // ✏️ Editor Appearance
   "editor.fontSize": 12,
+  "editor.glyphMargin": false,
+  "editor.lineNumbers": "on",
+  "editor.tabSize": 2,
+  "editor.formatOnSave": true,
+  "files.eol": "\n",
+
+  // 🧠 Integrated Tools
   "debug.console.fontSize": 12,
   "terminal.integrated.fontSize": 12,
-  "editor.glyphMargin": false,
-  "workbench.activityBar.location": "hidden",
-  "editor.lineNumbers": "on",
-  "files.eol": "\n",
-  "workbench.editor.labelFormat": "short",
-  "editor.tabSize": 2,
-  "explorer.compactFolders": false,
 
-  // 🛠 Formatação e Lint
+  // 🧹 Code Formatting and Linting
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.formatOnSave": true,
-
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit"
+    "source.fixAll": true,
+    "source.fixAll.eslint": true
   },
 
+  // 🌐 Language-Specific Settings
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },

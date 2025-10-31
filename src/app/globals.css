@@ -1,66 +1,87 @@
+/* -------------------------------------------------------------------------- */
+/* 🎨 Tailwind Core                                                           */
+/* -------------------------------------------------------------------------- */
 @import 'tailwindcss';
 
-/* Define CSS variables for each theme using the data-theme attribute */
+/* -------------------------------------------------------------------------- */
+/* 🌍 Theme Variables (This block is for v4)                             */
+/* -------------------------------------------------------------------------- */
+@theme {
+  /* Default: Off-white theme */
+  --background: 30 29% 96%;
+  --foreground: 0 0% 9%;
+  --card-background: 0 0% 100%;
+  --border: 0 0% 80%;
+  --primary: 220 89% 60%;
+  --primary-hover: 220 89% 55%;
+  --primary-foreground: 0 0% 100%;
+}
+
+/* -------------------------------------------------------------------------- */
+/* 🖌️ Base Styles & Theme Overrides                                           */
+/* -------------------------------------------------------------------------- */
 @layer base {
-  /* Default theme (light) */
-  :root,
   [data-theme='light'] {
-    --background: 0 0% 100%; /* White */
-    --foreground: 0 0% 9%; /* Near Black */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 9%;
+    --card-background: 0 0% 100%;
+    --border: 0 0% 80%;
+    --primary: 220 89% 60%;
+    --primary-hover: 220 89% 55%;
+    --primary-foreground: 0 0% 100%;
   }
 
   [data-theme='dark'] {
-    --background: 0 0% 4%; /* Near Black */
-    --foreground: 0 0% 95%; /* Light Gray */
-  }
-
-  [data-theme='off-white'] {
-    --background: 30 29% 96%; /* Off-White */
-    --foreground: 0 0% 9%; /* Near Black */
+    --background: 0 0% 4%;
+    --foreground: 0 0% 95%;
+    --card-background: 0 0% 10%;
+    --border: 0 0% 25%;
+    --primary: 220 89% 60%;
+    --primary-hover: 220 89% 55%;
+    --primary-foreground: 0 0% 100%;
   }
 
   body {
+    @apply antialiased;
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+      Roboto, Helvetica, Arial, sans-serif;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 }
 
+/* -------------------------------------------------------------------------- */
+/* 🧩 Components                                                              */
+/* -------------------------------------------------------------------------- */
 @layer components {
   .btn {
-    @apply font-bold py-2 px-4 rounded;
+    @apply font-semibold py-2 px-4 rounded-lg transition-colors duration-200 inline-flex items-center justify-center select-none;
   }
-  .btn-blue {
-    @apply bg-blue-500 hover:bg-blue-600 text-white;
+
+  .btn-primary {
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
   }
-  .btn-green {
-    @apply bg-green-500 hover:bg-green-600 text-white;
+
+  .btn-primary:hover {
+    background-color: hsl(var(--primary-hover));
   }
+
   .card {
-    /* ✨ FIX: Use the CSS variable directly instead of @apply */
-    background-color: hsl(var(--background));
-    @apply shadow-md rounded-lg p-6;
+    background-color: hsl(var(--card-background));
+    border: 1px solid hsl(var(--border));
+    @apply rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow;
   }
+
   .input {
-    @apply border rounded-lg p-2 w-full;
-  }
-  .nav-link {
-    /* ✨ FIX: Use the CSS variable directly instead of @apply */
+    background-color: hsl(var(--card-background));
+    border: 1px solid hsl(var(--border));
     color: hsl(var(--foreground));
-    @apply hover:text-gray-500;
+    @apply rounded-lg p-2 w-full transition-all;
   }
-  .table {
-    /* ✨ FIX: Use the CSS variable directly instead of @apply */
-    background-color: hsl(var(--background));
-    @apply min-w-full border;
-  }
-  .table-header {
-    @apply py-2 px-4 border-b;
-  }
-  .table-row {
-    @apply hover:bg-gray-100 dark:hover:bg-gray-700;
-  }
-  .table-cell {
-    @apply py-2 px-4 border-b text-center;
+
+  .input:focus {
+    @apply ring-2 ring-blue-500 outline-none;
   }
 }
