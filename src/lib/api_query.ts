@@ -214,14 +214,18 @@ export const useGetSubscriptionsByStudyClass = (
  */
 export const useGetStudentsByStudyClass = (studyClassId: number | null) => {
   // First, fetch the subscriptions
-  const { data: subscriptions, isLoading: isLoadingSubscriptions } =
-    useGetSubscriptionsByStudyClass(studyClassId);
+  const {
+    data: subscriptions,
+    isLoading: isLoadingSubscriptions,
+    error: subscriptionsError,
+  } = useGetSubscriptionsByStudyClass(studyClassId);
 
   // Then, use those subscriptions to fetch the students
-  const { data: students, isLoading: isLoadingStudents } = useQuery<
-    Student[],
-    Error
-  >({
+  const {
+    data: students,
+    isLoading: isLoadingStudents,
+    error: studentsError,
+  } = useQuery<Student[], Error>({
     queryKey: queryKeys.studentsBySubscriptions(subscriptions?.map(s => s.id)),
     queryFn: () => api.getStudentsInBatches(subscriptions!),
     enabled: !!subscriptions && subscriptions.length > 0,
@@ -230,6 +234,7 @@ export const useGetStudentsByStudyClass = (studyClassId: number | null) => {
   return {
     data: subscriptions?.length === 0 ? [] : students,
     isLoading: isLoadingSubscriptions || isLoadingStudents,
+    error: subscriptionsError || studentsError,
   };
 };
 

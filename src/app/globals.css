@@ -79,12 +79,10 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Apply border color to all elements for consistency */
 * {
   @apply border-border;
 }
 
-/* Highlight selected text with brand colors */
 ::selection {
   background-color: var(--primary);
   color: var(--primary-foreground);
