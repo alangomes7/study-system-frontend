@@ -7,7 +7,7 @@ import { Student, StudentCreationData } from '@/types/student';
 import { StudyClass, StudyClassCreationData } from '@/types/study-class';
 import { Subscription, SubscriptionCreationData } from '@/types/subscription';
 
-const API_BASE_URL = 'http://localhost:8080';
+const API_BASE_URL = 'http://192.168.0.177:8080';
 
 /* -------------------------------------------------------------------------- */
 /* COURSES                                  */

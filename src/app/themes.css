@@ -1,0 +1,137 @@
+/* -------------------------------------------------------------------------- */
+/* 🎨 THEME.CSS (Tailwind CSS v4.1 + Next.js 15)                              */
+/* -------------------------------------------------------------------------- */
+/* Unified color palette with light/dark mapping                              */
+/* -------------------------------------------------------------------------- */
+
+/* 🌈 GLOBAL COLOR PALETTE (shared for all themes) */
+:root {
+  /* ---- Grayscale ---- */
+  --gray-50: #fdfdfd;
+  --gray-100: #f8f8f8;
+  --gray-200: #f3f3f3;
+  --gray-300: #e6e6e6;
+  --gray-400: #dcdcdc;
+  --gray-500: #a6a6a6;
+  --gray-600: #555555;
+  --gray-700: #363d56;
+  --gray-800: #181f2e;
+  --gray-900: #0a0f1a;
+
+  /* ---- Brand & Functional Colors ---- */
+  --primary-50: #e6fff7;
+  --primary-100: #b2f5e6;
+  --primary-200: #4de7b7;
+  --primary-300: #0da170;
+  --primary-400: #065f46;
+  --primary-500: #034533;
+
+  --success: #22c55e;
+  --warning: #eab308;
+  --error: #991b1b;
+  --info: #0ea5e9;
+
+  /* ---- Transition ---- */
+  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease,
+    fill 0.3s ease, stroke 0.3s ease;
+}
+
+/* -------------------------------------------------------------------------- */
+/* 🌞 LIGHT THEME                                                            */
+/* -------------------------------------------------------------------------- */
+:root[data-theme='light'] {
+  --background: var(--gray-50);
+  --foreground: var(--gray-900);
+  --card-background: var(--gray-100);
+  --border: var(--gray-300);
+  --muted-foreground: var(--gray-600);
+
+  --primary-light: var(--primary-100);
+  --primary: var(--primary-300);
+  --primary-dark: var(--primary-400);
+
+  --link-color: var(--primary-300);
+  --link-hover: var(--primary-400);
+
+  --text-default: var(--gray-900);
+  --text-muted: var(--gray-600);
+  --text-disabled: var(--gray-400);
+  --disabled: var(--gray-200);
+
+  --text-over-primary: var(--gray-900);
+  --text-over-success: var(--gray-900);
+  --text-over-warning: var(--gray-900);
+  --text-over-error: var(--gray-50);
+  --text-over-info: var(--gray-900);
+}
+
+/* -------------------------------------------------------------------------- */
+/* 🌑 DARK THEME                                                             */
+/* -------------------------------------------------------------------------- */
+:root[data-theme='dark'] {
+  --background: var(--gray-900);
+  --foreground: var(--gray-50);
+  --card-background: var(--gray-800);
+  --border: var(--gray-700);
+  --muted-foreground: var(--gray-500);
+
+  --primary-light: var(--primary-200);
+  --primary: var(--primary-300);
+  --primary-dark: var(--primary-400);
+
+  --link-color: var(--primary-200);
+  --link-hover: var(--primary-100);
+
+  --text-default: var(--gray-50);
+  --text-muted: var(--gray-500);
+  --text-disabled: var(--gray-700);
+  --disabled: var(--gray-700);
+
+  --text-over-primary: var(--gray-900);
+  --text-over-success: var(--gray-900);
+  --text-over-warning: var(--gray-900);
+  --text-over-error: var(--gray-50);
+  --text-over-info: var(--gray-900);
+}
+
+/* -------------------------------------------------------------------------- */
+/* 📝 FORM INPUTS & TEXTAREAS                                                */
+/* -------------------------------------------------------------------------- */
+input[type='text'],
+input[type='email'],
+input[type='password'],
+input[type='search'],
+input[type='tel'],
+input[type='url'],
+textarea {
+  background-color: var(--background);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  width: 100%;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+input:focus,
+input:focus-visible,
+textarea:focus,
+textarea:focus-visible {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--primary-light);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--muted-foreground);
+  opacity: 1;
+}
+
+input:disabled,
+textarea:disabled {
+  background-color: var(--disabled);
+  color: var(--text-disabled);
+  cursor: not-allowed;
+  opacity: 0.7;
+}

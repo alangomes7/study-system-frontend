@@ -1,7 +1,6 @@
 {
   // 🪟 UI & Window
   "window.zoomLevel": 1,
-  "workbench.activityBar.visible": true,
   "workbench.activityBar.location": "left",
   "workbench.editor.labelFormat": "short",
   "explorer.compactFolders": false,
@@ -22,8 +21,8 @@
   // 🧹 Code Formatting and Linting
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.codeActionsOnSave": {
-    "source.fixAll": true,
-    "source.fixAll.eslint": true
+    "source.fixAll": "explicit",
+    "source.fixAll.eslint": "explicit"
   },
 
   // 🌐 Language-Specific Settings

@@ -12,7 +12,7 @@
 /* -------------------------------------------------------------------------- */
 /* 🎨 1. Import Custom Theme Variables (Light & Dark Modes)                   */
 /* -------------------------------------------------------------------------- */
-@import './theme.css';
+@import './themes.css';
 
 /* -------------------------------------------------------------------------- */
 /* 🎨 2. Define Tailwind Theme Using CSS Custom Properties                    */
@@ -90,6 +90,14 @@ body {
   color: var(--primary-foreground);
 }
 
+/* ─────────────── Disabled Elements ─────────────── */
+[disabled],
+.disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
 /* ─────────────── Links ─────────────── */
 a {
   color: var(--link-color);
@@ -98,6 +106,19 @@ a {
 }
 a:hover {
   color: var(--link-hover);
+}
+
+/* ─────────────── Buttons ─────────────── */
+.btn {
+  @apply inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2;
+}
+
+.btn-primary {
+  @apply bg-primary text-primary-foreground shadow-sm;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-dark);
 }
 
 /* ─────────────── Cards ─────────────── */
@@ -109,10 +130,27 @@ a:hover {
   color: var(--color-card-text);
 }
 
-/* ─────────────── Disabled Elements ─────────────── */
-[disabled],
-.disabled {
-  cursor: not-allowed;
-  opacity: 0.6;
-  pointer-events: none;
+/* ─────────────── Tables ─────────────── */
+table {
+  @apply min-w-full bg-card-background rounded-lg shadow-sm overflow-hidden;
+}
+
+th {
+  @apply py-2 px-4 border-b border-border text-foreground/80 font-semibold;
+}
+
+tbody tr {
+  @apply hover:bg-foreground/10 cursor-pointer;
+}
+
+tbody tr.selected {
+  @apply bg-primary/20;
+}
+
+td {
+  @apply py-2 px-4 border-b border-border text-center text-foreground;
+}
+
+tbody tr:last-child td {
+  @apply border-b-0;
 }

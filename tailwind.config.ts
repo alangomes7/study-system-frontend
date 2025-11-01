@@ -1,59 +1,85 @@
 import type { Config } from 'tailwindcss';
 
-export default {
+/**
+ * 🎨 Custom Color Palette
+ * Defined as a constant for better organization.
+ * These are linked to CSS variables in your global stylesheet
+ * (e.g., global.css or index.css).
+ */
+const customColors = {
+  /* 🌍 Base Tokens */
+  background: 'hsl(var(--background) / <alpha-value>)',
+  foreground: 'hsl(var(--foreground) / <alpha-value>)',
+  card: 'hsl(var(--card-background) / <alpha-value>)',
+  border: 'hsl(var(--border) / <alpha-value>)',
+
+  /* 📝 Text */
+  'text-default': 'hsl(var(--text-default) / <alpha-value>)',
+  'text-muted': 'hsl(var(--text-muted) / <alpha-value>)',
+  'text-disabled': 'hsl(var(--text-disabled) / <alpha-value>)',
+
+  /* 💡 Functional */
+  primary: 'hsl(var(--primary) / <alpha-value>)',
+  'primary-light': 'hsl(var(--primary-light) / <alpha-value>)',
+  'primary-dark': 'hsl(var(--primary-dark) / <alpha-value>)',
+
+  success: 'hsl(var(--success) / <alpha-value>)',
+  warning: 'hsl(var(--warning) / <alpha-value>)',
+  error: 'hsl(var(--error) / <alpha-value>)',
+  info: 'hsl(var(--info) / <alpha-value>)',
+
+  link: 'hsl(var(--link-color) / <alpha-value>)',
+  'link-hover': 'hsl(var(--link-hover) / <alpha-value>)',
+
+  disabled: 'hsl(var(--disabled) / <alpha-value>)',
+
+  /* 🎨 Support for text-over colors */
+  'over-primary': 'hsl(var(--text-over-primary) / <alpha-value>)',
+  'over-success': 'hsl(var(--text-over-success) / <alpha-value>)',
+  'over-warning': 'hsl(var(--text-over-warning) / <alpha-value>)',
+  'over-error': 'hsl(var(--text-over-error) / <alpha-value>)',
+  'over-info': 'hsl(var(--text-over-info) / <alpha-value>)',
+};
+
+/**
+ * 📐 Custom Border Radius
+ * Overriding default Tailwind values.
+ */
+const customBorderRadius = {
+  DEFAULT: '0.5rem', // Overrides 'rounded'
+  lg: '0.75rem', // Overrides 'rounded-lg'
+  xl: '1rem', // Overrides 'rounded-xl'
+};
+
+/**
+ * 💨 Custom Transitions
+ * A utility class for theme-aware transitions.
+ * Usage: `transition-theme`
+ */
+const customTransitions = {
+  theme: 'background, color, border-color, fill, stroke',
+};
+
+// --- Main Tailwind Config ---
+
+const config: Config = {
   darkMode: ['selector', '[data-theme="dark"]'],
+
+  content: [
+    './src/**/*.{js,ts,jsx,tsx}',
+    './components/**/*.{js,ts,jsx,tsx}',
+    './app/**/*.{js,ts,jsx,tsx}',
+  ],
+
   theme: {
     extend: {
-      colors: {
-        gray: {
-          100: 'var(--gray-100)',
-          200: 'var(--gray-200)',
-          300: 'var(--gray-300)',
-          400: 'var(--gray-400)',
-          500: 'var(--gray-500)',
-          600: 'var(--gray-600)',
-          700: 'var(--gray-700)',
-          800: 'var(--gray-800)',
-          900: 'var(--gray-900)',
-        },
-
-        background: 'var(--background)',
-        foreground: 'var(--foreground)',
-        border: 'var(--border)',
-        'card-background': 'var(--card-background)',
-        'muted-foreground': 'var(--muted-foreground)',
-
-        primary: 'var(--primary)',
-        'primary-light': 'var(--primary-light)',
-        'primary-dark': 'var(--primary-dark)',
-        'primary-foreground': 'var(--text-over-primary)',
-        'primary-light-foreground': 'var(--text-over-primary-light)',
-        'primary-dark-foreground': 'var(--text-over-primary-dark)',
-
-        success: 'var(--success)',
-        warning: 'var(--warning)',
-        error: 'var(--error)',
-        info: 'var(--info)',
-        'success-foreground': 'var(--text-over-success)',
-        'warning-foreground': 'var(--text-over-warning)',
-        'error-foreground': 'var(--text-over-error)',
-        'info-foreground': 'var(--text-over-info)',
-
-        link: 'var(--link-color)',
-        'link-hover': 'var(--link-hover)',
-        disabled: 'var(--disabled)',
-        'text-disabled': 'var(--text-disabled)',
-      },
-      borderRadius: {
-        DEFAULT: '0.5rem',
-        lg: '1rem',
-        xl: '1.5rem',
-      },
-      fontFamily: {
-        sans: ['ui-sans-serif', 'system-ui', 'sans-serif'],
-        mono: ['ui-monospace', 'SFMono-Regular', 'monospace'],
-      },
+      colors: customColors,
+      borderRadius: customBorderRadius,
+      transitionProperty: customTransitions,
     },
   },
+
   plugins: [],
-} satisfies Config;
+};
+
+export default config;
