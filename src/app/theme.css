@@ -1,0 +1,294 @@
+/* -------------------------------------------------------------------------- */
+/* 🎨 THEME.CSS (Tailwind CSS v4.1 + Next.js 15)                               */
+/* -------------------------------------------------------------------------- */
+/* This file defines all theme variables (light and dark modes).              */
+/* :root = Global / Shared Variables                                          */
+/* :root[data-theme='light'] = Light Theme Override                           */
+/* :root[data-theme='dark'] = Default (Dark Theme)                            */
+/* -------------------------------------------------------------------------- */
+
+/* -------------------------------------------------------------------------- */
+/* 🌍 GLOBAL / SHARED VARIABLES                                                */
+/* -------------------------------------------------------------------------- */
+:root {
+  /* These colors are the same in both light and dark mode */
+  --warning: #eab308;
+  --error: #991b1b;
+  --info: #0ea5e9;
+}
+
+/* -------------------------------------------------------------------------- */
+/* 🌞 LIGHT THEME (Off-white)                                                 */
+/* -------------------------------------------------------------------------- */
+:root[data-theme='light'] {
+  --gray-100: #fdfdfd;
+  --gray-200: #f8f8f8;
+  --gray-300: #f3f3f3;
+  --gray-400: #e6e6e6;
+  --gray-500: #dcdcdc;
+  --gray-600: #cfcfcf;
+  --gray-700: #bfbfbf;
+  --gray-800: #a6a6a6;
+  --gray-900: #8c8c8c;
+
+  --text-default: #1a1a1a;
+  --text-muted: #555555;
+
+  --background: var(--gray-100);
+  --foreground: var(--text-default);
+  --card-background: var(--gray-200);
+  --border: var(--gray-300);
+  --muted-foreground: var(--text-muted);
+
+  --primary-light: #d1d1d1; /* neutral */
+  --primary: #8c8c8c; /* neutral/off-white */
+  --primary-dark: #555555;
+  --primary-foreground: var(--text-over-primary);
+
+  --link-color: #555555;
+  --link-hover: #333333;
+
+  --success: #999999;
+  /* --warning, --error, and --info are inherited from :root */
+
+  --text-over-primary: #fdfdfd;
+  --text-over-primary-dark: #fdfdfd;
+  --text-over-primary-light: #1a1a1a;
+  --text-over-success: #1a1a1a;
+  --text-over-warning: #1a1a1a;
+  --text-over-error: #fdfdfd;
+  --text-over-info: #1a1a1a;
+
+  --disabled: #dcdcdc;
+  --text-disabled: #a6a6a6;
+}
+
+/* -------------------------------------------------------------------------- */
+/* 🌑 DARK THEME                                                              */
+/* -------------------------------------------------------------------------- */
+:root[data-theme='dark'] {
+  --gray-100: #0a0f1a;
+  --gray-200: #181f2e;
+  --gray-300: #272f43;
+  --gray-400: #363d56;
+  --gray-500: #454f6a;
+  --gray-600: #555f7d;
+  --gray-700: #aab3cc;
+  --gray-800: #cdd3e1;
+  --gray-900: #e6e9f0;
+
+  --text-default: #e6e9f0;
+  --text-muted: #aab3cc;
+
+  --background: var(--gray-900);
+  --foreground: var(--text-default);
+  --card-background: var(--gray-800);
+  --border: var(--gray-700);
+  --muted-foreground: var(--text-muted);
+
+  --primary-light: #4de7b7;
+  --primary: #0da170;
+  --primary-dark: #065f46;
+  --primary-foreground: var(--text-over-primary);
+
+  --link-color: #10b981;
+  --link-hover: #0b8a60;
+
+  --success: #22c55e;
+  /* --warning, --error, and --info are inherited from :root */
+
+  --text-over-primary: #0a0f1a;
+  --text-over-primary-dark: #e6e9f0;
+  --text-over-primary-light: #0a0f1a;
+  --text-over-success: #0a0f1a;
+  --text-over-warning: #0a0f1a;
+  --text-over-error: #e6e9f0;
+  --text-over-info: #0a0f1a;
+
+  --disabled: #555f7d;
+  --text-disabled: #aab3cc;
+}
+
+:root,
+:root[data-theme='light'],
+:root[data-theme='dark'] {
+  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease,
+    fill 0.3s ease, stroke 0.3s ease;
+}
+
+/* -------------------------------------------------------------------------- */
+/* 🎨 THEME.CSS (Tailwind CSS v4.1 + Next.js 15)                               */
+/* -------------------------------------------------------------------------- */
+/* This file defines all theme variables (light and dark modes).              */
+/* :root = Global / Shared Variables                                          */
+/* :root[data-theme='light'] = Light Theme Override                           */
+/* :root[data-theme='dark'] = Default (Dark Theme)                            */
+/* -------------------------------------------------------------------------- */
+
+/* -------------------------------------------------------------------------- */
+/* 🌍 GLOBAL / SHARED VARIABLES                                                */
+/* -------------------------------------------------------------------------- */
+:root {
+  /* These colors are the same in both light and dark mode */
+  --warning: #eab308;
+  --error: #991b1b;
+  --info: #0ea5e9;
+}
+
+/* -------------------------------------------------------------------------- */
+/* 🌞 LIGHT THEME (Off-white)                                                 */
+/* -------------------------------------------------------------------------- */
+:root[data-theme='light'] {
+  --gray-100: #fdfdfd;
+  --gray-200: #f8f8f8;
+  --gray-300: #f3f3f3;
+  --gray-400: #e6e6e6;
+  --gray-500: #dcdcdc;
+  --gray-600: #cfcfcf;
+  --gray-700: #bfbfbf;
+  --gray-800: #a6a6a6;
+  --gray-900: #8c8c8c;
+
+  --text-default: #1a1a1a;
+  --text-muted: #555555;
+
+  --background: var(--gray-100);
+  --foreground: var(--text-default);
+  --card-background: var(--gray-200);
+  --border: var(--gray-300);
+  --muted-foreground: var(--text-muted);
+
+  --primary-light: #d1d1d1; /* neutral */
+  --primary: #8c8c8c; /* neutral/off-white */
+  --primary-dark: #555555;
+  --primary-foreground: var(--text-over-primary);
+
+  --link-color: #555555;
+  --link-hover: #333333;
+
+  --success: #999999;
+  /* --warning, --error, and --info are inherited from :root */
+
+  --text-over-primary: #fdfdfd;
+  --text-over-primary-dark: #fdfdfd;
+  --text-over-primary-light: #1a1a1a;
+  --text-over-success: #1a1a1a;
+  --text-over-warning: #1a1a1a;
+  --text-over-error: #fdfdfd;
+  --text-over-info: #1a1a1a;
+
+  --disabled: #dcdcdc;
+  --text-disabled: #a6a6a6;
+}
+
+/* -------------------------------------------------------------------------- */
+/* 🌑 DARK THEME                                                              */
+/* -------------------------------------------------------------------------- */
+:root[data-theme='dark'] {
+  --gray-100: #0a0f1a;
+  --gray-200: #181f2e;
+  --gray-300: #272f43;
+  --gray-400: #363d56;
+  --gray-500: #454f6a;
+  --gray-600: #555f7d;
+  --gray-700: #aab3cc;
+  --gray-800: #cdd3e1;
+  --gray-900: #e6e9f0;
+
+  --text-default: var(--gray-900);
+  --text-muted: #aab3cc;
+  --text-card: #ffffff;
+
+  --background: var(--gray-200);
+  --foreground: var(--text-default);
+  --card-background: var(--gray-600);
+  --border: var(--gray-700);
+  --muted-foreground: var(--text-muted);
+
+  --primary-light: #4de7b7;
+  --primary: #0da170;
+  --primary-dark: #065f46;
+  --primary-foreground: var(--text-over-primary);
+
+  --link-color: #10b981;
+  --link-hover: #0b8a60;
+
+  --success: #22c55e;
+  /* --warning, --error, and --info are inherited from :root */
+
+  --text-over-primary: #0a0f1a;
+  --text-over-primary-dark: #e6e9f0;
+  --text-over-primary-light: #0a0f1a;
+  --text-over-success: #0a0f1a;
+  --text-over-warning: #0a0f1a;
+  --text-over-error: #e6e9f0;
+  --text-over-info: #0a0f1a;
+
+  --disabled: #555f7d;
+  --text-disabled: #aab3cc;
+}
+
+:root,
+:root[data-theme='light'],
+:root[data-theme='dark'] {
+  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease,
+    fill 0.3s ease, stroke 0.3s ease;
+}
+/* -------------------------------------------------------------------------- */
+/* 📝 FORM INPUTS & TEXTAREAS                                                 */
+/* -------------------------------------------------------------------------- */
+
+input[type='text'],
+input[type='email'],
+input[type='password'],
+input[type='search'],
+input[type='tel'],
+input[type='url'],
+textarea {
+  /* --- Default State --- */
+  background-color: var(--background);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem; /* Your config's 'DEFAULT' border-radius */
+  padding: 0.5rem 0.75rem;
+  width: 100%;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* --- Focus State --- */
+/* :focus-visible is preferred for accessibility (shows focus on keyboard nav) */
+input[type='text']:focus,
+input[type='email']:focus,
+input[type='password']:focus,
+input[type='search']:focus,
+input[type='tel']:focus,
+input[type='url']:focus,
+textarea:focus,
+input[type='text']:focus-visible,
+input[type='email']:focus-visible,
+input[type='password']:focus-visible,
+input[type='search']:focus-visible,
+input[type='tel']:focus-visible,
+input[type='url']:focus-visible,
+textarea:focus-visible {
+  outline: none; /* Remove default browser outline */
+  border-color: var(--primary);
+  /* Add a "ring" effect using box-shadow */
+  box-shadow: 0 0 0 2px var(--primary-light);
+}
+
+/* --- Placeholder Text --- */
+input::placeholder,
+textarea::placeholder {
+  color: var(--muted-foreground);
+  opacity: 1; /* Firefox has a lower default opacity */
+}
+
+/* --- Disabled State --- */
+input:disabled,
+textarea:disabled {
+  background-color: var(--disabled);
+  color: var(--text-disabled);
+  cursor: not-allowed;
+  opacity: 0.7;
+}

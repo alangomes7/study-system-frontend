@@ -1,28 +1,31 @@
 'use client';
 
-import { useCreateStudent } from '@/hooks/useStudents';
+import { useState } from 'react';
+import { useCreateStudent } from '@/lib/api_query';
 
 export default function CreateStudentPage() {
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [register, setRegister] = useState('');
+
   const {
-    name,
-    setName,
-    phone,
-    setPhone,
-    email,
-    setEmail,
-    register,
-    setRegister,
+    mutate: createStudent,
+    isPending: isSubmitting,
     error,
-    isSubmitting,
-    handleSubmit,
   } = useCreateStudent();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    createStudent({ name, phone, email, register });
+  };
 
   return (
     <div className='container mx-auto px-4 py-8'>
       <h1 className='text-3xl font-bold mb-6 text-foreground'>
         Create Student
       </h1>
-      {error && <p className='text-red-500 mb-4'>{error}</p>}
+      {error && <p className='text-red-500 mb-4'>{error.message}</p>}
       <form onSubmit={handleSubmit} className='card p-6'>
         <div className='mb-4'>
           <label

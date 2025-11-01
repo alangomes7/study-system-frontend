@@ -2,37 +2,28 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { createProfessor } from '@/lib/api';
+import { useCreateProfessor } from '@/lib/api_query';
 import Link from 'next/link';
 
 export default function CreateProfessorPage() {
   const [name, setName] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setIsSubmitting(true);
+  const {
+    mutate: createProfessor,
+    isPending: isSubmitting,
+    error,
+  } = useCreateProfessor();
 
-    try {
-      await createProfessor(name);
-      router.push('/professors');
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('An unknown error occurred');
-      }
-    } finally {
-      setIsSubmitting(false);
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (name.trim()) {
+      createProfessor(name);
     }
   };
 
   return (
     <div className='container mx-auto px-4 py-8 max-w-lg'>
-      {/* --- THEME CSS: Updated text --- */}
       <h1 className='text-2xl md:text-3xl font-bold mb-6 text-foreground'>
         Create Professor
       </h1>
@@ -45,26 +36,25 @@ export default function CreateProfessorPage() {
           >
             Name
           </label>
-          {/* --- THEME CSS: Use 'input' class --- */}
           <input
             type='text'
             id='name'
             value={name}
             onChange={e => setName(e.target.value)}
             className='input'
-            disabled={isSubmitting} // <-- Added
+            disabled={isSubmitting}
             required
           />
         </div>
 
-        {error && <p className='text-red-500 text-sm'>{error}</p>}
+        {/* 5. Display the error from the hook */}
+        {error && <p className='text-red-500 text-sm'>{error.message}</p>}
 
-        {/* --- THEME CSS: Button container --- */}
         <div className='flex items-center gap-4 pt-2'>
           <button
             type='submit'
             className='btn btn-primary'
-            disabled={isSubmitting} // <-- Added
+            disabled={isSubmitting}
           >
             {isSubmitting ? 'Creating...' : 'Create'}
           </button>

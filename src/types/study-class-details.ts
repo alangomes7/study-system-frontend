@@ -1,16 +1,16 @@
 interface Professor {
-  id: string;
+  id: number;
   name: string;
 }
 
 interface Student {
-  id: string;
+  id: number;
   name: string;
   email: string;
 }
 
 export interface StudyClassDetails {
-  id: string;
+  id: number;
   code: string;
   semester: number;
   year: number;

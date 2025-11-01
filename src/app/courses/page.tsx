@@ -1,42 +1,32 @@
 'use client';
 
-import { getCourses } from '@/lib/api';
-import { Course } from '@/types/course';
+import { useGetCourses } from '@/lib/api_query';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useState, useMemo } from 'react';
 
 export default function CoursesPage() {
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
+  const { data: courses = [], isLoading, error } = useGetCourses();
+
   const [searchTerm, setSearchTerm] = useState('');
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function fetchCourses() {
-      try {
-        const coursesData = await getCourses();
-        setCourses(coursesData);
-        setFilteredCourses(coursesData);
-      } catch (err) {
-        if (err instanceof Error) {
-          setError(err.message);
-        } else {
-          setError('An unknown error occurred');
-        }
-      }
-    }
-    fetchCourses();
-  }, []);
-
-  useEffect(() => {
-    const results = courses.filter(course =>
+  const filteredCourses = useMemo(() => {
+    return courses.filter(course =>
       course.name.toLowerCase().includes(searchTerm.toLowerCase()),
     );
-    setFilteredCourses(results);
   }, [searchTerm, courses]);
 
+  if (isLoading) {
+    return (
+      <div className='container mx-auto px-4 py-8 text-center'>
+        Loading courses...
+      </div>
+    );
+  }
+
   if (error) {
-    return <p className='text-center mt-8 text-red-500'>Error: {error}</p>;
+    return (
+      <p className='text-center mt-8 text-red-500'>Error: {error.message}</p>
+    );
   }
 
   return (

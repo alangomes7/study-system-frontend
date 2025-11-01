@@ -1,20 +1,38 @@
 'use client';
 
-import { useEnrollStudent } from '@/hooks/useSubscriptions';
+import { useState } from 'react';
+import {
+  useGetAllStudents,
+  useGetAllStudyClasses,
+  useCreateSubscription,
+} from '@/lib/api_query';
 
 export default function EnrollStudentPage() {
+  const [selectedStudent, setSelectedStudent] = useState<string>('');
+  const [selectedStudyClass, setSelectedStudyClass] = useState<string>('');
+
+  const { data: students = [], isLoading: isLoadingStudents } =
+    useGetAllStudents();
+  const { data: studyClasses = [], isLoading: isLoadingStudyClasses } =
+    useGetAllStudyClasses();
+
   const {
-    students,
-    studyClasses,
-    selectedStudent,
-    setSelectedStudent,
-    selectedStudyClass,
-    setSelectedStudyClass,
+    mutate: createSubscription,
+    isPending: isSubmitting,
     error,
-    isLoading,
-    isSubmitting,
-    handleSubmit,
-  } = useEnrollStudent();
+  } = useCreateSubscription();
+
+  const isLoading = isLoadingStudents || isLoadingStudyClasses;
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedStudent || !selectedStudyClass) return;
+
+    createSubscription({
+      studentId: Number(selectedStudent),
+      studyClassId: Number(selectedStudyClass),
+    });
+  };
 
   if (isLoading) {
     return (
@@ -29,7 +47,9 @@ export default function EnrollStudentPage() {
       <h1 className='text-3xl font-bold mb-6 text-foreground'>
         Enroll Student
       </h1>
-      {error && <p className='text-center mb-4 text-red-500'>{error}</p>}
+      {error && (
+        <p className='text-center mb-4 text-red-500'>{error.message}</p>
+      )}
       <form onSubmit={handleSubmit} className='card p-6'>
         <div className='mb-4'>
           <label

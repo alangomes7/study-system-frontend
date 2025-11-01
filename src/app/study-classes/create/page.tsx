@@ -1,25 +1,42 @@
 'use client';
 
-import { useCreateStudyClass } from '@/hooks/useStudyClasses';
+import { useState } from 'react';
 import Link from 'next/link';
+import {
+  useGetCourses,
+  useGetProfessors,
+  useCreateStudyClass,
+} from '@/lib/api_query';
 
 export default function CreateStudyClassPage() {
+  const [year, setYear] = useState<number>(new Date().getFullYear());
+  const [semester, setSemester] = useState<number>(1);
+  const [courseId, setCourseId] = useState<string>('');
+  const [professorId, setProfessorId] = useState<string>('');
+
+  const { data: courses = [], isLoading: isLoadingCourses } = useGetCourses();
+  const { data: professors = [], isLoading: isLoadingProfessors } =
+    useGetProfessors();
+
   const {
-    courses,
-    professors,
-    year,
-    setYear,
-    semester,
-    setSemester,
-    courseId,
-    setCourseId,
-    professorId,
-    setProfessorId,
+    mutate: createStudyClass,
+    isPending: isSubmitting,
     error,
-    isLoading,
-    isSubmitting,
-    handleSubmit,
   } = useCreateStudyClass();
+
+  const isLoading = isLoadingCourses || isLoadingProfessors;
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!courseId) return;
+
+    createStudyClass({
+      year,
+      semester,
+      courseId: Number(courseId),
+      professorId: professorId ? Number(professorId) : null, // Handle optional prof.
+    });
+  };
 
   if (isLoading) {
     return (
@@ -124,7 +141,7 @@ export default function CreateStudyClassPage() {
           </select>
         </div>
 
-        {error && <p className='text-red-500 text-sm'>{error}</p>}
+        {error && <p className='text-red-500 text-sm'>{error.message}</p>}
 
         <div className='flex items-center gap-4 pt-2'>
           <button

@@ -1,3 +1,6 @@
+/**
+ * This file contains all the core data-fetching functions.
+ */
 import { Course, CourseCreationData } from '@/types/course';
 import { Professor } from '@/types/professor';
 import { Student, StudentCreationData } from '@/types/student';
@@ -15,9 +18,8 @@ const API_BASE_URL = 'http://localhost:8080';
  * @returns A promise that resolves to an array of Course objects.
  */
 export async function getCourses(): Promise<Course[]> {
-  const response = await fetch(`${API_BASE_URL}/courses`, {
-    cache: 'no-store',
-  });
+  // We remove 'cache: no-store' as React Query will handle caching.
+  const response = await fetch(`${API_BASE_URL}/courses`);
   if (!response.ok) throw new Error('Failed to fetch courses');
   return response.json();
 }
@@ -29,9 +31,7 @@ export async function getCourses(): Promise<Course[]> {
  * @throws Throws an error if the course is not found (404) or on API failure.
  */
 export async function getCourse(id: string): Promise<Course> {
-  const response = await fetch(`${API_BASE_URL}/courses/${id}`, {
-    cache: 'no-store',
-  });
+  const response = await fetch(`${API_BASE_URL}/courses/${id}`);
 
   if (!response.ok) {
     if (response.status === 404) throw new Error('Course not found');
@@ -56,7 +56,6 @@ export async function createCourse(
   });
 
   if (!response.ok) {
-    // You could add more detailed error handling here
     throw new Error('Failed to create course');
   }
   return response.json();
@@ -71,27 +70,19 @@ export async function createCourse(
  * @returns A promise that resolves to an array of StudyClass objects.
  */
 export async function getAllStudyClasses(): Promise<StudyClass[]> {
-  const response = await fetch(`${API_BASE_URL}/study-classes`, {
-    cache: 'no-store',
-  });
+  const response = await fetch(`${API_BASE_URL}/study-classes`);
   if (!response.ok) throw new Error('Failed to fetch study classes');
   return response.json();
 }
 
 /**
  * Fetches a single study class by its unique identifier.
- *
- * This function bypasses the cache (`'no-store'`) to ensure fresh data
- * is retrieved from the API upon every call.
- *
  * @param id - The numerical ID of the study class to retrieve.
  * @returns A Promise that resolves to the {@link StudyClass} object.
  * @throws Will throw an Error if the fetch response is not 'ok' (e.g., 404, 500).
  */
 export async function getStudyClass(id: number): Promise<StudyClass> {
-  const response = await fetch(`${API_BASE_URL}/study-classes/${id}`, {
-    cache: 'no-store',
-  });
+  const response = await fetch(`${API_BASE_URL}/study-classes/${id}`);
   if (!response.ok) {
     throw new Error('Failed to fetch study class details');
   }
@@ -108,9 +99,6 @@ export async function getStudyClassesByCourse(
 ): Promise<StudyClass[]> {
   const response = await fetch(
     `${API_BASE_URL}/study-classes/course/${courseId}`,
-    {
-      cache: 'no-store',
-    },
   );
   if (!response.ok) throw new Error('Failed to fetch study classes');
   return response.json();
@@ -153,7 +141,6 @@ export async function enrollProfessorInStudyClass(
       headers: {
         'Content-Type': 'application/json',
       },
-      // Ensure the key 'professorId' matches what your API expects
       body: JSON.stringify({
         professorId: professorId,
       }),
@@ -175,9 +162,7 @@ export async function enrollProfessorInStudyClass(
  * @returns A promise that resolves to an array of Professor objects.
  */
 export async function getProfessors(): Promise<Professor[]> {
-  const response = await fetch(`${API_BASE_URL}/professors`, {
-    cache: 'no-store',
-  });
+  const response = await fetch(`${API_BASE_URL}/professors`);
   if (!response.ok) throw new Error('Failed to fetch professors');
   return response.json();
 }
@@ -207,9 +192,7 @@ export async function createProfessor(name: string): Promise<Professor> {
  * @returns A promise that resolves to an array of Student objects.
  */
 export async function getAllStudents(): Promise<Student[]> {
-  const response = await fetch(`${API_BASE_URL}/students`, {
-    cache: 'no-store',
-  });
+  const response = await fetch(`${API_BASE_URL}/students`);
   if (!response.ok) throw new Error('Failed to fetch students');
   return response.json();
 }
@@ -220,9 +203,7 @@ export async function getAllStudents(): Promise<Student[]> {
  * @returns A promise that resolves to the Student object.
  */
 export async function getStudent(id: number): Promise<Student> {
-  const response = await fetch(`${API_BASE_URL}/students/${id}`, {
-    cache: 'no-store',
-  });
+  const response = await fetch(`${API_BASE_URL}/students/${id}`);
   if (!response.ok) throw new Error(`Failed to fetch student with id ${id}`);
   return response.json();
 }
@@ -289,7 +270,6 @@ export async function getSubscriptionsByStudyClass(
 ): Promise<Subscription[]> {
   const response = await fetch(
     `${API_BASE_URL}/subscriptions?studyClassId=${studyClassId}`,
-    { cache: 'no-store' },
   );
 
   if (!response.ok) throw new Error('Failed to fetch subscriptions');

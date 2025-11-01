@@ -2,29 +2,80 @@
 
 import clsx from 'clsx';
 import Link from 'next/link';
-import { useStudyClasses } from '@/hooks/useStudyClasses';
+import { useState, useMemo } from 'react';
+
+import {
+  useGetAllStudyClasses,
+  useGetStudentsByStudyClass,
+} from '@/lib/api_query';
+import { StudyClass } from '@/types';
 
 export default function StudyClassesPage() {
-  const {
-    isLoading,
-    isStudentsLoading,
-    selectedStudyClass,
-    filteredStudyClasses,
-    currentStudents,
-    studentSearchTerm,
-    setStudentSearchTerm,
-    studyClassSearchTerm,
-    setStudyClassSearchTerm,
-    currentPage,
-    paginationLength,
-    filteredStudents,
-    handleStudyClassClick,
-    handleStudyClassDeselect,
-    handlePaginationLengthChange,
-    paginate,
-  } = useStudyClasses();
+  // 3. Setup local state for UI
+  const [selectedStudyClass, setSelectedStudyClass] =
+    useState<StudyClass | null>(null);
+  const [studentSearchTerm, setStudentSearchTerm] = useState('');
+  const [studyClassSearchTerm, setStudyClassSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [paginationLength, setPaginationLength] = useState(10);
 
-  if (isLoading) {
+  // 4. Setup React Query for data fetching
+  const { data: studyClasses = [], isLoading: isClassesLoading } =
+    useGetAllStudyClasses();
+
+  const { data: students = [], isLoading: isStudentsLoading } =
+    useGetStudentsByStudyClass(selectedStudyClass?.id || null);
+
+  const filteredStudyClasses = useMemo(() => {
+    if (studyClassSearchTerm.trim() === '') {
+      return [];
+    }
+    return studyClasses.filter(sc =>
+      sc.classCode
+        .toLowerCase()
+        .includes(studyClassSearchTerm.toLowerCase().trim()),
+    );
+  }, [studyClasses, studyClassSearchTerm]);
+
+  const filteredStudents = useMemo(() => {
+    return students.filter(student =>
+      student.name.toLowerCase().includes(studentSearchTerm.toLowerCase()),
+    );
+  }, [students, studentSearchTerm]);
+
+  const currentStudents = useMemo(() => {
+    const indexOfLastStudent = currentPage * paginationLength;
+    const indexOfFirstStudent = indexOfLastStudent - paginationLength;
+    return filteredStudents.slice(indexOfFirstStudent, indexOfLastStudent);
+  }, [filteredStudents, currentPage, paginationLength]);
+
+  const handleStudyClassClick = (studyClass: StudyClass) => {
+    if (selectedStudyClass?.id === studyClass.id) return;
+    setSelectedStudyClass(studyClass);
+    setStudentSearchTerm('');
+    setCurrentPage(1);
+  };
+
+  const handleStudyClassDeselect = () => {
+    setSelectedStudyClass(null);
+    setStudentSearchTerm('');
+    setCurrentPage(1);
+  };
+
+  const handlePaginationLengthChange = (
+    e: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
+    setPaginationLength(Number(e.target.value));
+    setCurrentPage(1); // Reset to first page
+  };
+
+  const paginate = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
+
+  // --- Render Logic ---
+
+  if (isClassesLoading) {
     return (
       <div className='text-center mt-8 text-foreground'>
         Loading study classes...

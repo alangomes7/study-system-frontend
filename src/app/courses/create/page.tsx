@@ -1,36 +1,37 @@
 'use client';
 
-import { createCourse } from '@/lib/api';
+import { useCreateCourse } from '@/lib/api_query';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function CreateCoursePage() {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
+  const createCourseMutation = useCreateCourse();
 
-    try {
-      await createCourse({ name, description });
-      router.push('/courses');
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('An unknown error occurred');
-      }
-    }
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    createCourseMutation.mutate(
+      { name, description },
+      {
+        onSuccess: () => {
+          router.push('/courses');
+        },
+      },
+    );
   };
 
   return (
     <div className='container mx-auto px-4 py-8'>
       <h1 className='text-3xl font-bold mb-6 text-foreground'>Create Course</h1>
 
-      {error && <p className='text-red-500 mb-4'>{error}</p>}
+      {createCourseMutation.error && (
+        <p className='text-red-500 mb-4'>
+          {createCourseMutation.error.message}
+        </p>
+      )}
 
       <form onSubmit={handleSubmit} className='card p-6'>
         <div className='mb-4'>
@@ -47,6 +48,7 @@ export default function CreateCoursePage() {
             onChange={e => setName(e.target.value)}
             className='input'
             required
+            disabled={createCourseMutation.isPending}
           />
         </div>
 
@@ -63,11 +65,16 @@ export default function CreateCoursePage() {
             onChange={e => setDescription(e.target.value)}
             className='input min-h-[100px]'
             required
+            disabled={createCourseMutation.isPending}
           />
         </div>
 
-        <button type='submit' className='btn btn-primary'>
-          Create
+        <button
+          type='submit'
+          className='btn btn-primary'
+          disabled={createCourseMutation.isPending}
+        >
+          {createCourseMutation.isPending ? 'Creating...' : 'Create'}
         </button>
       </form>
     </div>

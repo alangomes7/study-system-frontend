@@ -1,22 +1,50 @@
 'use client';
 
 import Link from 'next/link';
-import { useStudents } from '@/hooks/useStudents';
+import { useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
+import { useGetAllStudents } from '@/lib/api_query';
 
 export default function StudentsPage() {
   const {
+    data: students = [], // Default to empty array
     isLoading,
     error,
-    filteredStudents,
-    currentStudents,
-    currentPage,
-    paginationLength,
-    searchTerm,
-    setSearchTerm,
-    handlePaginationLengthChange,
-    handleRowClick,
-    paginate,
-  } = useStudents();
+  } = useGetAllStudents();
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [paginationLength, setPaginationLength] = useState(10);
+  const router = useRouter();
+
+  const filteredStudents = useMemo(() => {
+    return students.filter(student =>
+      student.name.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
+  }, [students, searchTerm]);
+
+  const currentStudents = useMemo(() => {
+    const indexOfLastStudent = currentPage * paginationLength;
+    const indexOfFirstStudent = indexOfLastStudent - paginationLength;
+    return filteredStudents.slice(indexOfFirstStudent, indexOfLastStudent);
+  }, [filteredStudents, currentPage, paginationLength]);
+
+  const handlePaginationLengthChange = (
+    e: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
+    setPaginationLength(Number(e.target.value));
+    setCurrentPage(1);
+  };
+
+  const paginate = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const handleRowClick = (studentId: number) => {
+    router.push(`/students/${studentId}`);
+  };
+
+  // --- Render Logic ---
 
   if (isLoading) {
     return (
@@ -27,7 +55,9 @@ export default function StudentsPage() {
   }
 
   if (error) {
-    return <p className='text-center mt-8 text-red-500'>Error: {error}</p>;
+    return (
+      <p className='text-center mt-8 text-red-500'>Error: {error.message}</p>
+    );
   }
 
   return (
@@ -43,9 +73,9 @@ export default function StudentsPage() {
             onChange={handlePaginationLengthChange}
             className='input w-full sm:w-auto'
           >
+            <option value={5}>5 per page</option>
             <option value={10}>10 per page</option>
             <option value={20}>20 per page</option>
-            <option value={50}>50 per page</option>
           </select>
           <input
             type='text'
@@ -80,6 +110,7 @@ export default function StudentsPage() {
                 </tr>
               </thead>
               <tbody>
+                {/* Use currentStudents (paginated) */}
                 {currentStudents.map(student => (
                   <tr
                     key={student.id}
@@ -107,6 +138,7 @@ export default function StudentsPage() {
 
           {/* Mobile Card View */}
           <div className='grid grid-cols-1 gap-4 md:hidden'>
+            {/* Use currentStudents (paginated) */}
             {currentStudents.map(student => (
               <Link
                 key={student.id}

@@ -1,37 +1,89 @@
 'use client';
 
-import { useCourses } from '@/hooks/useCourses';
+import {
+  useGetCourse,
+  useGetStudyClassesByCourse,
+  useGetStudentsByStudyClass,
+} from '@/lib/api_query';
+import { StudyClass } from '@/types';
 import clsx from 'clsx';
 import Link from 'next/link';
-import { use } from 'react';
+import { use, useState, useMemo } from 'react';
 
 export default function CourseDetailsPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: number }>;
 }) {
   const { id } = use(params);
 
-  const {
-    isLoading,
-    error,
-    course,
-    selectedStudyClass,
-    studyClassSearchTerm,
-    setStudyClassSearchTerm,
-    filteredStudyClasses,
-    handleStudyClassClick,
-    filteredStudents,
-    currentStudents,
-    currentPage,
-    paginationLength,
-    searchTerm,
-    setSearchTerm,
-    handlePaginationLengthChange,
-    paginate,
-  } = useCourses(id);
+  // --- Local UI State ---
+  // We still use useState for state that is not server state
+  const [selectedStudyClass, setSelectedStudyClass] =
+    useState<StudyClass | null>(null);
+  const [studyClassSearchTerm, setStudyClassSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [paginationLength, setPaginationLength] = useState(10);
 
-  if (isLoading) {
+  // --- Data Fetching with React Query ---
+  const {
+    data: course,
+    isLoading: isCourseLoading,
+    error: courseError,
+  } = useGetCourse(id);
+
+  const {
+    data: studyClasses = [],
+    isLoading: isStudyClassesLoading,
+    error: studyClassesError,
+  } = useGetStudyClassesByCourse(id);
+
+  // 6. Fetch students *only* for the selected class ID
+  const { data: students = [], isLoading: isStudentsLoading } =
+    useGetStudentsByStudyClass(selectedStudyClass?.id || null);
+
+  // --- Memoized Filtering (Client-side) ---
+  const filteredStudyClasses = useMemo(() => {
+    return studyClasses.filter(studyClass =>
+      studyClass.classCode
+        .toLowerCase()
+        .includes(studyClassSearchTerm.toLowerCase()),
+    );
+  }, [studyClasses, studyClassSearchTerm]);
+
+  const filteredStudents = useMemo(() => {
+    if (!Array.isArray(students)) return [];
+    return students.filter(student =>
+      student.name.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
+  }, [students, searchTerm]);
+
+  // --- Memoized Pagination (Client-side) ---
+  const currentStudents = useMemo(() => {
+    const indexOfLastStudent = currentPage * paginationLength;
+    const indexOfFirstStudent = indexOfLastStudent - paginationLength;
+    return filteredStudents.slice(indexOfFirstStudent, indexOfLastStudent);
+  }, [filteredStudents, currentPage, paginationLength]);
+
+  // --- Event Handlers ---
+  const handleStudyClassClick = (studyClass: StudyClass) => {
+    setSelectedStudyClass(studyClass);
+    setCurrentPage(1);
+    setSearchTerm('');
+  };
+
+  const handlePaginationLengthChange = (
+    e: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
+    setPaginationLength(Number(e.target.value));
+    setCurrentPage(1);
+  };
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
+  // --- Loading and Error States ---
+  if (isCourseLoading || isStudyClassesLoading) {
     return (
       <div className='text-center mt-8 text-foreground'>
         Loading course details...
@@ -39,8 +91,9 @@ export default function CourseDetailsPage({
     );
   }
 
+  const error = courseError || studyClassesError;
   if (error) {
-    return <div className='text-center mt-8 text-red-500'>{error}</div>;
+    return <div className='text-center mt-8 text-red-500'>{error.message}</div>;
   }
 
   if (!course) {
@@ -51,6 +104,7 @@ export default function CourseDetailsPage({
     );
   }
 
+  // --- Render Logic ---
   return (
     <div className='container mx-auto px-4 py-8'>
       <h1 className='text-2xl font-bold md:text-3xl mb-2 text-foreground'>
@@ -151,7 +205,11 @@ export default function CourseDetailsPage({
                 </div>
               </div>
 
-              {filteredStudents.length > 0 ? (
+              {isStudentsLoading ? (
+                <div className='text-center mt-8 text-foreground'>
+                  Loading students...
+                </div>
+              ) : filteredStudents.length > 0 ? (
                 <>
                   <div className='hidden md:block overflow-x-auto'>
                     <table className='min-w-full bg-card-background border border-border rounded-lg shadow-sm'>

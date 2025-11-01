@@ -1,43 +1,66 @@
 'use client';
 
-// Import the hook you will create
-import { useEnrollStudent } from '@/hooks/useStudyClasses';
+import { use, useState } from 'react';
 import Link from 'next/link';
+import {
+  useGetAllStudents,
+  useGetStudyClass,
+  useCreateSubscription,
+} from '@/lib/api_query';
 
 export default function EnrollStudentPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: number }>;
 }) {
-  // 1. Get the study class id from params
-  const { id } = params;
+  const { id } = use(params);
+  const [selectedStudent, setSelectedStudent] = useState<string>('');
 
-  // 2. Call the new hook for enrolling students
   const {
-    students,
-    studyClass,
-    selectedStudent,
-    setSelectedStudent,
-    error,
-    isLoading,
-    isSubmitting,
-    handleSubmit,
-  } = useEnrollStudent(id);
+    data: students = [],
+    isLoading: isLoadingStudents,
+    error: studentsError,
+  } = useGetAllStudents();
+  const {
+    data: studyClass,
+    isLoading: isLoadingClass,
+    error: classError,
+  } = useGetStudyClass(id);
+
+  const {
+    mutate: createSubscription,
+    isPending: isSubmitting,
+    error: submissionError,
+  } = useCreateSubscription();
+
+  const isLoading = isLoadingStudents || isLoadingClass;
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedStudent) return;
+
+    createSubscription({
+      studyClassId: id,
+      studentId: Number(selectedStudent),
+    });
+  };
 
   if (isLoading) {
     return <div className='text-center mt-8 text-foreground'>Loading...</div>;
   }
 
-  // 4. Page-level error (e.g., class not found)
-  if (error && !isSubmitting) {
-    return <p className='text-center mt-8 text-red-500'>Error: {error}</p>;
+  const queryError = studentsError || classError;
+  if (queryError) {
+    return (
+      <p className='text-center mt-8 text-red-500'>
+        Error: {queryError.message}
+      </p>
+    );
   }
 
-  // 5. Render the form
   return (
     <div className='container mx-auto px-4 py-8 max-w-lg'>
       <h1 className='text-2xl md:text-3xl font-bold mb-6 text-foreground'>
-        {/* CHANGED: Title text */}
         Enroll Student in {studyClass?.classCode || 'Class'}
       </h1>
 
@@ -54,6 +77,7 @@ export default function EnrollStudentPage({
             value={selectedStudent}
             onChange={e => setSelectedStudent(e.target.value)}
             className='input'
+            disabled={isSubmitting}
             required
           >
             <option value='' disabled>
@@ -67,8 +91,14 @@ export default function EnrollStudentPage({
           </select>
         </div>
 
-        {/* Submission error */}
-        {error && <p className='text-red-500 text-sm'>{error}</p>}
+        {/* Submission error - Use type-safe check */}
+        {submissionError && (
+          <p className='text-red-500 text-sm'>
+            {submissionError instanceof Error
+              ? submissionError.message
+              : 'An unknown error occurred.'}
+          </p>
+        )}
 
         <div className='flex items-center gap-4'>
           <button

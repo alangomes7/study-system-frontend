@@ -1,21 +1,16 @@
 'use client';
 
-// Import the hook you just created
 import { useEnrollProfessor } from '@/hooks/useStudyClasses';
 import Link from 'next/link';
-
-// All other imports (useState, useEffect, api, types) are no longer needed
-// as the hook handles all of that.
+import { use } from 'react';
 
 export default function EnrollProfessorPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: number }>;
 }) {
-  // 1. Get the id from params
-  const { id } = params;
+  const { id } = use(params);
 
-  // 2. Call the hook, which provides all the state and logic
   const {
     professors,
     studyClass,
@@ -27,16 +22,10 @@ export default function EnrollProfessorPage({
     handleSubmit,
   } = useEnrollProfessor(id);
 
-  // 3. All the previous logic (useState, useEffect, handleSubmit) is gone!
-
-  // The JSX remains exactly the same, as the hook provides
-  // all the same-named variables.
-
   if (isLoading) {
     return <div className='text-center mt-8 text-foreground'>Loading...</div>;
   }
 
-  // Page-level error (e.g., class not found)
   if (error && !isSubmitting) {
     return <p className='text-center mt-8 text-red-500'>Error: {error}</p>;
   }
@@ -73,7 +62,6 @@ export default function EnrollProfessorPage({
           </select>
         </div>
 
-        {/* Submission error */}
         {error && <p className='text-red-500 text-sm'>{error}</p>}
 
         <div className='flex items-center gap-4'>
