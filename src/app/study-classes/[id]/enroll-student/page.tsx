@@ -1,121 +1,199 @@
 'use client';
 
-import { use, useState } from 'react';
-import Link from 'next/link';
+import { useState } from 'react';
 import {
   useGetAllStudents,
-  useGetStudyClass,
+  useGetAllStudyClasses,
   useCreateSubscription,
 } from '@/lib/api_query';
+import { ChevronDown } from 'lucide-react';
 
-export default function EnrollStudentPage({
-  params,
-}: {
-  params: Promise<{ id: number }>;
-}) {
-  const { id } = use(params);
+export default function EnrollStudentPage() {
   const [selectedStudent, setSelectedStudent] = useState<string>('');
+  const [selectedStudyClass, setSelectedStudyClass] = useState<string>('');
+  const [openDropdown, setOpenDropdown] = useState<
+    'student' | 'studyClass' | null
+  >(null);
 
-  const {
-    data: students = [],
-    isLoading: isLoadingStudents,
-    error: studentsError,
-  } = useGetAllStudents();
-  const {
-    data: studyClass,
-    isLoading: isLoadingClass,
-    error: classError,
-  } = useGetStudyClass(id);
+  const { data: students = [], isLoading: isLoadingStudents } =
+    useGetAllStudents();
+  const { data: studyClasses = [], isLoading: isLoadingStudyClasses } =
+    useGetAllStudyClasses();
 
   const {
     mutate: createSubscription,
     isPending: isSubmitting,
-    error: submissionError,
+    error,
   } = useCreateSubscription();
 
-  const isLoading = isLoadingStudents || isLoadingClass;
+  const isLoading = isLoadingStudents || isLoadingStudyClasses;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedStudent) return;
+    if (!selectedStudent || !selectedStudyClass) return;
 
     createSubscription({
-      studyClassId: id,
       studentId: Number(selectedStudent),
+      studyClassId: Number(selectedStudyClass),
     });
   };
 
-  if (isLoading) {
-    return <div className='text-center mt-8 text-foreground'>Loading...</div>;
-  }
+  // --- Handlers for custom dropdowns ---
+  const handleStudentSelect = (studentId: string) => {
+    setSelectedStudent(studentId);
+    setOpenDropdown(null);
+  };
 
-  const queryError = studentsError || classError;
-  if (queryError) {
+  const handleStudyClassSelect = (classId: string) => {
+    setSelectedStudyClass(classId);
+    setOpenDropdown(null);
+  };
+
+  // --- Display values for dropdowns ---
+  const selectedStudentName =
+    students.find(s => s.id === Number(selectedStudent))?.name ||
+    'Select a student';
+
+  const selectedStudyClassName =
+    studyClasses.find(sc => sc.id === Number(selectedStudyClass))?.classCode ||
+    'Select a study class';
+
+  if (isLoading) {
     return (
-      <p className='text-center mt-8 text-red-500'>
-        Error: {queryError.message}
-      </p>
+      <div className='text-center mt-8 text-foreground'>
+        Loading students and study classes...
+      </div>
     );
   }
 
   return (
     <div className='container mx-auto px-4 py-8 max-w-lg'>
-      <h1 className='text-2xl md:text-3xl font-bold mb-6 text-foreground'>
-        Enroll Student in {studyClass?.classCode || 'Class'}
+      <h1 className='text-3xl font-bold mb-6 text-foreground'>
+        Enroll Student
       </h1>
-
+      {error && (
+        <p className='text-center mb-4 text-red-500'>{error.message}</p>
+      )}
       <form onSubmit={handleSubmit} className='card p-6 space-y-4'>
-        <div className='mb-4'>
+        {/* Student Dropdown */}
+        <div className='relative'>
           <label
-            htmlFor='student'
-            className='block text-sm font-medium text-foreground/80 mb-1'
+            htmlFor='student-button'
+            className='block text-foreground font-bold mb-2'
           >
             Student
           </label>
-          <select
-            id='student'
-            value={selectedStudent}
-            onChange={e => setSelectedStudent(e.target.value)}
-            className='input'
-            disabled={isSubmitting}
-            required
-          >
-            <option value='' disabled>
-              Select a student
-            </option>
-            {students.map(student => (
-              <option key={student.id} value={student.id}>
-                {student.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Submission error - Use type-safe check */}
-        {submissionError && (
-          <p className='text-red-500 text-sm'>
-            {submissionError instanceof Error
-              ? submissionError.message
-              : 'An unknown error occurred.'}
-          </p>
-        )}
-
-        <div className='flex items-center gap-4'>
           <button
-            type='submit'
-            className='btn btn-primary'
+            type='button'
+            id='student-button'
+            onClick={() =>
+              setOpenDropdown(openDropdown === 'student' ? null : 'student')
+            }
+            className='w-full bg-card-background border border-border text-foreground rounded-md px-3 py-2 flex justify-between items-center shadow-sm hover:border-primary transition-colors'
             disabled={isSubmitting}
+            aria-required='true'
           >
-            {isSubmitting ? 'Enrolling...' : 'Enroll'}
+            <span
+              className={
+                selectedStudent
+                  ? 'text-foreground'
+                  : 'text-muted-foreground italic'
+              }
+            >
+              {selectedStudentName}
+            </span>
+            <ChevronDown
+              className={`w-4 h-4 transition-transform duration-200 ${
+                openDropdown === 'student'
+                  ? 'rotate-180 text-primary'
+                  : 'text-muted-foreground'
+              }`}
+            />
           </button>
 
-          <Link
-            href={`/study-classes/${id}`}
-            className='btn border border-border hover:bg-foreground/5'
-          >
-            Cancel
-          </Link>
+          {openDropdown === 'student' && (
+            <ul className='absolute z-20 mt-1 w-full max-h-60 overflow-y-auto bg-card-background border border-border rounded-lg shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2'>
+              {students.map(student => (
+                <li
+                  key={student.id}
+                  onClick={() => handleStudentSelect(String(student.id))}
+                  className={`px-3 py-2 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors ${
+                    selectedStudent === String(student.id)
+                      ? 'bg-primary/20 text-primary-foreground'
+                      : 'text-foreground'
+                  }`}
+                >
+                  {student.name}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
+
+        {/* Study Class Dropdown */}
+        <div className='relative'>
+          <label
+            htmlFor='studyClass-button'
+            className='block text-foreground font-bold mb-2'
+          >
+            Study Class
+          </label>
+          <button
+            type='button'
+            id='studyClass-button'
+            onClick={() =>
+              setOpenDropdown(
+                openDropdown === 'studyClass' ? null : 'studyClass',
+              )
+            }
+            className='w-full bg-card-background border border-border text-foreground rounded-md px-3 py-2 flex justify-between items-center shadow-sm hover:border-primary transition-colors'
+            disabled={isSubmitting}
+            aria-required='true'
+          >
+            <span
+              className={
+                selectedStudyClass
+                  ? 'text-foreground'
+                  : 'text-muted-foreground italic'
+              }
+            >
+              {selectedStudyClassName}
+            </span>
+            <ChevronDown
+              className={`w-4 h-4 transition-transform duration-200 ${
+                openDropdown === 'studyClass'
+                  ? 'rotate-180 text-primary'
+                  : 'text-muted-foreground'
+              }`}
+            />
+          </button>
+
+          {openDropdown === 'studyClass' && (
+            <ul className='absolute z-20 mt-1 w-full max-h-60 overflow-y-auto bg-card-background border border-border rounded-lg shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2'>
+              {studyClasses.map(studyClass => (
+                <li
+                  key={studyClass.id}
+                  onClick={() => handleStudyClassSelect(String(studyClass.id))}
+                  className={`px-3 py-2 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors ${
+                    selectedStudyClass === String(studyClass.id)
+                      ? 'bg-primary/20 text-primary-foreground'
+                      : 'text-foreground'
+                  }`}
+                >
+                  {studyClass.classCode}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <button
+          type='submit'
+          className='btn btn-primary disabled:opacity-50'
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? 'Enrolling...' : 'Enroll'}
+        </button>
       </form>
     </div>
   );

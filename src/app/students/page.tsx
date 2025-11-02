@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useGetAllStudents } from '@/lib/api_query';
+import { ChevronDown } from 'lucide-react';
 
 export default function StudentsPage() {
   const {
@@ -15,6 +16,7 @@ export default function StudentsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [paginationLength, setPaginationLength] = useState(10);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const router = useRouter();
 
   const filteredStudents = useMemo(() => {
@@ -29,11 +31,10 @@ export default function StudentsPage() {
     return filteredStudents.slice(indexOfFirstStudent, indexOfLastStudent);
   }, [filteredStudents, currentPage, paginationLength]);
 
-  const handlePaginationLengthChange = (
-    e: React.ChangeEvent<HTMLSelectElement>,
-  ) => {
-    setPaginationLength(Number(e.target.value));
+  const handlePaginationLengthChange = (length: number) => {
+    setPaginationLength(length);
     setCurrentPage(1);
+    setOpenDropdown(null);
   };
 
   const paginate = (pageNumber: number) => {
@@ -67,16 +68,45 @@ export default function StudentsPage() {
           Students
         </h1>
         <div className='flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto'>
-          <select
-            id='pagination-length'
-            value={paginationLength}
-            onChange={handlePaginationLengthChange}
-            className='input w-full sm:w-auto'
-          >
-            <option value={5}>5 per page</option>
-            <option value={10}>10 per page</option>
-            <option value={20}>20 per page</option>
-          </select>
+          {/* Custom Dropdown for Pagination */}
+          <div className='relative w-full sm:w-auto'>
+            <button
+              type='button'
+              onClick={() =>
+                setOpenDropdown(
+                  openDropdown === 'pagination' ? null : 'pagination',
+                )
+              }
+              className='bg-card-background border border-border text-foreground rounded-md px-3 py-2 flex justify-between items-center w-full sm:w-36 shadow-sm hover:border-primary transition-colors'
+            >
+              <span>{paginationLength} per page</span>
+              <ChevronDown
+                className={`w-4 h-4 transition-transform duration-200 ${
+                  openDropdown === 'pagination'
+                    ? 'rotate-180 text-primary'
+                    : 'text-muted-foreground'
+                }`}
+              />
+            </button>
+
+            {openDropdown === 'pagination' && (
+              <ul className='absolute z-20 mt-1 w-full sm:w-36 bg-card-background border border-border rounded-lg shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2'>
+                {[5, 10, 20].map(length => (
+                  <li
+                    key={length}
+                    onClick={() => handlePaginationLengthChange(length)}
+                    className={`px-3 py-2 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors ${
+                      paginationLength === length
+                        ? 'bg-primary/20 text-primary-foreground'
+                        : 'text-foreground'
+                    }`}
+                  >
+                    {length} per page
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
           <input
             type='text'
             placeholder='Search by student name...'

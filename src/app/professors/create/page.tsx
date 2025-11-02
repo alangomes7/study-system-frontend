@@ -1,13 +1,11 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useCreateProfessor } from '@/lib/api_query';
 import Link from 'next/link';
 
 export default function CreateProfessorPage() {
   const [name, setName] = useState('');
-  const router = useRouter();
 
   const {
     mutate: createProfessor,

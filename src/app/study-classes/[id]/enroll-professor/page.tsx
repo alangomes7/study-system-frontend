@@ -1,8 +1,14 @@
 'use client';
 
-import { useEnrollProfessor } from '@/hooks/useStudyClasses';
+import {
+  useGetProfessors,
+  useGetStudyClass,
+  useEnrollProfessor,
+} from '@/lib/api_query';
 import Link from 'next/link';
-import { use } from 'react';
+import { useRouter } from 'next/navigation';
+import { use, useState } from 'react';
+import { ChevronDown } from 'lucide-react';
 
 export default function EnrollProfessorPage({
   params,
@@ -10,24 +16,76 @@ export default function EnrollProfessorPage({
   params: Promise<{ id: number }>;
 }) {
   const { id } = use(params);
+  const router = useRouter();
 
+  // State for the form
+  const [selectedProfessor, setSelectedProfessor] = useState<string>('');
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+
+  // Data fetching hooks
   const {
-    professors,
-    studyClass,
-    selectedProfessor,
-    setSelectedProfessor,
-    error,
-    isLoading,
-    isSubmitting,
-    handleSubmit,
-  } = useEnrollProfessor(id);
+    data: professors = [],
+    isLoading: isLoadingProfessors,
+    error: professorsError,
+  } = useGetProfessors();
+  const {
+    data: studyClass,
+    isLoading: isLoadingClass,
+    error: classError,
+  } = useGetStudyClass(id);
+
+  // Mutation hook
+  const {
+    mutate: enrollProfessor,
+    isPending: isSubmitting,
+    error: mutationError,
+  } = useEnrollProfessor();
+
+  // --- Event Handlers ---
+
+  const handleProfessorSelect = (professorId: string) => {
+    setSelectedProfessor(professorId);
+    setOpenDropdown(null);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedProfessor) return;
+
+    enrollProfessor(
+      {
+        studyClassId: id,
+        professorId: Number(selectedProfessor),
+      },
+      {
+        onSuccess: () => {
+          // On success, go back to the class details page
+          router.push(`/study-classes/${id}`);
+        },
+      },
+    );
+  };
+
+  // --- Derived State & Loading/Error Handling ---
+
+  const selectedProfessorName =
+    professors.find(p => p.id === Number(selectedProfessor))?.name ||
+    'Select a professor';
+
+  const isLoading = isLoadingProfessors || isLoadingClass;
+  const queryError = professorsError || classError;
+  const error = queryError || mutationError;
 
   if (isLoading) {
     return <div className='text-center mt-8 text-foreground'>Loading...</div>;
   }
 
-  if (error && !isSubmitting) {
-    return <p className='text-center mt-8 text-red-500'>Error: {error}</p>;
+  if (queryError && !isSubmitting) {
+    return (
+      <p className='text-center mt-8 text-red-500'>
+        Error: {queryError.message}
+      </p>
+    );
   }
 
   return (
@@ -37,34 +95,70 @@ export default function EnrollProfessorPage({
       </h1>
 
       <form onSubmit={handleSubmit} className='card p-6 space-y-4'>
-        <div className='mb-4'>
+        <div>
           <label
-            htmlFor='professor'
+            htmlFor='professor-button'
             className='block text-sm font-medium text-foreground/80 mb-1'
           >
             Professor
           </label>
-          <select
-            id='professor'
-            value={selectedProfessor}
-            onChange={e => setSelectedProfessor(e.target.value)}
-            className='input'
-            required
-          >
-            <option value='' disabled>
-              Select a professor
-            </option>
-            {professors.map(professor => (
-              <option key={professor.id} value={professor.id}>
-                {professor.name}
-              </option>
-            ))}
-          </select>
+          <div className='relative'>
+            <button
+              type='button'
+              id='professor-button'
+              onClick={() =>
+                setOpenDropdown(
+                  openDropdown === 'professor' ? null : 'professor',
+                )
+              }
+              className='w-full bg-card-background border border-border text-foreground rounded-md px-3 py-2 flex justify-between items-center shadow-sm hover:border-primary transition-colors'
+              disabled={isSubmitting}
+            >
+              <span
+                className={
+                  selectedProfessor
+                    ? 'text-foreground'
+                    : 'text-muted-foreground italic'
+                }
+              >
+                {selectedProfessorName}
+              </span>
+              <ChevronDown
+                className={`w-4 h-4 transition-transform duration-200 ${
+                  openDropdown === 'professor'
+                    ? 'rotate-180 text-primary'
+                    : 'text-muted-foreground'
+                }`}
+              />
+            </button>
+
+            {openDropdown === 'professor' && (
+              <ul className='absolute z-20 mt-1 w-full max-h-60 overflow-y-auto bg-card-background border border-border rounded-lg shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2'>
+                {professors.map(professor => (
+                  <li
+                    key={professor.id}
+                    onClick={() => handleProfessorSelect(String(professor.id))}
+                    className={`px-3 py-2 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors ${
+                      selectedProfessor === String(professor.id)
+                        ? 'bg-primary/20 text-primary-foreground'
+                        : 'text-foreground'
+                    }`}
+                  >
+                    {professor.name}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
 
-        {error && <p className='text-red-500 text-sm'>{error}</p>}
+        {error && (
+          <p className='text-red-500 text-sm'>
+            {error instanceof Error ? error.message : 'An error occurred'}
+          </p>
+        )}
 
-        <div className='flex items-center gap-4'>
+        <div className='flex items-center gap-4 pt-2'>
           <button
             type='submit'
             className='btn btn-primary'
