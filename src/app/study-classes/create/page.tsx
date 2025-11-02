@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { ChevronDown } from 'lucide-react';
 import {
   useGetCourses,
   useGetProfessors,
@@ -11,8 +12,11 @@ import {
 export default function CreateStudyClassPage() {
   const [year, setYear] = useState<number>(new Date().getFullYear());
   const [semester, setSemester] = useState<number>(1);
-  const [courseId, setCourseId] = useState<string>('');
-  const [professorId, setProfessorId] = useState<string>('');
+  const [courseId, setCourseId] = useState<number | null>(null);
+  const [professorId, setProfessorId] = useState<number | null>(null);
+  const [openDropdown, setOpenDropdown] = useState<
+    'course' | 'professor' | null
+  >(null);
 
   const { data: courses = [], isLoading: isLoadingCourses } = useGetCourses();
   const { data: professors = [], isLoading: isLoadingProfessors } =
@@ -29,12 +33,11 @@ export default function CreateStudyClassPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!courseId) return;
-
     createStudyClass({
       year,
       semester,
-      courseId: Number(courseId),
-      professorId: professorId ? Number(professorId) : null, // Handle optional prof.
+      courseId,
+      professorId,
     });
   };
 
@@ -53,6 +56,7 @@ export default function CreateStudyClassPage() {
       </h1>
 
       <form onSubmit={handleSubmit} className='card p-6 space-y-4'>
+        {/* Year & Semester */}
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <div>
             <label
@@ -71,6 +75,7 @@ export default function CreateStudyClassPage() {
               required
             />
           </div>
+
           <div>
             <label
               htmlFor='semester'
@@ -92,57 +97,127 @@ export default function CreateStudyClassPage() {
           </div>
         </div>
 
-        <div>
-          <label
-            htmlFor='course'
-            className='block text-sm font-medium text-foreground/80 mb-1'
-          >
+        {/* Course Dropdown */}
+        <div className='relative'>
+          <label className='block text-sm font-medium text-foreground/80 mb-1'>
             Course
           </label>
-          <select
-            id='course'
-            value={courseId}
-            onChange={e => setCourseId(e.target.value)}
-            className='input'
-            disabled={isSubmitting}
-            required
+          <button
+            type='button'
+            onClick={() =>
+              setOpenDropdown(openDropdown === 'course' ? null : 'course')
+            }
+            className='w-full bg-card-background border border-border text-foreground rounded-md px-3 py-2 flex justify-between items-center shadow-sm hover:border-primary transition-colors'
           >
-            <option value='' disabled>
-              Select a course
-            </option>
-            {courses.map(course => (
-              <option key={course.id} value={course.id}>
-                {course.name}
-              </option>
-            ))}
-          </select>
+            <span
+              className={
+                courseId ? 'text-foreground' : 'text-muted-foreground italic'
+              }
+            >
+              {courseId
+                ? courses.find(c => c.id === courseId)?.name
+                : '-- Select a course --'}
+            </span>
+            <ChevronDown
+              className={`w-4 h-4 transition-transform duration-200 ${
+                openDropdown === 'course'
+                  ? 'rotate-180 text-primary'
+                  : 'text-muted-foreground'
+              }`}
+            />
+          </button>
+
+          {openDropdown === 'course' && (
+            <ul className='absolute z-20 mt-1 w-full bg-card-background border border-border rounded-lg shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2'>
+              {courses.map(course => (
+                <li
+                  key={course.id}
+                  onClick={() => {
+                    setCourseId(course.id);
+                    setOpenDropdown(null);
+                  }}
+                  className={`px-3 py-2 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors ${
+                    courseId === course.id
+                      ? 'bg-primary/20 text-primary-foreground'
+                      : 'text-foreground'
+                  }`}
+                >
+                  {course.name}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
-        <div>
-          <label
-            htmlFor='professor'
-            className='block text-sm font-medium text-foreground/80 mb-1'
-          >
+        {/* Professor Dropdown */}
+        <div className='relative'>
+          <label className='block text-sm font-medium text-foreground/80 mb-1'>
             Professor (Optional)
           </label>
-          <select
-            id='professor'
-            value={professorId}
-            onChange={e => setProfessorId(e.target.value)}
-            className='input'
-            disabled={isSubmitting}
+          <button
+            type='button'
+            onClick={() =>
+              setOpenDropdown(openDropdown === 'professor' ? null : 'professor')
+            }
+            className='w-full bg-card-background border border-border text-foreground rounded-md px-3 py-2 flex justify-between items-center shadow-sm hover:border-primary transition-colors'
           >
-            <option value=''>Not Assigned</option>
-            {professors.map(professor => (
-              <option key={professor.id} value={professor.id}>
-                {professor.name}
-              </option>
-            ))}
-          </select>
+            <span
+              className={
+                professorId ? 'text-foreground' : 'text-muted-foreground italic'
+              }
+            >
+              {professorId
+                ? professors.find(p => p.id === professorId)?.name
+                : 'Not Assigned'}
+            </span>
+            <ChevronDown
+              className={`w-4 h-4 transition-transform duration-200 ${
+                openDropdown === 'professor'
+                  ? 'rotate-180 text-primary'
+                  : 'text-muted-foreground'
+              }`}
+            />
+          </button>
+
+          {openDropdown === 'professor' && (
+            <ul className='absolute z-20 mt-1 w-full bg-card-background border border-border rounded-lg shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2'>
+              <li
+                onClick={() => {
+                  setProfessorId(null);
+                  setOpenDropdown(null);
+                }}
+                className={`px-3 py-2 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors ${
+                  !professorId
+                    ? 'bg-primary/20 text-primary-foreground'
+                    : 'text-foreground'
+                }`}
+              >
+                Not Assigned
+              </li>
+
+              {professors.map(professor => (
+                <li
+                  key={professor.id}
+                  onClick={() => {
+                    setProfessorId(professor.id);
+                    setOpenDropdown(null);
+                  }}
+                  className={`px-3 py-2 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors ${
+                    professorId === professor.id
+                      ? 'bg-primary/20 text-primary-foreground'
+                      : 'text-foreground'
+                  }`}
+                >
+                  {professor.name}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         {error && <p className='text-red-500 text-sm'>{error.message}</p>}
 
+        {/* Buttons */}
         <div className='flex items-center gap-4 pt-2'>
           <button
             type='submit'

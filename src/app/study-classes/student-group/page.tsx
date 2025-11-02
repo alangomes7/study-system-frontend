@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import clsx from 'clsx';
+import { ChevronDown } from 'lucide-react';
 import {
   useGetAllStudyClasses,
   useGetStudentsByStudyClass,
 } from '@/lib/api_query';
-import clsx from 'clsx';
 import { useStudentGroup } from '@/hooks/useStudents';
 
 export default function StudentGroupPage() {
@@ -28,81 +29,105 @@ export default function StudentGroupPage() {
     error: studentsError,
   } = useGetStudentsByStudyClass(selectedClassId);
 
-  // Hook into our local storage manager, passing the classCode
   const { addStudent, removeStudent, isStudentInGroup } = useStudentGroup(
     selectedClass?.classCode || null,
   );
 
-  // --- Render Functions ---
-
+  // ──────────────────────── Class Selector ────────────────────────
   const renderClassSelector = () => {
     if (isClassesLoading) return <p>Loading classes...</p>;
-    if (classesError) {
+    if (classesError)
       return (
         <p className='text-error'>
           Error loading classes: {classesError.message}
         </p>
       );
-    }
 
     return (
-      <div className='mb-4'>
+      <div className='mb-4 relative'>
         <label
           htmlFor='class-select'
           className='block text-sm font-medium text-muted-foreground mb-1'
         >
           Study Class
         </label>
-        <select
+
+        {/* Custom Dropdown Trigger */}
+        <button
           id='class-select'
-          className='input max-w-xs'
-          value={selectedClassId || ''}
-          onChange={e => setSelectedClassId(Number(e.target.value) || null)}
+          type='button'
+          onClick={() => setDropdownOpen(prev => !prev)}
+          className='w-full max-w-xs bg-card-background border border-border text-foreground rounded-md px-3 py-2 flex justify-between items-center shadow-sm hover:border-primary transition-colors'
         >
-          <option value=''>-- Select a class --</option>
-          {classes.map(studyClass => (
-            <option key={studyClass.id} value={studyClass.id}>
-              {studyClass.classCode} - {studyClass.courseName}
-            </option>
-          ))}
-        </select>
+          <span
+            className={
+              selectedClass ? 'text-foreground' : 'text-muted-foreground italic'
+            }
+          >
+            {selectedClass
+              ? `${selectedClass.classCode} - ${selectedClass.courseName}`
+              : '-- Select a class --'}
+          </span>
+          <ChevronDown
+            className={`w-4 h-4 transition-transform duration-200 ${
+              dropdownOpen ? 'rotate-180 text-primary' : 'text-muted-foreground'
+            }`}
+          />
+        </button>
+
+        {/* Dropdown Drawer */}
+        {dropdownOpen && (
+          <ul className='absolute z-20 mt-1 w-full max-w-xs bg-card-background border border-border rounded-lg shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2'>
+            {classes.map(studyClass => (
+              <li
+                key={studyClass.id}
+                onClick={() => {
+                  setSelectedClassId(studyClass.id);
+                  setDropdownOpen(false);
+                }}
+                className={`px-3 py-2 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors ${
+                  selectedClassId === studyClass.id
+                    ? 'bg-primary/20 text-primary-foreground'
+                    : 'text-foreground'
+                }`}
+              >
+                {studyClass.classCode} - {studyClass.courseName}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     );
   };
 
+  // ──────────────────────── Student Table ────────────────────────
   const renderStudentTable = () => {
-    if (!selectedClassId) {
+    if (!selectedClassId)
       return (
         <p className='text-muted-foreground'>
           Please select a class to see students.
         </p>
       );
-    }
 
-    if (isStudentsLoading) {
-      return <p>Loading students...</p>;
-    }
+    if (isStudentsLoading) return <p>Loading students...</p>;
 
-    if (studentsError) {
+    if (studentsError)
       return (
         <p className='text-error'>
           Error loading students: {studentsError.message}
         </p>
       );
-    }
 
-    if (!students || students.length === 0) {
-      return <p>No students found for this class.</p>;
-    }
+    if (!students?.length) return <p>No students found for this class.</p>;
 
     return (
       <div className='overflow-x-auto'>
         <table>
           <thead>
             <tr>
-              <th className='text-left'>ID</th>
-              <th className='text-left'>Name</th>
-              <th className='text-left'>Email</th>
+              <th className='text-center'>ID</th>
+              <th className='text-center'>Name</th>
+              <th className='text-center'>Email</th>
               <th className='text-center'>Group</th>
             </tr>
           </thead>
@@ -111,9 +136,9 @@ export default function StudentGroupPage() {
               const inGroup = isStudentInGroup(student.id);
               return (
                 <tr key={student.id}>
-                  <td className='text-left'>{student.id}</td>
-                  <td className='text-left'>{student.name}</td>
-                  <td className='text-left'>{student.email}</td>
+                  <td className='text-center'>{student.id}</td>
+                  <td className='text-center'>{student.name}</td>
+                  <td className='text-center'>{student.email}</td>
                   <td className='text-center'>
                     <button
                       className={clsx(
@@ -139,6 +164,9 @@ export default function StudentGroupPage() {
       </div>
     );
   };
+
+  // ──────────────────────── Render Page ────────────────────────
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   return (
     <div className='container mx-auto px-4 py-8'>

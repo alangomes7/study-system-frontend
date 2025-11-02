@@ -2,6 +2,7 @@
 
 import clsx from 'clsx';
 import Link from 'next/link';
+import { ChevronDown } from 'lucide-react';
 import { useState, useMemo } from 'react';
 
 import {
@@ -11,18 +12,16 @@ import {
 import { StudyClass } from '@/types';
 
 export default function StudyClassesPage() {
-  // 3. Setup local state for UI
   const [selectedStudyClass, setSelectedStudyClass] =
     useState<StudyClass | null>(null);
   const [studentSearchTerm, setStudentSearchTerm] = useState('');
   const [studyClassSearchTerm, setStudyClassSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [paginationLength, setPaginationLength] = useState(10);
+  const [openDropdown, setOpenDropdown] = useState<'pagination' | null>(null);
 
-  // 4. Setup React Query for data fetching
   const { data: studyClasses = [], isLoading: isClassesLoading } =
     useGetAllStudyClasses();
-
   const { data: students = [], isLoading: isStudentsLoading } =
     useGetStudentsByStudyClass(selectedStudyClass?.id || null);
 
@@ -62,18 +61,13 @@ export default function StudyClassesPage() {
     setCurrentPage(1);
   };
 
-  const handlePaginationLengthChange = (
-    e: React.ChangeEvent<HTMLSelectElement>,
-  ) => {
-    setPaginationLength(Number(e.target.value));
-    setCurrentPage(1); // Reset to first page
+  const handlePaginationLengthChange = (length: number) => {
+    setPaginationLength(length);
+    setCurrentPage(1);
+    setOpenDropdown(null);
   };
 
-  const paginate = (pageNumber: number) => {
-    setCurrentPage(pageNumber);
-  };
-
-  // --- Render Logic ---
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   if (isClassesLoading) {
     return (
@@ -95,6 +89,7 @@ export default function StudyClassesPage() {
       </div>
 
       <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+        {/* Class List */}
         <div className='md:col-span-1'>
           <h2 className='text-xl md:text-2xl font-bold mb-4 text-foreground'>
             Class List
@@ -144,13 +139,14 @@ export default function StudyClassesPage() {
           </div>
         </div>
 
-        {/* Details and Students Column */}
+        {/* Details & Students */}
         <div className='md:col-span-2'>
           {selectedStudyClass ? (
             <div>
               <h2 className='text-xl md:text-2xl font-bold mb-4 text-foreground'>
                 Class Details
               </h2>
+
               <div className='card p-6 mb-8'>
                 <p className='text-foreground'>
                   <strong>Course:</strong> {selectedStudyClass.courseName}
@@ -165,20 +161,53 @@ export default function StudyClassesPage() {
                 </p>
               </div>
 
+              {/* Filters */}
               <div className='flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-4'>
                 <h2 className='text-xl md:text-2xl font-semibold text-foreground'>
                   Students
                 </h2>
+
                 <div className='flex items-center gap-4 w-full md:w-auto'>
-                  <select
-                    value={paginationLength}
-                    onChange={handlePaginationLengthChange}
-                    className='input'
-                  >
-                    <option value={5}>5 per page</option>
-                    <option value={10}>10 per page</option>
-                    <option value={20}>20 per page</option>
-                  </select>
+                  {/* Custom Dropdown */}
+                  <div className='relative'>
+                    <button
+                      type='button'
+                      onClick={() =>
+                        setOpenDropdown(
+                          openDropdown === 'pagination' ? null : 'pagination',
+                        )
+                      }
+                      className='bg-card-background border border-border text-foreground rounded-md px-3 py-2 flex justify-between items-center w-36 shadow-sm hover:border-primary transition-colors'
+                    >
+                      <span>{paginationLength} per page</span>
+                      <ChevronDown
+                        className={`w-4 h-4 transition-transform duration-200 ${
+                          openDropdown === 'pagination'
+                            ? 'rotate-180 text-primary'
+                            : 'text-muted-foreground'
+                        }`}
+                      />
+                    </button>
+
+                    {openDropdown === 'pagination' && (
+                      <ul className='absolute z-20 mt-1 w-36 bg-card-background border border-border rounded-lg shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2'>
+                        {[5, 10, 20].map(length => (
+                          <li
+                            key={length}
+                            onClick={() => handlePaginationLengthChange(length)}
+                            className={`px-3 py-2 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors ${
+                              paginationLength === length
+                                ? 'bg-primary/20 text-primary-foreground'
+                                : 'text-foreground'
+                            }`}
+                          >
+                            {length} per page
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+
                   <input
                     type='text'
                     placeholder='Search by student name'
@@ -189,29 +218,25 @@ export default function StudyClassesPage() {
                 </div>
               </div>
 
+              {/* Students Table */}
               {isStudentsLoading ? (
                 <div className='text-center p-6 text-foreground'>
                   Loading students...
                 </div>
               ) : filteredStudents.length > 0 ? (
                 <>
-                  {/* Desktop Table */}
                   <div className='hidden md:block overflow-x-auto bg-card-background rounded-lg border border-border'>
                     <table className='min-w-full'>
                       <thead>
                         <tr className='border-b border-border'>
-                          <th className='py-2 px-4 border-b border-border text-left text-foreground/80'>
-                            ID
-                          </th>
-                          <th className='py-2 px-4 border-b border-border text-left text-foreground/80'>
-                            Name
-                          </th>
-                          <th className='py-2 px-4 border-b border-border text-left text-foreground/80'>
-                            Phone
-                          </th>
-                          <th className='py-2 px-4 border-b border-border text-left text-foreground/80'>
-                            Register
-                          </th>
+                          {['ID', 'Name', 'Phone', 'Register'].map(h => (
+                            <th
+                              key={h}
+                              className='py-2 px-4 text-left text-foreground/80 border-b border-border'
+                            >
+                              {h}
+                            </th>
+                          ))}
                         </tr>
                       </thead>
                       <tbody>
@@ -221,34 +246,22 @@ export default function StudyClassesPage() {
                             className='hover:bg-foreground/5 border-b border-border'
                           >
                             <td className='py-2 px-4 text-center text-foreground'>
-                              <Link
-                                href={`/students/${student.id}`}
-                                className='block w-full h-full'
-                              >
+                              <Link href={`/students/${student.id}`}>
                                 {student.id}
                               </Link>
                             </td>
                             <td className='py-2 px-4 text-center text-foreground'>
-                              <Link
-                                href={`/students/${student.id}`}
-                                className='block w-full h-full'
-                              >
+                              <Link href={`/students/${student.id}`}>
                                 {student.name}
                               </Link>
                             </td>
                             <td className='py-2 px-4 text-center text-foreground'>
-                              <Link
-                                href={`/students/${student.id}`}
-                                className='block w-full h-full'
-                              >
+                              <Link href={`/students/${student.id}`}>
                                 {student.phone}
                               </Link>
                             </td>
                             <td className='py-2 px-4 text-center text-foreground'>
-                              <Link
-                                href={`/students/${student.id}`}
-                                className='block w-full h-full'
-                              >
+                              <Link href={`/students/${student.id}`}>
                                 {student.register}
                               </Link>
                             </td>
@@ -256,25 +269,6 @@ export default function StudyClassesPage() {
                         ))}
                       </tbody>
                     </table>
-                  </div>
-
-                  {/* Mobile Cards */}
-                  <div className='grid grid-cols-1 gap-4 md:hidden'>
-                    {currentStudents.map(student => (
-                      <Link
-                        key={student.id}
-                        href={`/students/${student.id}`}
-                        className='card'
-                      >
-                        <div className='font-bold text-primary'>
-                          {student.name}
-                        </div>
-                        <div className='text-sm text-foreground/80 mt-2'>
-                          <p>ID: {student.id}</p>
-                          <p>Phone: {student.phone}</p>
-                        </div>
-                      </Link>
-                    ))}
                   </div>
 
                   {/* Pagination */}

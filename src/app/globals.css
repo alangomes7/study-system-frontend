@@ -152,3 +152,37 @@ td {
 tbody tr:last-child td {
   @apply border-b-0;
 }
+
+/* ─────────────── Combox ─────────────── */
+/* Style the select field itself */
+select.input {
+  @apply bg-card-background text-foreground border border-border rounded-md px-3 py-2;
+  appearance: none;
+  background-image: url("data:image/svg+xml,<svg fill='%23aaa' height='20' viewBox='0 0 24 24' width='20'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+select.input:focus {
+  @apply border-primary ring-2 ring-primary/20;
+}
+
+/* Options (partial support) */
+select.input option {
+  background-color: var(--card-background);
+  color: var(--foreground);
+  border-radius: 0.5rem; /* only visible in some browsers (mainly Firefox) */
+}
+
+/* Firefox-only tweak for rounded dropdown drawer */
+@-moz-document url-prefix() {
+  select.input {
+    border-radius: var(--radius-default);
+  }
+
+  select.input option {
+    border-radius: var(--radius-default);
+  }
+}
