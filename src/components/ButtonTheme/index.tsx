@@ -44,7 +44,20 @@ export function ButtonTheme() {
     setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
   };
 
-  if (!mounted) return null;
+  const buttonClasses = `
+    p-2 rounded-full bg-card-background text-foreground border border-border
+    hover:bg-border transition-all duration-300
+    focus:outline-none focus:ring-2 focus:ring-offset-2
+    focus:ring-primary focus:ring-offset-background
+  `;
+
+  if (!mounted) {
+    return (
+      <button aria-label='Toggle theme' className={buttonClasses} disabled>
+        <MoonIcon className='h-5 w-5' /> {/* Default icon */}
+      </button>
+    );
+  }
 
   // --- Show icon for next theme ---
   const renderIcon = () =>
@@ -58,12 +71,7 @@ export function ButtonTheme() {
     <button
       onClick={handleThemeSwitch}
       aria-label='Toggle theme'
-      className='
-        p-2 rounded-full bg-card-background text-foreground border border-border
-        hover:bg-border transition-all duration-300
-        focus:outline-none focus:ring-2 focus:ring-offset-2
-        focus:ring-primary focus:ring-offset-background
-      '
+      className={buttonClasses}
     >
       {renderIcon()}
     </button>

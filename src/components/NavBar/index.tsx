@@ -9,14 +9,20 @@ export default function NavBar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isManageOpen, setIsManageOpen] = useState(false);
+
+  // --- mounted state ---
+  const [mounted, setMounted] = useState(false);
+  // Default to false (desktop) to match server render
   const [isMobile, setIsMobile] = useState(false);
 
   const createMenuRef = useRef<HTMLDivElement>(null);
   const manageMenuRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLDivElement>(null);
 
-  // Detect mobile viewport
+  // --- Set mounted and THEN check mobile ---
   useEffect(() => {
+    setMounted(true); // Signal client mount
+
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     handleResize();
     window.addEventListener('resize', handleResize);
@@ -32,7 +38,6 @@ export default function NavBar() {
       ) {
         setIsCreateOpen(false);
       }
-      // Close manage menu on outside click
       if (
         manageMenuRef.current &&
         !manageMenuRef.current.contains(event.target as Node)
@@ -43,9 +48,14 @@ export default function NavBar() {
         setIsOpen(false);
       }
     }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+
+    // Only add listener if mounted
+    if (mounted) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () =>
+        document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [mounted]);
 
   const navLinkClass =
     'text-sm font-medium text-foreground/80 hover:text-foreground transition-colors';
@@ -138,6 +148,10 @@ export default function NavBar() {
               </div>
             )}
           </div>
+
+          <Link href='/about' className={navLinkClass}>
+            About
+          </Link>
         </div>
 
         {/* Desktop Login */}
@@ -149,21 +163,25 @@ export default function NavBar() {
 
         {/* Mobile Menu Toggle */}
         <div className='md:hidden'>
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className='text-foreground focus:outline-none'
-          >
-            {isOpen ? (
-              <XIcon className='h-6 w-6' />
-            ) : (
-              <MenuIcon className='h-6 w-6' />
-            )}
-          </button>
+          {!mounted ? (
+            <div className='h-6 w-6' />
+          ) : (
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className='text-foreground focus:outline-none'
+            >
+              {isOpen ? (
+                <XIcon className='h-6 w-6' />
+              ) : (
+                <MenuIcon className='h-6 w-6' />
+              )}
+            </button>
+          )}
         </div>
       </div>
 
       {/* --- Mobile Overlay + Menu Together --- */}
-      {isOpen && (
+      {mounted && isOpen && (
         <div className='fixed inset-0 z-40 bg-black/30 backdrop-blur-xs flex justify-end'>
           {/* Clicking the overlay area closes the menu */}
           <div
@@ -271,6 +289,15 @@ export default function NavBar() {
                 </div>
               )}
             </div>
+
+            {/* --- Other Links --- */}
+            <Link
+              href='/about'
+              className={`${menuItemClass} border-t border-border`}
+              onClick={() => setIsOpen(false)}
+            >
+              About
+            </Link>
 
             <div className='border-t border-border pt-2'>
               <Link
