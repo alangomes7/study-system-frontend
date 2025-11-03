@@ -8,12 +8,14 @@ import { MenuIcon, XIcon } from 'lucide-react';
 export default function NavBar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isManageOpen, setIsManageOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   const createMenuRef = useRef<HTMLDivElement>(null);
+  const manageMenuRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLDivElement>(null);
 
-  // Detect if user is on mobile
+  // Detect mobile viewport
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     handleResize();
@@ -21,7 +23,7 @@ export default function NavBar() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Close menus when clicking outside
+  // Handle click outside (for menus)
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -30,12 +32,17 @@ export default function NavBar() {
       ) {
         setIsCreateOpen(false);
       }
-
+      // Close manage menu on outside click
+      if (
+        manageMenuRef.current &&
+        !manageMenuRef.current.contains(event.target as Node)
+      ) {
+        setIsManageOpen(false);
+      }
       if (navRef.current && !navRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     }
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
@@ -46,7 +53,10 @@ export default function NavBar() {
     'block px-4 py-2 text-sm text-foreground hover:bg-foreground/10 rounded-md';
 
   return (
-    <nav ref={navRef} className='relative bg-background border-b border-border'>
+    <nav
+      ref={navRef}
+      className='relative bg-background border-b border-border z-50'
+    >
       <div className='flex items-center justify-between p-4'>
         {/* Left section */}
         <div className='flex items-center space-x-4'>
@@ -61,8 +71,14 @@ export default function NavBar() {
           <Link href='/courses' className={navLinkClass}>
             Courses
           </Link>
+          <Link href='/students' className={navLinkClass}>
+            Students
+          </Link>
+          <Link href='/study-classes' className={navLinkClass}>
+            Study Classes
+          </Link>
 
-          {/* Hover-based Dropdown (Desktop) */}
+          {/* Create Dropdown (Desktop) */}
           <div
             ref={createMenuRef}
             className='relative'
@@ -77,7 +93,7 @@ export default function NavBar() {
             </button>
 
             {isCreateOpen && (
-              <div className='absolute right-0 mt-2 w-48 bg-card-background border border-border rounded-md shadow-lg py-1 p-1 z-50'>
+              <div className='absolute right-0 w-48 bg-card-background border border-border rounded-md shadow-lg py-1 p-1 z-50'>
                 <Link href='/students/create' className={menuItemClass}>
                   Create Student
                 </Link>
@@ -94,9 +110,34 @@ export default function NavBar() {
             )}
           </div>
 
-          <Link href='/about' className={navLinkClass}>
-            About
-          </Link>
+          {/* Manage Dropdown (Desktop) */}
+          <div
+            ref={manageMenuRef}
+            className='relative'
+            onMouseEnter={() => !isMobile && setIsManageOpen(true)}
+            onMouseLeave={() => !isMobile && setIsManageOpen(false)}
+          >
+            <button
+              onClick={() => isMobile && setIsManageOpen(!isManageOpen)}
+              className={navLinkClass}
+            >
+              Manage
+            </button>
+
+            {isManageOpen && (
+              <div className='absolute right-0 w-48 bg-card-background border border-border rounded-md shadow-lg py-1 p-1 z-50'>
+                <Link href='/students/enroll' className={menuItemClass}>
+                  Enroll Student
+                </Link>
+                <Link
+                  href='/study-classes/student-group'
+                  className={menuItemClass}
+                >
+                  Student Groups
+                </Link>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Desktop Login */}
@@ -121,48 +162,125 @@ export default function NavBar() {
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* --- Mobile Overlay + Menu Together --- */}
       {isOpen && (
-        <div className='px-4 pt-2 pb-4 space-y-2 md:hidden bg-background border-t border-border'>
-          <Link href='/courses' className={menuItemClass}>
-            Courses
-          </Link>
+        <div className='fixed inset-0 z-40 bg-black/30 backdrop-blur-xs flex justify-end'>
+          {/* Clicking the overlay area closes the menu */}
+          <div
+            className='flex-1'
+            onClick={() => {
+              setIsOpen(false);
+              setIsCreateOpen(false);
+              setIsManageOpen(false);
+            }}
+          />
 
-          {/* "Create" Section (Mobile - Requires Click) */}
-          <div ref={createMenuRef} className='border-t border-border pt-2'>
-            <button
-              onClick={() => setIsCreateOpen(!isCreateOpen)}
-              className='w-full text-left font-semibold text-foreground/70 mb-1'
+          {/* Slide-in Mobile Menu */}
+          <div className='w-3/4 sm:w-2/5 h-full bg-background border-l border-border shadow-xl p-4 space-y-2 overflow-y-auto animate-slide-in'>
+            {/* --- Main Links --- */}
+            <Link
+              href='/courses'
+              className={menuItemClass}
+              onClick={() => setIsOpen(false)}
             >
-              Create
-            </button>
-
-            {isCreateOpen && (
-              <div className='pl-2 space-y-1'>
-                <Link href='/students/create' className={menuItemClass}>
-                  Create Student
-                </Link>
-                <Link href='/professors/create' className={menuItemClass}>
-                  Create Professor
-                </Link>
-                <Link href='/courses/create' className={menuItemClass}>
-                  Create Course
-                </Link>
-                <Link href='/study-classes/create' className={menuItemClass}>
-                  Create Study Class
-                </Link>
-              </div>
-            )}
-          </div>
-
-          <Link href='/about' className={menuItemClass}>
-            About
-          </Link>
-
-          <div className='border-t border-border pt-2'>
-            <Link href='/login' className='btn btn-primary w-full'>
-              Login
+              Courses
             </Link>
+            <Link
+              href='/students'
+              className={menuItemClass}
+              onClick={() => setIsOpen(false)}
+            >
+              Students
+            </Link>
+            <Link
+              href='/study-classes'
+              className={menuItemClass}
+              onClick={() => setIsOpen(false)}
+            >
+              Study Classes
+            </Link>
+
+            {/* --- Create Section (Click to toggle) --- */}
+            <div ref={createMenuRef} className='border-t border-border pt-2'>
+              <button
+                onClick={() => setIsCreateOpen(!isCreateOpen)}
+                className='w-full text-left font-semibold text-foreground/70 mb-1 px-4 py-2'
+              >
+                Create
+              </button>
+
+              {isCreateOpen && (
+                <div className='pl-2 space-y-1'>
+                  <Link
+                    href='/students/create'
+                    className={menuItemClass}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Create Student
+                  </Link>
+                  <Link
+                    href='/professors/create'
+                    className={menuItemClass}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Create Professor
+                  </Link>
+                  <Link
+                    href='/courses/create'
+                    className={menuItemClass}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Create Course
+                  </Link>
+                  <Link
+                    href='/study-classes/create'
+                    className={menuItemClass}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Create Study Class
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            {/* --- Manage Section (Click to toggle) --- */}
+            <div ref={manageMenuRef} className='border-t border-border pt-2'>
+              <button
+                onClick={() => setIsManageOpen(!isManageOpen)}
+                className='w-full text-left font-semibold text-foreground/70 mb-1 px-4 py-2'
+              >
+                Manage
+              </button>
+
+              {isManageOpen && (
+                <div className='pl-2 space-y-1'>
+                  <Link
+                    href='/students/enroll'
+                    className={menuItemClass}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Enroll Student
+                  </Link>
+                  <Link
+                    href='/study-classes/student-group'
+                    className={menuItemClass}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Student Groups
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            <div className='border-t border-border pt-2'>
+              <Link
+                href='/login'
+                className='btn btn-primary w-full'
+                onClick={() => setIsOpen(false)}
+              >
+                Login
+              </Link>
+            </div>
           </div>
         </div>
       )}
