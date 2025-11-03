@@ -1,7 +1,8 @@
 {
   // 🪟 UI & Window
   "window.zoomLevel": 1,
-  "workbench.activityBar.location": "left",
+  "workbench.activityBar.location": "default",
+  "workbench.editor.alwaysShowEditorActions": true,
   "workbench.editor.labelFormat": "short",
   "explorer.compactFolders": false,
   "breadcrumbs.enabled": true,
