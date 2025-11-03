@@ -5,7 +5,7 @@ import {
   useGetAllStudents,
   useGetAllStudyClasses,
   useCreateSubscription,
-} from '@/lib/api_query';
+} from '@/lib/api/api_query';
 import { ChevronDown } from 'lucide-react';
 
 export default function EnrollStudentPage() {

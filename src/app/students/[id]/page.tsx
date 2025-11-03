@@ -1,6 +1,6 @@
 'use client';
 
-import { useGetStudent } from '@/lib/api_query';
+import { useGetStudent } from '@/lib/api/api_query';
 import Link from 'next/link';
 import { use } from 'react';
 

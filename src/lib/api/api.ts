@@ -7,7 +7,7 @@ import { Student, StudentCreationData } from '@/types/student';
 import { StudyClass, StudyClassCreationData } from '@/types/study-class';
 import { Subscription, SubscriptionCreationData } from '@/types/subscription';
 
-const API_BASE_URL = 'http://172.23.9.129:8080';
+const API_BASE_URL = process.env.NEXT_PUBLIC_SPRINGBOOT_SERVER_IP_ADDRESS;
 
 /* -------------------------------------------------------------------------- */
 /* COURSES                                  */

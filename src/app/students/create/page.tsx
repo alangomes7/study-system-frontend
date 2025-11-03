@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useCreateStudent } from '@/lib/api_query';
+import { useCreateStudent } from '@/lib/api/api_query';
 
 export default function CreateStudentPage() {
   const [name, setName] = useState('');
@@ -21,7 +21,7 @@ export default function CreateStudentPage() {
   };
 
   return (
-    <div className='container mx-auto px-4 py-8'>
+    <div className='container mx-auto px-4 py-8 max-w-2xl'>
       <h1 className='text-3xl font-bold mb-6 text-foreground'>
         Create Student
       </h1>

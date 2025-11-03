@@ -1,15 +1,21 @@
 'use client';
 
 import { useState } from 'react';
+import { ChevronDown } from 'lucide-react';
 import {
   useGetAllStudents,
   useGetAllStudyClasses,
   useCreateSubscription,
-} from '@/lib/api_query';
+} from '@/lib/api/api_query';
 
 export default function EnrollStudentPage() {
-  const [selectedStudent, setSelectedStudent] = useState<string>('');
-  const [selectedStudyClass, setSelectedStudyClass] = useState<string>('');
+  const [selectedStudent, setSelectedStudent] = useState<number | null>(null);
+  const [selectedStudyClass, setSelectedStudyClass] = useState<number | null>(
+    null,
+  );
+  const [openDropdown, setOpenDropdown] = useState<
+    'student' | 'studyClass' | null
+  >(null);
 
   const { data: students = [], isLoading: isLoadingStudents } =
     useGetAllStudents();
@@ -29,8 +35,8 @@ export default function EnrollStudentPage() {
     if (!selectedStudent || !selectedStudyClass) return;
 
     createSubscription({
-      studentId: Number(selectedStudent),
-      studyClassId: Number(selectedStudyClass),
+      studentId: selectedStudent,
+      studyClassId: selectedStudyClass,
     });
   };
 
@@ -43,67 +49,137 @@ export default function EnrollStudentPage() {
   }
 
   return (
-    <div className='container mx-auto px-4 py-8'>
-      <h1 className='text-3xl font-bold mb-6 text-foreground'>
+    <div className='container mx-auto px-4 py-8 max-w-2xl'>
+      <h1 className='text-2xl md:text-3xl font-bold mb-6 text-foreground'>
         Enroll Student
       </h1>
-      {error && (
-        <p className='text-center mb-4 text-red-500'>{error.message}</p>
-      )}
-      <form onSubmit={handleSubmit} className='card p-6'>
-        <div className='mb-4'>
-          <label
-            htmlFor='student'
-            className='block text-foreground font-bold mb-2'
-          >
+
+      <form onSubmit={handleSubmit} className='card p-6 space-y-4'>
+        {/* Student Dropdown */}
+        <div className='relative'>
+          <label className='block text-sm font-medium text-foreground/80 mb-1'>
             Student
           </label>
-          <select
-            id='student'
-            value={selectedStudent}
-            onChange={e => setSelectedStudent(e.target.value)}
-            className='input'
+          <button
+            type='button'
+            onClick={() =>
+              setOpenDropdown(openDropdown === 'student' ? null : 'student')
+            }
+            className='w-full bg-card-background border border-border text-foreground rounded-md px-3 py-2 flex justify-between items-center shadow-sm hover:border-primary transition-colors'
             disabled={isSubmitting}
-            required
           >
-            <option value=''>Select a student</option>
-            {students.map(student => (
-              <option key={student.id} value={student.id}>
-                {student.name}
-              </option>
-            ))}
-          </select>
+            <span
+              className={
+                selectedStudent
+                  ? 'text-foreground'
+                  : 'text-muted-foreground italic'
+              }
+            >
+              {selectedStudent
+                ? students.find(s => s.id === selectedStudent)?.name
+                : '-- Select a student --'}
+            </span>
+            <ChevronDown
+              className={`w-4 h-4 transition-transform duration-200 ${
+                openDropdown === 'student'
+                  ? 'rotate-180 text-primary'
+                  : 'text-muted-foreground'
+              }`}
+            />
+          </button>
+
+          {openDropdown === 'student' && (
+            <ul className='absolute z-20 mt-1 w-full bg-card-background border border-border rounded-lg shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2 max-h-60 overflow-y-auto'>
+              {students.map(student => (
+                <li
+                  key={student.id}
+                  onClick={() => {
+                    setSelectedStudent(student.id);
+                    setOpenDropdown(null);
+                  }}
+                  className={`px-3 py-2 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors ${
+                    selectedStudent === student.id
+                      ? 'bg-primary/20 text-primary-foreground'
+                      : 'text-foreground'
+                  }`}
+                >
+                  {student.name}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
-        <div className='mb-4'>
-          <label
-            htmlFor='studyClass'
-            className='block text-foreground font-bold mb-2'
-          >
+
+        {/* Study Class Dropdown */}
+        <div className='relative'>
+          <label className='block text-sm font-medium text-foreground/80 mb-1'>
             Study Class
           </label>
-          <select
-            id='studyClass'
-            value={selectedStudyClass}
-            onChange={e => setSelectedStudyClass(e.target.value)}
-            className='input'
+          <button
+            type='button'
+            onClick={() =>
+              setOpenDropdown(
+                openDropdown === 'studyClass' ? null : 'studyClass',
+              )
+            }
+            className='w-full bg-card-background border border-border text-foreground rounded-md px-3 py-2 flex justify-between items-center shadow-sm hover:border-primary transition-colors'
             disabled={isSubmitting}
-            required
           >
-            <option value=''>Select a study class</option>
-            {studyClasses.map(studyClass => (
-              <option key={studyClass.id} value={studyClass.id}>
-                {studyClass.classCode}
-              </option>
-            ))}
-          </select>
+            <span
+              className={
+                selectedStudyClass
+                  ? 'text-foreground'
+                  : 'text-muted-foreground italic'
+              }
+            >
+              {selectedStudyClass
+                ? studyClasses.find(sc => sc.id === selectedStudyClass)
+                    ?.classCode
+                : '-- Select a study class --'}
+            </span>
+            <ChevronDown
+              className={`w-4 h-4 transition-transform duration-200 ${
+                openDropdown === 'studyClass'
+                  ? 'rotate-180 text-primary'
+                  : 'text-muted-foreground'
+              }`}
+            />
+          </button>
+
+          {openDropdown === 'studyClass' && (
+            <ul className='absolute z-20 mt-1 w-full bg-card-background border border-border rounded-lg shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2 max-h-60 overflow-y-auto'>
+              {studyClasses.map(studyClass => (
+                <li
+                  key={studyClass.id}
+                  onClick={() => {
+                    setSelectedStudyClass(studyClass.id);
+                    setOpenDropdown(null);
+                  }}
+                  className={`px-3 py-2 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors ${
+                    selectedStudyClass === studyClass.id
+                      ? 'bg-primary/20 text-primary-foreground'
+                      : 'text-foreground'
+                  }`}
+                >
+                  {studyClass.classCode}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
-        <button
-          type='submit'
-          className='btn btn-primary disabled:opacity-50'
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? 'Enrolling...' : 'Enroll'}
-        </button>
+
+        {error && <p className='text-red-500 text-sm'>{error.message}</p>}
+
+        {/* Submit Button */}
+        <div className='pt-2'>
+          <button
+            type='submit'
+            className='btn btn-primary disabled:opacity-50'
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Enrolling...' : 'Enroll Student'}
+          </button>
+        </div>
       </form>
     </div>
   );

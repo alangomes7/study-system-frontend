@@ -8,7 +8,7 @@ import { useState, useMemo } from 'react';
 import {
   useGetAllStudyClasses,
   useGetStudentsByStudyClass,
-} from '@/lib/api_query';
+} from '@/lib/api/api_query';
 import { StudyClass } from '@/types';
 
 export default function StudyClassesPage() {

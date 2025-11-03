@@ -6,7 +6,7 @@ import { ChevronDown } from 'lucide-react';
 import {
   useGetAllStudyClasses,
   useGetStudentsByStudyClass,
-} from '@/lib/api_query';
+} from '@/lib/api/api_query';
 import { useStudentGroup } from '@/hooks/useStudents';
 
 export default function StudentGroupPage() {

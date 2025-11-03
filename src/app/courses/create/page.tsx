@@ -1,6 +1,6 @@
 'use client';
 
-import { useCreateCourse } from '@/lib/api_query';
+import { useCreateCourse } from '@/lib/api/api_query';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -24,7 +24,7 @@ export default function CreateCoursePage() {
   };
 
   return (
-    <div className='container mx-auto px-4 py-8'>
+    <div className='container mx-auto px-4 py-8 max-w-2xl'>
       <h1 className='text-3xl font-bold mb-6 text-foreground'>Create Course</h1>
 
       {createCourseMutation.error && (
@@ -33,7 +33,7 @@ export default function CreateCoursePage() {
         </p>
       )}
 
-      <form onSubmit={handleSubmit} className='card p-6'>
+      <form onSubmit={handleSubmit} className='card p-6 space-y-4'>
         <div className='mb-4'>
           <label
             htmlFor='name'

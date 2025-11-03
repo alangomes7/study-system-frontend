@@ -1,6 +1,6 @@
 'use client';
 
-import { useGetCourses } from '@/lib/api_query';
+import { useGetCourses } from '@/lib/api/api_query';
 import Link from 'next/link';
 import { useState, useMemo } from 'react';
 

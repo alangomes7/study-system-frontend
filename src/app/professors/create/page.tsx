@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useCreateProfessor } from '@/lib/api_query';
+import { useCreateProfessor } from '@/lib/api/api_query';
 import Link from 'next/link';
 
 export default function CreateProfessorPage() {
@@ -24,7 +24,7 @@ export default function CreateProfessorPage() {
   };
 
   return (
-    <div className='container mx-auto px-4 py-8 max-w-lg'>
+    <div className='container mx-auto px-4 py-8 max-w-2xl'>
       <h1 className='text-2xl md:text-3xl font-bold mb-6 text-foreground'>
         Create Professor
       </h1>

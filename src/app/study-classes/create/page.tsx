@@ -7,7 +7,7 @@ import {
   useGetCourses,
   useGetProfessors,
   useCreateStudyClass,
-} from '@/lib/api_query';
+} from '@/lib/api/api_query';
 
 export default function CreateStudyClassPage() {
   const [year, setYear] = useState<number>(new Date().getFullYear());

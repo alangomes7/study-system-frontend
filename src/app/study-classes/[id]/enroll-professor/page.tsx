@@ -4,7 +4,7 @@ import {
   useGetProfessors,
   useGetStudyClass,
   useEnrollProfessor,
-} from '@/lib/api_query';
+} from '@/lib/api/api_query';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { use, useState } from 'react';

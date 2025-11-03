@@ -4,7 +4,7 @@ import Link from 'next/link';
 import {
   useGetStudyClass,
   useGetSubscriptionsByStudyClass,
-} from '@/lib/api_query';
+} from '@/lib/api/api_query';
 import { use } from 'react';
 
 export default function StudyClassDetailsPage({
