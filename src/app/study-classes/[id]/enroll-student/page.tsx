@@ -91,7 +91,6 @@ export default function EnrollStudentPage() {
             }
             className='w-full bg-card-background border border-border text-foreground rounded-md px-3 py-2 flex justify-between items-center shadow-sm hover:border-primary transition-colors'
             disabled={isSubmitting}
-            aria-required='true'
           >
             <span
               className={
@@ -148,7 +147,6 @@ export default function EnrollStudentPage() {
             }
             className='w-full bg-card-background border border-border text-foreground rounded-md px-3 py-2 flex justify-between items-center shadow-sm hover:border-primary transition-colors'
             disabled={isSubmitting}
-            aria-required='true'
           >
             <span
               className={

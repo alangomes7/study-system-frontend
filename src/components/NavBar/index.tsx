@@ -86,11 +86,17 @@ export default function NavBar() {
       {/* Mobile Menu Dropdown */}
       {isOpen && (
         <div className='px-4 pt-2 pb-4 space-y-2 md:hidden bg-background'>
-          <Link
-            href='/courses'
-            className='block px-2 py-1 rounded text-foreground/80 hover:text-foreground'
-          >
+          <Link href='/courses' className={menuItemClass}>
             Courses
+          </Link>
+          <Link href='/students' className={menuItemClass}>
+            Students
+          </Link>
+          <Link href='/study-classes' className={menuItemClass}>
+            Study Classes
+          </Link>
+          <Link href='/study-classes/student-group' className={menuItemClass}>
+            Study Class - Groups
           </Link>
         </div>
       )}

@@ -2,12 +2,12 @@
  * This file contains all the core data-fetching functions.
  */
 import { Course, CourseCreationData } from '@/types/course';
-import { Professor } from '@/types/professor';
+import { Professor, ProfessorCreationData } from '@/types/professor';
 import { Student, StudentCreationData } from '@/types/student';
 import { StudyClass, StudyClassCreationData } from '@/types/study-class';
 import { Subscription, SubscriptionCreationData } from '@/types/subscription';
 
-const API_BASE_URL = 'http://192.168.0.177:8080';
+const API_BASE_URL = 'http://172.23.9.129:8080';
 
 /* -------------------------------------------------------------------------- */
 /* COURSES                                  */
@@ -123,21 +123,21 @@ export async function createStudyClass(
 }
 
 /**
- * Enrolls a professor in a specific study class via an API POST request.
+ * Assigns a professor to a specific study class via a PUT request.
  *
- * @param studyClassId - The ID of the study class (from URL params).
- * @param professorId - The ID of the professor to enroll (from form state).
- * @returns A Promise that resolves to void on success.
+ * @param studyClassId - The ID of the study class.
+ * @param professorId - The ID of the professor to assign.
+ * @returns A Promise that resolves to the updated StudyClass DTO on success.
  * @throws Will throw an Error if the fetch response is not 'ok'.
  */
 export async function enrollProfessorInStudyClass(
   studyClassId: string | number,
   professorId: string | number,
-): Promise<void> {
+): Promise<StudyClass> {
   const response = await fetch(
-    `${API_BASE_URL}/study-classes/${studyClassId}/enroll-professor`,
+    `${API_BASE_URL}/study-classes/${studyClassId}/professor`,
     {
-      method: 'POST',
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
@@ -149,8 +149,9 @@ export async function enrollProfessorInStudyClass(
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.message || 'Failed to enroll professor');
+    throw new Error(errorData.message || 'Failed to assign professor');
   }
+  return response.json();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -169,14 +170,16 @@ export async function getProfessors(): Promise<Professor[]> {
 
 /**
  * Creates a new professor.
- * @param name The name of the new professor.
+ * @param professorData The data for the new professor.
  * @returns A promise that resolves to the newly created Professor object.
  */
-export async function createProfessor(name: string): Promise<Professor> {
+export async function createProfessor(
+  professorData: ProfessorCreationData,
+): Promise<Professor> {
   const response = await fetch(`${API_BASE_URL}/professors`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name }),
+    body: JSON.stringify(professorData), // Send the full object
   });
 
   if (!response.ok) throw new Error('Failed to create professor');

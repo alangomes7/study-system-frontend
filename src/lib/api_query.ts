@@ -7,7 +7,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import * as api from './api';
 import { Course, CourseCreationData } from '@/types/course';
-import { Professor } from '@/types/professor';
+import { Professor, ProfessorCreationData } from '@/types/professor';
 import { Student, StudentCreationData } from '@/types/student';
 import { StudyClass, StudyClassCreationData } from '@/types/study-class';
 import { Subscription, SubscriptionCreationData } from '@/types/subscription';
@@ -120,23 +120,32 @@ export const useCreateStudyClass = () => {
 export const useEnrollProfessor = () => {
   const queryClient = useQueryClient();
   return useMutation<
-    void,
+    StudyClass, // Updated return type from void to StudyClass
     Error,
-    // Changed types to number
-    { studyClassId: number; professorId: number }
+    { studyClassId: number; professorId: number } // Input variables type
   >({
     mutationFn: variables =>
       api.enrollProfessorInStudyClass(
         variables.studyClassId,
         variables.professorId,
       ),
-    onSuccess: (_, variables) => {
-      // Refetch the specific study class details
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.studyClass(variables.studyClassId),
-      });
-      // Also refetch the main list in case it's displayed
+    onSuccess: (data, variables) => {
+      // 'data' is the updated StudyClassDto returned from the backend
+      // We can use it to immediately update the cache
+
+      // Update the specific study class query cache
+      queryClient.setQueryData(
+        queryKeys.studyClass(variables.studyClassId),
+        data,
+      );
+
+      // Invalidate the general study classes list
       queryClient.invalidateQueries({ queryKey: queryKeys.studyClasses });
+
+      // Invalidate the study classes by course list, if it's in use
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.studyClassesByCourse(data.courseId),
+      });
     },
   });
 };
@@ -156,7 +165,8 @@ export const useCreateProfessor = () => {
   const queryClient = useQueryClient();
   const router = useRouter();
 
-  return useMutation<Professor, Error, string>({
+  // Change the input type from string to ProfessorCreationData
+  return useMutation<Professor, Error, ProfessorCreationData>({
     mutationFn: api.createProfessor,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.professors });

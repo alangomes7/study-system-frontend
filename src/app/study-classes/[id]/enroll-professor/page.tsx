@@ -18,23 +18,24 @@ export default function EnrollProfessorPage({
   const { id } = use(params);
   const router = useRouter();
 
-  // State for the form
-  const [selectedProfessor, setSelectedProfessor] = useState<string>('');
+  // State for the form - changed to number | null
+  const [selectedProfessor, setSelectedProfessor] = useState<number | null>(
+    null,
+  );
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
-  // Data fetching hooks
   const {
     data: professors = [],
     isLoading: isLoadingProfessors,
     error: professorsError,
   } = useGetProfessors();
+
   const {
     data: studyClass,
     isLoading: isLoadingClass,
     error: classError,
   } = useGetStudyClass(id);
 
-  // Mutation hook
   const {
     mutate: enrollProfessor,
     isPending: isSubmitting,
@@ -43,7 +44,7 @@ export default function EnrollProfessorPage({
 
   // --- Event Handlers ---
 
-  const handleProfessorSelect = (professorId: string) => {
+  const handleProfessorSelect = (professorId: number) => {
     setSelectedProfessor(professorId);
     setOpenDropdown(null);
   };
@@ -55,11 +56,10 @@ export default function EnrollProfessorPage({
     enrollProfessor(
       {
         studyClassId: id,
-        professorId: Number(selectedProfessor),
+        professorId: selectedProfessor,
       },
       {
         onSuccess: () => {
-          // On success, go back to the class details page
           router.push(`/study-classes/${id}`);
         },
       },
@@ -68,8 +68,9 @@ export default function EnrollProfessorPage({
 
   // --- Derived State & Loading/Error Handling ---
 
+  // Updated logic to find by number
   const selectedProfessorName =
-    professors.find(p => p.id === Number(selectedProfessor))?.name ||
+    professors.find(p => p.id === selectedProfessor)?.name ||
     'Select a professor';
 
   const isLoading = isLoadingProfessors || isLoadingClass;
@@ -116,7 +117,7 @@ export default function EnrollProfessorPage({
             >
               <span
                 className={
-                  selectedProfessor
+                  selectedProfessor !== null
                     ? 'text-foreground'
                     : 'text-muted-foreground italic'
                 }
@@ -137,9 +138,11 @@ export default function EnrollProfessorPage({
                 {professors.map(professor => (
                   <li
                     key={professor.id}
-                    onClick={() => handleProfessorSelect(String(professor.id))}
+                    // Pass professor.id (number) directly
+                    onClick={() => handleProfessorSelect(professor.id)}
                     className={`px-3 py-2 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors ${
-                      selectedProfessor === String(professor.id)
+                      // Compare numbers
+                      selectedProfessor === professor.id
                         ? 'bg-primary/20 text-primary-foreground'
                         : 'text-foreground'
                     }`}
