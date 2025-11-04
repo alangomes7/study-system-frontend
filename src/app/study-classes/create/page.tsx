@@ -1,45 +1,25 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import { ChevronDown } from 'lucide-react';
-import {
-  useGetCourses,
-  useGetProfessors,
-  useCreateStudyClass,
-} from '@/lib/api/api_query';
+import { useStudyClassForm } from '@/hooks/useStudyClassForm';
 
 export default function CreateStudyClassPage() {
-  const [year, setYear] = useState<number>(new Date().getFullYear());
-  const [semester, setSemester] = useState<number>(1);
-  const [courseId, setCourseId] = useState<number | null>(null);
-  const [professorId, setProfessorId] = useState<number | null>(null);
-  const [openDropdown, setOpenDropdown] = useState<
-    'course' | 'professor' | null
-  >(null);
-
-  const { data: courses = [], isLoading: isLoadingCourses } = useGetCourses();
-  const { data: professors = [], isLoading: isLoadingProfessors } =
-    useGetProfessors();
-
   const {
-    mutate: createStudyClass,
-    isPending: isSubmitting,
-    error,
-  } = useCreateStudyClass();
-
-  const isLoading = isLoadingCourses || isLoadingProfessors;
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!courseId) return;
-    createStudyClass({
-      year,
-      semester,
-      courseId,
-      professorId,
-    });
-  };
+    formData,
+    setFormField,
+    errors,
+    isSubmitting,
+    apiError,
+    isLoading,
+    courses,
+    professors,
+    openDropdown,
+    setOpenDropdown,
+    availableYears,
+    availableSemesters,
+    handleSubmit,
+  } = useStudyClassForm();
 
   if (isLoading) {
     return (
@@ -56,44 +36,98 @@ export default function CreateStudyClassPage() {
       </h1>
 
       <form onSubmit={handleSubmit} className='card p-6 space-y-4'>
-        {/* Year & Semester */}
+        {/* Year & Semester Dropdowns */}
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-          <div>
-            <label
-              htmlFor='year'
-              className='block text-sm font-medium text-foreground/80 mb-1'
-            >
+          {/* Year Dropdown */}
+          <div className='relative'>
+            <label className='block text-sm font-medium text-foreground/80 mb-1'>
               Year
             </label>
-            <input
-              type='number'
-              id='year'
-              value={year}
-              onChange={e => setYear(Number(e.target.value))}
-              className='input'
-              disabled={isSubmitting}
-              required
-            />
+            <button
+              type='button'
+              onClick={() =>
+                setOpenDropdown(openDropdown === 'year' ? null : 'year')
+              }
+              className='w-full bg-card-background border border-border text-foreground rounded-md px-3 py-2 flex justify-between items-center shadow-sm hover:border-primary transition-colors'
+            >
+              <span className='text-foreground'>{formData.year}</span>
+              <ChevronDown
+                className={`w-4 h-4 transition-transform duration-200 ${
+                  openDropdown === 'year'
+                    ? 'rotate-180 text-primary'
+                    : 'text-muted-foreground'
+                }`}
+              />
+            </button>
+            {openDropdown === 'year' && (
+              <ul className='absolute z-30 mt-1 w-full bg-card-background border border-border rounded-lg shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2'>
+                {availableYears.map(year => (
+                  <li
+                    key={year}
+                    onClick={() => {
+                      setFormField('year', year);
+                      setOpenDropdown(null);
+                    }}
+                    className={`px-3 py-2 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors ${
+                      formData.year === year
+                        ? 'bg-primary/20 text-primary-foreground'
+                        : 'text-foreground'
+                    }`}
+                  >
+                    {year}
+                  </li>
+                ))}
+              </ul>
+            )}
+            {errors.year && (
+              <p className='text-red-500 text-sm mt-1'>{errors.year[0]}</p>
+            )}
           </div>
 
-          <div>
-            <label
-              htmlFor='semester'
-              className='block text-sm font-medium text-foreground/80 mb-1'
-            >
+          {/* Semester Dropdown */}
+          <div className='relative'>
+            <label className='block text-sm font-medium text-foreground/80 mb-1'>
               Semester
             </label>
-            <input
-              type='number'
-              id='semester'
-              value={semester}
-              onChange={e => setSemester(Number(e.target.value))}
-              className='input'
-              disabled={isSubmitting}
-              required
-              min='1'
-              max='2'
-            />
+            <button
+              type='button'
+              onClick={() =>
+                setOpenDropdown(openDropdown === 'semester' ? null : 'semester')
+              }
+              className='w-full bg-card-background border border-border text-foreground rounded-md px-3 py-2 flex justify-between items-center shadow-sm hover:border-primary transition-colors'
+            >
+              <span className='text-foreground'>{formData.semester}</span>
+              <ChevronDown
+                className={`w-4 h-4 transition-transform duration-200 ${
+                  openDropdown === 'semester'
+                    ? 'rotate-180 text-primary'
+                    : 'text-muted-foreground'
+                }`}
+              />
+            </button>
+            {openDropdown === 'semester' && (
+              <ul className='absolute z-30 mt-1 w-full bg-card-background border border-border rounded-lg shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2'>
+                {availableSemesters.map(semester => (
+                  <li
+                    key={semester}
+                    onClick={() => {
+                      setFormField('semester', semester);
+                      setOpenDropdown(null);
+                    }}
+                    className={`px-3 py-2 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors ${
+                      formData.semester === semester
+                        ? 'bg-primary/20 text-primary-foreground'
+                        : 'text-foreground'
+                    }`}
+                  >
+                    {semester}
+                  </li>
+                ))}
+              </ul>
+            )}
+            {errors.semester && (
+              <p className='text-red-500 text-sm mt-1'>{errors.semester[0]}</p>
+            )}
           </div>
         </div>
 
@@ -111,11 +145,13 @@ export default function CreateStudyClassPage() {
           >
             <span
               className={
-                courseId ? 'text-foreground' : 'text-muted-foreground italic'
+                formData.courseId
+                  ? 'text-foreground'
+                  : 'text-muted-foreground italic'
               }
             >
-              {courseId
-                ? courses.find(c => c.id === courseId)?.name
+              {formData.courseId
+                ? courses.find(c => c.id === formData.courseId)?.name
                 : '-- Select a course --'}
             </span>
             <ChevronDown
@@ -126,18 +162,17 @@ export default function CreateStudyClassPage() {
               }`}
             />
           </button>
-
           {openDropdown === 'course' && (
             <ul className='absolute z-20 mt-1 w-full bg-card-background border border-border rounded-lg shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2'>
               {courses.map(course => (
                 <li
                   key={course.id}
                   onClick={() => {
-                    setCourseId(course.id);
+                    setFormField('courseId', course.id);
                     setOpenDropdown(null);
                   }}
                   className={`px-3 py-2 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors ${
-                    courseId === course.id
+                    formData.courseId === course.id
                       ? 'bg-primary/20 text-primary-foreground'
                       : 'text-foreground'
                   }`}
@@ -146,6 +181,9 @@ export default function CreateStudyClassPage() {
                 </li>
               ))}
             </ul>
+          )}
+          {errors.courseId && (
+            <p className='text-red-500 text-sm mt-1'>{errors.courseId[0]}</p>
           )}
         </div>
 
@@ -163,11 +201,13 @@ export default function CreateStudyClassPage() {
           >
             <span
               className={
-                professorId ? 'text-foreground' : 'text-muted-foreground italic'
+                formData.professorId
+                  ? 'text-foreground'
+                  : 'text-muted-foreground italic'
               }
             >
-              {professorId
-                ? professors.find(p => p.id === professorId)?.name
+              {formData.professorId
+                ? professors.find(p => p.id === formData.professorId)?.name
                 : 'Not Assigned'}
             </span>
             <ChevronDown
@@ -183,11 +223,11 @@ export default function CreateStudyClassPage() {
             <ul className='absolute z-20 mt-1 w-full bg-card-background border border-border rounded-lg shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2'>
               <li
                 onClick={() => {
-                  setProfessorId(null);
+                  setFormField('professorId', null);
                   setOpenDropdown(null);
                 }}
                 className={`px-3 py-2 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors ${
-                  !professorId
+                  !formData.professorId
                     ? 'bg-primary/20 text-primary-foreground'
                     : 'text-foreground'
                 }`}
@@ -199,11 +239,11 @@ export default function CreateStudyClassPage() {
                 <li
                   key={professor.id}
                   onClick={() => {
-                    setProfessorId(professor.id);
+                    setFormField('professorId', professor.id);
                     setOpenDropdown(null);
                   }}
                   className={`px-3 py-2 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors ${
-                    professorId === professor.id
+                    formData.professorId === professor.id
                       ? 'bg-primary/20 text-primary-foreground'
                       : 'text-foreground'
                   }`}
@@ -215,7 +255,8 @@ export default function CreateStudyClassPage() {
           )}
         </div>
 
-        {error && <p className='text-red-500 text-sm'>{error.message}</p>}
+        {/* Display API Error */}
+        {apiError && <p className='text-red-500 text-sm'>{apiError.message}</p>}
 
         {/* Buttons */}
         <div className='flex items-center gap-4 pt-2'>

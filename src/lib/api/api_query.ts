@@ -21,7 +21,11 @@ import {
   Student,
   StudentCreationData,
 } from '@/types/student';
-import { StudyClass, StudyClassCreationData } from '@/types/study-class';
+import {
+  CreateStudyClassOptions,
+  StudyClass,
+  StudyClassCreationData,
+} from '@/types/study-class';
 import { Subscription, SubscriptionCreationData } from '@/types/subscription';
 
 // --- Query Keys ---
@@ -124,17 +128,21 @@ export const useGetStudyClassesByCourse = (courseId: number) => {
   });
 };
 
-export const useCreateStudyClass = () => {
+export const useCreateStudyClass = (options?: CreateStudyClassOptions) => {
   const queryClient = useQueryClient();
   return useMutation<StudyClass, Error, StudyClassCreationData>({
+    ...options,
     mutationFn: api.createStudyClass,
-    onSuccess: data => {
-      // Invalidate both the general list and the specific course list
+    onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.studyClasses });
       queryClient.invalidateQueries({
-        // Pass number to the updated query key
         queryKey: queryKeys.studyClassesByCourse(data.courseId),
       });
+
+      options?.onSuccess?.(data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      options?.onError?.(error, variables, context);
     },
   });
 };
