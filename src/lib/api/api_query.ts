@@ -6,9 +6,21 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import * as api from './api';
-import { Course, CourseCreationData } from '@/types/course';
-import { Professor, ProfessorCreationData } from '@/types/professor';
-import { Student, StudentCreationData } from '@/types/student';
+import {
+  Course,
+  CourseCreationData,
+  CreateCourseOptions,
+} from '@/types/course';
+import {
+  CreateProfessorOptions,
+  Professor,
+  ProfessorCreationData,
+} from '@/types/professor';
+import {
+  CreateStudentOptions,
+  Student,
+  StudentCreationData,
+} from '@/types/student';
 import { StudyClass, StudyClassCreationData } from '@/types/study-class';
 import { Subscription, SubscriptionCreationData } from '@/types/subscription';
 
@@ -62,13 +74,23 @@ export const useGetCourse = (id: number) => {
   });
 };
 
-export const useCreateCourse = () => {
+export const useCreateCourse = (options?: CreateCourseOptions) => {
   const queryClient = useQueryClient();
+
   return useMutation<Course, Error, CourseCreationData>({
     mutationFn: api.createCourse,
-    onSuccess: () => {
-      // Invalidate the 'courses' query to refetch the list
+
+    onSuccess: (data, variables, context) => {
+      // 1. Your hook's internal logic
       queryClient.invalidateQueries({ queryKey: queryKeys.courses });
+
+      // 2. Call the callback passed from the component
+      options?.onSuccess?.(data, variables, context);
+    },
+
+    onError: (error, variables, context) => {
+      // 1. Call the callback passed from the component
+      options?.onError?.(error, variables, context);
     },
   });
 };
@@ -161,16 +183,17 @@ export const useGetProfessors = () => {
   });
 };
 
-export const useCreateProfessor = () => {
+export const useCreateProfessor = (options?: CreateProfessorOptions) => {
   const queryClient = useQueryClient();
   const router = useRouter();
 
-  // Change the input type from string to ProfessorCreationData
   return useMutation<Professor, Error, ProfessorCreationData>({
     mutationFn: api.createProfessor,
-    onSuccess: () => {
+    onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.professors });
       router.push('/professors');
+
+      options?.onSuccess?.(data, variables, context);
     },
   });
 };
@@ -194,12 +217,14 @@ export const useGetStudent = (id: number) => {
   });
 };
 
-export const useCreateStudent = () => {
+export const useCreateStudent = (options?: CreateStudentOptions) => {
   const queryClient = useQueryClient();
+
   return useMutation<Student, Error, StudentCreationData>({
     mutationFn: api.createStudent,
-    onSuccess: () => {
+    onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.students });
+      options?.onSuccess?.(data, variables, context);
     },
   });
 };

@@ -7,3 +7,11 @@ export interface Professor {
 }
 
 export type ProfessorCreationData = Omit<Professor, 'id'>;
+
+export type CreateProfessorOptions = {
+  onSuccess?: (
+    data: Professor,
+    variables: ProfessorCreationData,
+    context: unknown,
+  ) => void;
+};
