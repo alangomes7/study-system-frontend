@@ -8,7 +8,7 @@ import {
 import { StudyClass } from '@/types';
 import clsx from 'clsx';
 import Link from 'next/link';
-import { use, useState, useMemo } from 'react';
+import { useState, useMemo, use } from 'react';
 import { ChevronDown } from 'lucide-react';
 
 export default function CourseDetailsPage({
@@ -68,9 +68,16 @@ export default function CourseDetailsPage({
 
   // --- Event Handlers ---
   const handleStudyClassClick = (studyClass: StudyClass) => {
+    if (selectedStudyClass?.id === studyClass.id) return;
     setSelectedStudyClass(studyClass);
     setCurrentPage(1);
     setSearchTerm('');
+  };
+
+  const handleStudyClassDeselect = () => {
+    setSelectedStudyClass(null);
+    setSearchTerm('');
+    setCurrentPage(1);
   };
 
   const handlePaginationLengthChange = (length: number) => {
@@ -112,6 +119,7 @@ export default function CourseDetailsPage({
       <p className='text-foreground/80 mb-6'>{course?.description}</p>
 
       <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+        {/* --- Study Classes List --- */}
         <div className='md:col-span-1'>
           <h2 className='text-xl md:text-2xl font-bold mb-4 text-foreground'>
             Study Classes
@@ -142,6 +150,7 @@ export default function CourseDetailsPage({
                           selectedStudyClass?.id === studyClass.id,
                       })}
                       onClick={() => handleStudyClassClick(studyClass)}
+                      onDoubleClick={handleStudyClassDeselect}
                     >
                       <td className='py-2 px-4 border-b border-border text-center text-foreground'>
                         {studyClass.classCode}
@@ -158,7 +167,7 @@ export default function CourseDetailsPage({
           </div>
         </div>
 
-        {/* Details and Students Column */}
+        {/* --- Students + Details Column --- */}
         <div className='md:col-span-2'>
           {selectedStudyClass ? (
             <div>
@@ -179,6 +188,7 @@ export default function CourseDetailsPage({
                 </p>
               </div>
 
+              {/* --- Students --- */}
               <div className='flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-4'>
                 <h2 className='text-xl md:text-2xl font-semibold text-foreground'>
                   Students
@@ -206,16 +216,18 @@ export default function CourseDetailsPage({
                     </button>
 
                     {openDropdown === 'pagination' && (
-                      <ul className='absolute z-20 mt-1 w-full sm:w-36 bg-card-background border border-border rounded-lg shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2'>
+                      <ul className='absolute z-20 mt-1 w-full sm:w-36 bg-card-background border border-border rounded-lg shadow-lg overflow-hidden'>
                         {[5, 10, 20].map(length => (
                           <li
                             key={length}
                             onClick={() => handlePaginationLengthChange(length)}
-                            className={`px-3 py-2 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors ${
-                              paginationLength === length
-                                ? 'bg-primary/20 text-primary-foreground'
-                                : 'text-foreground'
-                            }`}
+                            className={clsx(
+                              'px-3 py-2 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors',
+                              {
+                                'bg-primary/20 text-primary-foreground':
+                                  paginationLength === length,
+                              },
+                            )}
                           >
                             {length} per page
                           </li>
@@ -223,6 +235,7 @@ export default function CourseDetailsPage({
                       </ul>
                     )}
                   </div>
+
                   <input
                     type='text'
                     placeholder='Search by student name'
@@ -233,31 +246,28 @@ export default function CourseDetailsPage({
                 </div>
               </div>
 
+              {/* --- Students Table / Cards --- */}
               {isStudentsLoading ? (
                 <div className='text-center mt-8 text-foreground'>
                   Loading students...
                 </div>
               ) : filteredStudents.length > 0 ? (
                 <>
+                  {/* Desktop Table */}
                   <div className='hidden md:block overflow-x-auto'>
                     <table className='min-w-full bg-card-background border border-border rounded-lg shadow-sm'>
                       <thead>
                         <tr>
-                          <th className='py-2 px-4 border-b border-border text-foreground/80 font-semibold'>
-                            ID
-                          </th>
-                          <th className='py-2 px-4 border-b border-border text-foreground/80 font-semibold'>
-                            Name
-                          </th>
-                          <th className='py-2 px-4 border-b border-border text-foreground/80 font-semibold'>
-                            Phone Number
-                          </th>
-                          <th className='py-2 px-4 border-b border-border text-foreground/80 font-semibold'>
-                            E-mail
-                          </th>
-                          <th className='py-2 px-4 border-b border-border text-foreground/80 font-semibold'>
-                            CPF
-                          </th>
+                          {['ID', 'Name', 'Phone Number', 'E-mail', 'CPF'].map(
+                            header => (
+                              <th
+                                key={header}
+                                className='py-2 px-4 border-b border-border text-foreground/80 font-semibold'
+                              >
+                                {header}
+                              </th>
+                            ),
+                          )}
                         </tr>
                       </thead>
                       <tbody>
@@ -266,52 +276,32 @@ export default function CourseDetailsPage({
                             key={student.id}
                             className='hover:bg-foreground/10'
                           >
-                            <td className='py-2 px-4 border-b border-border text-center'>
-                              <Link
-                                href={`/students/${student.id}`}
-                                className='block w-full h-full text-foreground hover:text-primary'
+                            {[
+                              student.id,
+                              student.name,
+                              student.phone,
+                              student.email,
+                              student.register,
+                            ].map((value, i) => (
+                              <td
+                                key={i}
+                                className='py-2 px-4 border-b border-border text-center'
                               >
-                                {student.id}
-                              </Link>
-                            </td>
-                            <td className='py-2 px-4 border-b border-border text-center'>
-                              <Link
-                                href={`/students/${student.id}`}
-                                className='block w-full h-full text-foreground hover:text-primary'
-                              >
-                                {student.name}
-                              </Link>
-                            </td>
-                            <td className='py-2 px-4 border-b border-border text-center'>
-                              <Link
-                                href={`/students/${student.id}`}
-                                className='block w-full h-full text-foreground hover:text-primary'
-                              >
-                                {student.phone}
-                              </Link>
-                            </td>
-                            <td className='py-2 px-4 border-b border-border text-center'>
-                              <Link
-                                href={`/students/${student.id}`}
-                                className='block w-full h-full text-foreground hover:text-primary'
-                              >
-                                {student.email}
-                              </Link>
-                            </td>
-                            <td className='py-2 px-4 border-b border-border text-center'>
-                              <Link
-                                href={`/students/${student.id}`}
-                                className='block w-full h-full text-foreground hover:text-primary'
-                              >
-                                {student.register}
-                              </Link>
-                            </td>
+                                <Link
+                                  href={`/students/${student.id}`}
+                                  className='block w-full h-full text-foreground hover:text-primary'
+                                >
+                                  {value}
+                                </Link>
+                              </td>
+                            ))}
                           </tr>
                         ))}
                       </tbody>
                     </table>
                   </div>
 
+                  {/* Mobile Cards */}
                   <div className='grid grid-cols-1 gap-4 md:hidden'>
                     {currentStudents.map(student => (
                       <Link
@@ -340,6 +330,7 @@ export default function CourseDetailsPage({
                     ))}
                   </div>
 
+                  {/* Pagination */}
                   <div className='flex justify-center mt-4'>
                     <button
                       onClick={() => paginate(currentPage - 1)}
