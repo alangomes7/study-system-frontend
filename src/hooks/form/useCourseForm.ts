@@ -5,9 +5,9 @@ import {
   courseSchema,
   type CourseFormData,
   type CourseFormErrors,
-} from '@/lib/schemas/course-schema';
-import { useCreateCourse } from '@/lib/api/api_query';
+} from '@/lib/schemas/index';
 import { z } from 'zod';
+import { useCreateCourse } from '@/hooks';
 
 const INITIAL_STATE: CourseFormData = {
   name: '',
@@ -17,7 +17,7 @@ const INITIAL_STATE: CourseFormData = {
 // -----------------------------
 // Hook definition
 // -----------------------------
-export function useCourseForm() {
+export default function useCourseForm() {
   const [formData, setFormData] = useState<CourseFormData>(INITIAL_STATE);
   const [errors, setErrors] = useState<CourseFormErrors>({});
 

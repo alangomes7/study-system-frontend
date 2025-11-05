@@ -6,7 +6,7 @@ import {
   useGetAllStudents,
   useGetAllStudyClasses,
   useCreateSubscription,
-} from '@/lib/api/api_query';
+} from '@/hooks';
 
 export default function EnrollStudentPage() {
   const [selectedStudent, setSelectedStudent] = useState<number | null>(null);
@@ -62,9 +62,9 @@ export default function EnrollStudentPage() {
           </label>
           <button
             type='button'
-            onClick={() =>
-              setOpenDropdown(openDropdown === 'student' ? null : 'student')
-            }
+            onClick={() => {
+              setOpenDropdown(openDropdown === 'student' ? null : 'student');
+            }}
             className='w-full bg-card-background border border-border text-foreground rounded-md px-3 py-2 flex justify-between items-center shadow-sm hover:border-primary transition-colors'
             disabled={isSubmitting}
           >
@@ -87,15 +87,15 @@ export default function EnrollStudentPage() {
               }`}
             />
           </button>
-
           {openDropdown === 'student' && (
             <ul className='absolute z-20 mt-1 w-full bg-card-background border border-border rounded-lg shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2 max-h-60 overflow-y-auto'>
               {students.map(student => (
                 <li
                   key={student.id}
-                  onClick={() => {
+                  onClick={studyClasses => {
                     setSelectedStudent(student.id);
                     setOpenDropdown(null);
+                    console.log(studyClasses);
                   }}
                   className={`px-3 py-2 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors ${
                     selectedStudent === student.id

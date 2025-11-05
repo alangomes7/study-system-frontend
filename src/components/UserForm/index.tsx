@@ -1,7 +1,7 @@
 'use client';
 
 import { IMaskInput } from 'react-imask';
-import { useUserForm } from '@/hooks/useUserForm';
+import { useUserForm } from '@/hooks/index';
 
 type UserFormState = {
   name: string;

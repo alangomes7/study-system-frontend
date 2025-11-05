@@ -9,7 +9,7 @@ import { useState, useEffect, useCallback } from 'react';
  * @param classCode The code of the currently selected class (e.g., "A001")
  * @returns An object with the group, and functions to modify it.
  */
-export function useStudentGroup(classCode: string | null) {
+export default function useStudentGroup(classCode: string | null) {
   const [group, setGroup] = useState<number[]>([]);
 
   // Helper to safely read from local storage

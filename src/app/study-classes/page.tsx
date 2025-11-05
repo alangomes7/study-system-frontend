@@ -5,10 +5,7 @@ import Link from 'next/link';
 import { ChevronDown } from 'lucide-react';
 import { useState, useMemo } from 'react';
 
-import {
-  useGetAllStudyClasses,
-  useGetStudentsByStudyClass,
-} from '@/lib/api/api_query';
+import { useGetAllStudyClasses, useGetStudentsByStudyClass } from '@/hooks';
 import { StudyClass } from '@/types';
 
 export default function StudyClassesPage() {

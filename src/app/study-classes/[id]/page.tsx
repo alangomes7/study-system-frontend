@@ -1,10 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import {
-  useGetStudyClass,
-  useGetSubscriptionsByStudyClass,
-} from '@/lib/api/api_query';
+import { useGetStudyClass, useGetSubscriptionsByStudyClass } from '@/hooks';
 import { use } from 'react';
 
 export default function StudyClassDetailsPage({

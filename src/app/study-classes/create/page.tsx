@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { ChevronDown } from 'lucide-react';
-import { useStudyClassForm } from '@/hooks/useStudyClassForm';
+import { useStudyClassForm } from '@/hooks';
 
 export default function CreateStudyClassPage() {
   const {

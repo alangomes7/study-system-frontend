@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { useGetAllStudents } from '@/lib/api/api_query';
+import { useGetAllStudents } from '@/hooks';
 import { ChevronDown } from 'lucide-react';
 
 export default function StudentsPage() {

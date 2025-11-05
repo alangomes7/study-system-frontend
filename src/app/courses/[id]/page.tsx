@@ -4,7 +4,7 @@ import {
   useGetCourse,
   useGetStudyClassesByCourse,
   useGetStudentsByStudyClass,
-} from '@/lib/api/api_query';
+} from '@/hooks';
 import { StudyClass } from '@/types';
 import clsx from 'clsx';
 import Link from 'next/link';

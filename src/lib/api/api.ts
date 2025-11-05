@@ -1,11 +1,19 @@
 /**
  * This file contains all the core data-fetching functions.
  */
-import { Course, CourseCreationData } from '@/types/course';
-import { Professor, ProfessorCreationData } from '@/types/professor';
-import { Student, StudentCreationData } from '@/types/student';
-import { StudyClass, StudyClassCreationData } from '@/types/study-class';
-import { Subscription, SubscriptionCreationData } from '@/types/subscription';
+
+import {
+  Course,
+  CourseCreationData,
+  Professor,
+  ProfessorCreationData,
+  Student,
+  StudentCreationData,
+  StudyClass,
+  StudyClassCreationData,
+  Subscription,
+  SubscriptionCreationData,
+} from '@/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_SPRINGBOOT_SERVER_IP_ADDRESS;
 

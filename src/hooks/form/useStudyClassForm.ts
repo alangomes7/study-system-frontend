@@ -2,16 +2,12 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { z } from 'zod';
-import {
-  useGetCourses,
-  useGetProfessors,
-  useCreateStudyClass,
-} from '@/lib/api/api_query';
+import { useGetCourses, useGetProfessors, useCreateStudyClass } from '@/hooks';
 import {
   studyClassSchema,
   type StudyClassFormErrors,
   type StudyClassFormData,
-} from '@/lib/schemas/study-class-schema';
+} from '@/lib/schemas';
 
 // --- Date/Time Constants (now) ---
 const currentYear = new Date().getFullYear();
@@ -30,7 +26,7 @@ const availableYears = [currentYear, currentYear + 1];
 const allSemesters = [1, 2];
 const currentYearAvailableSemesters = defaultSemester === 1 ? [1, 2] : [2];
 
-export function useStudyClassForm() {
+export default function useStudyClassForm() {
   const [formData, setFormData] = useState<StudyClassFormData>(INITIAL_STATE);
   const [errors, setErrors] = useState<StudyClassFormErrors>({});
   const [openDropdown, setOpenDropdown] = useState<

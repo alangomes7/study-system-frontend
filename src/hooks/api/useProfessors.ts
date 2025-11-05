@@ -1,0 +1,33 @@
+'use client';
+
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from './queryKeys';
+import * as api from '@/lib/api';
+import {
+  Professor,
+  CreateProfessorOptions,
+  ProfessorCreationData,
+} from '@/types';
+import { useRouter } from 'next/router';
+
+export const useGetProfessors = () => {
+  return useQuery<Professor[], Error>({
+    queryKey: queryKeys.professors,
+    queryFn: api.getProfessors,
+  });
+};
+
+export const useCreateProfessor = (options?: CreateProfessorOptions) => {
+  const queryClient = useQueryClient();
+  const router = useRouter();
+
+  return useMutation<Professor, Error, ProfessorCreationData>({
+    mutationFn: api.createProfessor,
+    onSuccess: (data, variables, context) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.professors });
+      router.push('/professors');
+
+      options?.onSuccess?.(data, variables, context);
+    },
+  });
+};

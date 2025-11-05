@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import NavBar from '@/components/NavBar';
-import QueryProvider from '@/providers/QueryProvider';
+import { NavBar } from '@/components';
+import { QueryProvider } from '@/providers';
 
 export const metadata: Metadata = {
   title: 'Create Next App',

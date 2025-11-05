@@ -1,6 +1,6 @@
 'use client';
 
-import { useCourseForm } from '@/hooks/useCourseForm';
+import { useCourseForm } from '@/hooks';
 
 type CourseFormState = {
   name: string;

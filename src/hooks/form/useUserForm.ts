@@ -5,8 +5,8 @@ import {
   userSchema,
   type userFormData,
   type userFormErrors,
-} from '@/lib/schemas/user-schema';
-import { useCreateStudent, useCreateProfessor } from '@/lib/api/api_query';
+} from '@/lib/schemas';
+import { useCreateStudent, useCreateProfessor } from '@/hooks';
 import z from 'zod';
 
 const INITIAL_STATE: userFormData = {
@@ -23,7 +23,7 @@ const unmask = (value: string) => value.replace(/\D/g, '');
 // -----------------------------
 type UserType = 'student' | 'professor';
 
-export function useUserForm(userType: UserType) {
+export default function useUserForm(userType: UserType) {
   const [formData, setFormData] = useState<userFormData>(INITIAL_STATE);
   const [errors, setErrors] = useState<userFormErrors>({});
 

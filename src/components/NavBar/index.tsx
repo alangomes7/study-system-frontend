@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
-import { ButtonTheme } from '../ButtonTheme';
 import { MenuIcon, XIcon } from 'lucide-react';
+import { ButtonTheme } from '@/components';
 
 export default function NavBar() {
   const [isOpen, setIsOpen] = useState(false);

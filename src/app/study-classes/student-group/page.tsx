@@ -4,10 +4,10 @@ import React, { useState, useMemo } from 'react';
 import clsx from 'clsx';
 import { ChevronDown } from 'lucide-react';
 import {
+  useStudentGroup,
   useGetAllStudyClasses,
   useGetStudentsByStudyClass,
-} from '@/lib/api/api_query';
-import { useStudentGroup } from '@/hooks/useStudents';
+} from '@/hooks';
 
 export default function StudentGroupPage() {
   const [selectedClassId, setSelectedClassId] = useState<number | null>(null);

@@ -9,7 +9,7 @@ type Theme = 'light' | 'dark';
  * Button component to toggle between light and dark themes.
  * Persists selection in localStorage.
  */
-export function ButtonTheme() {
+export default function ButtonTheme() {
   const [mounted, setMounted] = useState(false);
   const [theme, setTheme] = useState<Theme>('light');
 
