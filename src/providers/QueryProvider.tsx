@@ -15,8 +15,7 @@ export default function QueryProvider({
       new QueryClient({
         defaultOptions: {
           queries: {
-            // You can set default options here, e.g.,
-            // staleTime: 1000 * 60 * 5, // 5 minutes
+            staleTime: 1000 * 60 * 5,
             refetchOnWindowFocus: false,
           },
         },
@@ -26,7 +25,6 @@ export default function QueryProvider({
   return (
     <QueryClientProvider client={queryClient}>
       {children}
-      {/* The React Query Devtools are super helpful for debugging */}
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );

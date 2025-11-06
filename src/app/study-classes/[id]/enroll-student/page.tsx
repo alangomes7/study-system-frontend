@@ -1,85 +1,110 @@
 'use client';
 
-import { useState } from 'react';
 import {
   useGetAllStudents,
-  useGetAllStudyClasses,
+  useGetStudyClass,
   useCreateSubscription,
 } from '@/hooks';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { use, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 
-export default function EnrollStudentPage() {
-  const [selectedStudent, setSelectedStudent] = useState<string>('');
-  const [selectedStudyClass, setSelectedStudyClass] = useState<string>('');
-  const [openDropdown, setOpenDropdown] = useState<
-    'student' | 'studyClass' | null
-  >(null);
+export default function EnrollStudentPage({
+  params,
+}: {
+  params: Promise<{ id: number }>;
+}) {
+  const { id: studyClassId } = use(params);
+  const router = useRouter();
 
-  const { data: students = [], isLoading: isLoadingStudents } =
-    useGetAllStudents();
-  const { data: studyClasses = [], isLoading: isLoadingStudyClasses } =
-    useGetAllStudyClasses();
+  // --- Component State ---
+  const [selectedStudentId, setSelectedStudentId] = useState<number | null>(
+    null,
+  );
+  const [openDropdown, setOpenDropdown] = useState<'student' | null>(null);
+
+  // --- Data Fetching ---
+  const {
+    data: studyClass,
+    isLoading: isLoadingClass,
+    error: classError,
+  } = useGetStudyClass(studyClassId);
+
+  const {
+    data: students = [],
+    isLoading: isLoadingStudents,
+    error: studentsError,
+  } = useGetAllStudents();
 
   const {
     mutate: createSubscription,
     isPending: isSubmitting,
-    error,
+    error: mutationError,
   } = useCreateSubscription();
 
-  const isLoading = isLoadingStudents || isLoadingStudyClasses;
+  // --- Event Handlers ---
+
+  const handleStudentSelect = (studentId: number) => {
+    setSelectedStudentId(studentId);
+    setOpenDropdown(null);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedStudent || !selectedStudyClass) return;
+    if (!selectedStudentId) return;
 
-    createSubscription({
-      studentId: Number(selectedStudent),
-      studyClassId: Number(selectedStudyClass),
-    });
+    createSubscription(
+      {
+        studentId: selectedStudentId,
+        studyClassId: studyClassId,
+      },
+      {
+        onSuccess: () => {
+          // On success, redirect back to the class details page
+          router.push(`/study-classes/${studyClassId}`);
+        },
+      },
+    );
   };
 
-  // --- Handlers for custom dropdowns ---
-  const handleStudentSelect = (studentId: string) => {
-    setSelectedStudent(studentId);
-    setOpenDropdown(null);
-  };
+  // --- Derived State & Loading/Error Handling ---
 
-  const handleStudyClassSelect = (classId: string) => {
-    setSelectedStudyClass(classId);
-    setOpenDropdown(null);
-  };
-
-  // --- Display values for dropdowns ---
   const selectedStudentName =
-    students.find(s => s.id === Number(selectedStudent))?.name ||
-    'Select a student';
+    students.find(s => s.id === selectedStudentId)?.name || 'Select a student';
 
-  const selectedStudyClassName =
-    studyClasses.find(sc => sc.id === Number(selectedStudyClass))?.classCode ||
-    'Select a study class';
+  const isLoading = isLoadingStudents || isLoadingClass;
+  const queryError = studentsError || classError;
+  const error = queryError || mutationError;
 
   if (isLoading) {
     return (
       <div className='text-center mt-8 text-foreground'>
-        Loading students and study classes...
+        Loading class and student data...
       </div>
+    );
+  }
+
+  if (queryError && !isSubmitting) {
+    return (
+      <p className='text-center mt-8 text-red-500'>
+        Error: {queryError.message}
+      </p>
     );
   }
 
   return (
     <div className='container mx-auto px-4 py-8 max-w-lg'>
-      <h1 className='text-3xl font-bold mb-6 text-foreground'>
-        Enroll Student
+      <h1 className='text-2xl md:text-3xl font-bold mb-6 text-foreground'>
+        Enroll Student in {studyClass?.classCode || 'Class'}
       </h1>
-      {error && (
-        <p className='text-center mb-4 text-red-500'>{error.message}</p>
-      )}
+
       <form onSubmit={handleSubmit} className='card p-6 space-y-4'>
         {/* Student Dropdown */}
         <div className='relative'>
           <label
             htmlFor='student-button'
-            className='block text-foreground font-bold mb-2'
+            className='block text-sm font-medium text-foreground/80 mb-1'
           >
             Student
           </label>
@@ -94,7 +119,7 @@ export default function EnrollStudentPage() {
           >
             <span
               className={
-                selectedStudent
+                selectedStudentId !== null
                   ? 'text-foreground'
                   : 'text-muted-foreground italic'
               }
@@ -115,9 +140,9 @@ export default function EnrollStudentPage() {
               {students.map(student => (
                 <li
                   key={student.id}
-                  onClick={() => handleStudentSelect(String(student.id))}
+                  onClick={() => handleStudentSelect(student.id)}
                   className={`px-3 py-2 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors ${
-                    selectedStudent === String(student.id)
+                    selectedStudentId === student.id
                       ? 'bg-primary/20 text-primary-foreground'
                       : 'text-foreground'
                   }`}
@@ -129,69 +154,28 @@ export default function EnrollStudentPage() {
           )}
         </div>
 
-        {/* Study Class Dropdown */}
-        <div className='relative'>
-          <label
-            htmlFor='studyClass-button'
-            className='block text-foreground font-bold mb-2'
-          >
-            Study Class
-          </label>
+        {error && (
+          <p className='text-red-500 text-sm'>
+            {error instanceof Error ? error.message : 'An error occurred'}
+          </p>
+        )}
+
+        <div className='flex items-center gap-4 pt-2'>
           <button
-            type='button'
-            id='studyClass-button'
-            onClick={() =>
-              setOpenDropdown(
-                openDropdown === 'studyClass' ? null : 'studyClass',
-              )
-            }
-            className='w-full bg-card-background border border-border text-foreground rounded-md px-3 py-2 flex justify-between items-center shadow-sm hover:border-primary transition-colors'
-            disabled={isSubmitting}
+            type='submit'
+            className='btn btn-primary'
+            disabled={isSubmitting || !selectedStudentId}
           >
-            <span
-              className={
-                selectedStudyClass
-                  ? 'text-foreground'
-                  : 'text-muted-foreground italic'
-              }
-            >
-              {selectedStudyClassName}
-            </span>
-            <ChevronDown
-              className={`w-4 h-4 transition-transform duration-200 ${
-                openDropdown === 'studyClass'
-                  ? 'rotate-180 text-primary'
-                  : 'text-muted-foreground'
-              }`}
-            />
+            {isSubmitting ? 'Enrolling...' : 'Enroll Student'}
           </button>
 
-          {openDropdown === 'studyClass' && (
-            <ul className='absolute z-20 mt-1 w-full max-h-60 overflow-y-auto bg-card-background border border-border rounded-lg shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2'>
-              {studyClasses.map(studyClass => (
-                <li
-                  key={studyClass.id}
-                  onClick={() => handleStudyClassSelect(String(studyClass.id))}
-                  className={`px-3 py-2 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors ${
-                    selectedStudyClass === String(studyClass.id)
-                      ? 'bg-primary/20 text-primary-foreground'
-                      : 'text-foreground'
-                  }`}
-                >
-                  {studyClass.classCode}
-                </li>
-              ))}
-            </ul>
-          )}
+          <Link
+            href={`/study-classes/${studyClassId}`}
+            className='btn border border-border hover:bg-foreground/5'
+          >
+            Cancel
+          </Link>
         </div>
-
-        <button
-          type='submit'
-          className='btn btn-primary disabled:opacity-50'
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? 'Enrolling...' : 'Enroll'}
-        </button>
       </form>
     </div>
   );

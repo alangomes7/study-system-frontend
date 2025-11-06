@@ -8,7 +8,7 @@ import {
   CreateProfessorOptions,
   ProfessorCreationData,
 } from '@/types';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 export const useGetProfessors = () => {
   return useQuery<Professor[], Error>({
@@ -25,7 +25,7 @@ export const useCreateProfessor = (options?: CreateProfessorOptions) => {
     mutationFn: api.createProfessor,
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.professors });
-      router.push('/professors');
+      router.push('/');
 
       options?.onSuccess?.(data, variables, context);
     },
