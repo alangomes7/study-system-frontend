@@ -7,8 +7,11 @@
  * imports cleaner and helps maintain an organized project structure.
  *
  * Exports:
- *  - All API functions and definitions from `api.ts`
+ *  - All API functions and definitions
  */
 
-// Export all from api.ts
-export * from './api';
+export * from './course';
+export * from './studyClass';
+export * from './professor';
+export * from './student';
+export * from './subscription';

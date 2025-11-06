@@ -6,28 +6,27 @@ import { useState, useMemo } from 'react';
 
 export default function CoursesPage() {
   const { data: courses = [], isLoading, error } = useGetCourses();
-
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredCourses = useMemo(() => {
-    return courses.filter(course =>
-      course.name.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
-  }, [searchTerm, courses]);
+  const filteredCourses = useMemo(
+    () =>
+      courses.filter(course =>
+        course.name.toLowerCase().includes(searchTerm.toLowerCase()),
+      ),
+    [searchTerm, courses],
+  );
 
-  if (isLoading) {
+  if (isLoading)
     return (
       <div className='container mx-auto px-4 py-8 text-center'>
         Loading courses...
       </div>
     );
-  }
 
-  if (error) {
+  if (error)
     return (
       <p className='text-center mt-8 text-red-500'>Error: {error.message}</p>
     );
-  }
 
   return (
     <div className='container mx-auto px-4 py-8'>
