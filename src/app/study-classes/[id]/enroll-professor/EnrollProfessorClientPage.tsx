@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { use, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { StudyClass } from '@/types';
+import { SpinLoader } from '@/components';
 
 export default function EnrollProfessorClientPage({
   studyClass,
@@ -69,7 +70,11 @@ export default function EnrollProfessorClientPage({
   const error = queryError || mutationError;
 
   if (isLoading) {
-    return <div className='text-center mt-8 text-foreground'>Loading...</div>;
+    return (
+      <div className='text-center mt-8 text-foreground'>
+        <SpinLoader />
+      </div>
+    );
   }
 
   if (queryError && !isSubmitting) {

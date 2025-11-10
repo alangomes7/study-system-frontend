@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { ChevronDown } from 'lucide-react';
 import { useStudyClassForm } from '@/hooks';
+import { SpinLoader } from '@/components';
 
 export default function CreateStudyClassClientPage() {
   const {
@@ -24,7 +25,7 @@ export default function CreateStudyClassClientPage() {
   if (isLoading) {
     return (
       <div className='text-center mt-8 text-foreground'>
-        Loading courses and professors...
+        <SpinLoader />
       </div>
     );
   }
@@ -36,19 +37,35 @@ export default function CreateStudyClassClientPage() {
       </h1>
 
       <form onSubmit={handleSubmit} className='card p-6 space-y-4'>
-        {/* Year & Semester Dropdowns */}
+        {/* Year & Semester */}
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           {/* Year Dropdown */}
           <div className='relative'>
-            <label className='block text-sm font-medium text-foreground/80 mb-1'>
+            <label
+              htmlFor='year-input'
+              className='block text-sm font-medium text-foreground/80 mb-1'
+            >
               Year
             </label>
+            <input
+              type='hidden'
+              id='year-input'
+              name='year'
+              value={formData.year}
+              readOnly
+            />
             <button
               type='button'
               onClick={() =>
                 setOpenDropdown(openDropdown === 'year' ? null : 'year')
               }
               className='w-full bg-card-background border border-border text-foreground rounded-md px-3 py-2 flex justify-between items-center shadow-sm hover:border-primary transition-colors'
+              role='combobox'
+              aria-haspopup='listbox'
+              aria-expanded={openDropdown === 'year'}
+              aria-controls='year-listbox'
+              aria-labelledby='year-input'
+              aria-describedby={errors.year ? 'year-error' : undefined}
             >
               <span className='text-foreground'>{formData.year}</span>
               <ChevronDown
@@ -60,10 +77,17 @@ export default function CreateStudyClassClientPage() {
               />
             </button>
             {openDropdown === 'year' && (
-              <ul className='absolute z-30 mt-1 w-full bg-card-background border border-border rounded-lg shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2'>
+              <ul
+                id='year-listbox'
+                role='listbox'
+                aria-labelledby='year-input'
+                className='absolute z-30 mt-1 w-full bg-card-background border border-border rounded-lg shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2'
+              >
                 {availableYears.map(year => (
                   <li
                     key={year}
+                    role='option'
+                    aria-selected={formData.year === year}
                     onClick={() => {
                       setFormField('year', year);
                       setOpenDropdown(null);
@@ -80,21 +104,39 @@ export default function CreateStudyClassClientPage() {
               </ul>
             )}
             {errors.year && (
-              <p className='text-red-500 text-sm mt-1'>{errors.year[0]}</p>
+              <p id='year-error' className='text-red-500 text-sm mt-1'>
+                {errors.year[0]}
+              </p>
             )}
           </div>
 
           {/* Semester Dropdown */}
           <div className='relative'>
-            <label className='block text-sm font-medium text-foreground/80 mb-1'>
+            <label
+              htmlFor='semester-input'
+              className='block text-sm font-medium text-foreground/80 mb-1'
+            >
               Semester
             </label>
+            <input
+              type='hidden'
+              id='semester-input'
+              name='semester'
+              value={formData.semester}
+              readOnly
+            />
             <button
               type='button'
               onClick={() =>
                 setOpenDropdown(openDropdown === 'semester' ? null : 'semester')
               }
               className='w-full bg-card-background border border-border text-foreground rounded-md px-3 py-2 flex justify-between items-center shadow-sm hover:border-primary transition-colors'
+              role='combobox'
+              aria-haspopup='listbox'
+              aria-expanded={openDropdown === 'semester'}
+              aria-controls='semester-listbox'
+              aria-labelledby='semester-input'
+              aria-describedby={errors.semester ? 'semester-error' : undefined}
             >
               <span className='text-foreground'>{formData.semester}</span>
               <ChevronDown
@@ -106,10 +148,17 @@ export default function CreateStudyClassClientPage() {
               />
             </button>
             {openDropdown === 'semester' && (
-              <ul className='absolute z-30 mt-1 w-full bg-card-background border border-border rounded-lg shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2'>
+              <ul
+                id='semester-listbox'
+                role='listbox'
+                aria-labelledby='semester-input'
+                className='absolute z-30 mt-1 w-full bg-card-background border border-border rounded-lg shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2'
+              >
                 {availableSemesters.map(semester => (
                   <li
                     key={semester}
+                    role='option'
+                    aria-selected={formData.semester === semester}
                     onClick={() => {
                       setFormField('semester', semester);
                       setOpenDropdown(null);
@@ -126,22 +175,40 @@ export default function CreateStudyClassClientPage() {
               </ul>
             )}
             {errors.semester && (
-              <p className='text-red-500 text-sm mt-1'>{errors.semester[0]}</p>
+              <p id='semester-error' className='text-red-500 text-sm mt-1'>
+                {errors.semester[0]}
+              </p>
             )}
           </div>
         </div>
 
         {/* Course Dropdown */}
         <div className='relative'>
-          <label className='block text-sm font-medium text-foreground/80 mb-1'>
+          <label
+            htmlFor='course-input'
+            className='block text-sm font-medium text-foreground/80 mb-1'
+          >
             Course
           </label>
+          <input
+            type='hidden'
+            id='course-input'
+            name='courseId'
+            value={formData.courseId || ''}
+            readOnly
+          />
           <button
             type='button'
             onClick={() =>
               setOpenDropdown(openDropdown === 'course' ? null : 'course')
             }
             className='w-full bg-card-background border border-border text-foreground rounded-md px-3 py-2 flex justify-between items-center shadow-sm hover:border-primary transition-colors'
+            role='combobox'
+            aria-haspopup='listbox'
+            aria-expanded={openDropdown === 'course'}
+            aria-controls='course-listbox'
+            aria-labelledby='course-input'
+            aria-describedby={errors.courseId ? 'course-error' : undefined}
           >
             <span
               className={
@@ -163,10 +230,17 @@ export default function CreateStudyClassClientPage() {
             />
           </button>
           {openDropdown === 'course' && (
-            <ul className='absolute z-20 mt-1 w-full bg-card-background border border-border rounded-lg shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2'>
+            <ul
+              id='course-listbox'
+              role='listbox'
+              aria-labelledby='course-input'
+              className='absolute z-20 mt-1 w-full bg-card-background border border-border rounded-lg shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2'
+            >
               {courses.map(course => (
                 <li
                   key={course.id}
+                  role='option'
+                  aria-selected={formData.courseId === course.id}
                   onClick={() => {
                     setFormField('courseId', course.id);
                     setOpenDropdown(null);
@@ -183,21 +257,38 @@ export default function CreateStudyClassClientPage() {
             </ul>
           )}
           {errors.courseId && (
-            <p className='text-red-500 text-sm mt-1'>{errors.courseId[0]}</p>
+            <p id='course-error' className='text-red-500 text-sm mt-1'>
+              {errors.courseId[0]}
+            </p>
           )}
         </div>
 
         {/* Professor Dropdown */}
         <div className='relative'>
-          <label className='block text-sm font-medium text-foreground/80 mb-1'>
+          <label
+            htmlFor='professor-input'
+            className='block text-sm font-medium text-foreground/80 mb-1'
+          >
             Professor (Optional)
           </label>
+          <input
+            type='hidden'
+            id='professor-input'
+            name='professorId'
+            value={formData.professorId || ''}
+            readOnly
+          />
           <button
             type='button'
             onClick={() =>
               setOpenDropdown(openDropdown === 'professor' ? null : 'professor')
             }
             className='w-full bg-card-background border border-border text-foreground rounded-md px-3 py-2 flex justify-between items-center shadow-sm hover:border-primary transition-colors'
+            role='combobox'
+            aria-haspopup='listbox'
+            aria-expanded={openDropdown === 'professor'}
+            aria-controls='professor-listbox'
+            aria-labelledby='professor-input'
           >
             <span
               className={
@@ -220,8 +311,15 @@ export default function CreateStudyClassClientPage() {
           </button>
 
           {openDropdown === 'professor' && (
-            <ul className='absolute z-20 mt-1 w-full bg-card-background border border-border rounded-lg shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2'>
+            <ul
+              id='professor-listbox'
+              role='listbox'
+              aria-labelledby='professor-input'
+              className='absolute z-20 mt-1 w-full bg-card-background border border-border rounded-lg shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2'
+            >
               <li
+                role='option'
+                aria-selected={!formData.professorId}
                 onClick={() => {
                   setFormField('professorId', null);
                   setOpenDropdown(null);
@@ -234,10 +332,11 @@ export default function CreateStudyClassClientPage() {
               >
                 Not Assigned
               </li>
-
               {professors.map(professor => (
                 <li
                   key={professor.id}
+                  role='option'
+                  aria-selected={formData.professorId === professor.id}
                   onClick={() => {
                     setFormField('professorId', professor.id);
                     setOpenDropdown(null);
@@ -255,7 +354,7 @@ export default function CreateStudyClassClientPage() {
           )}
         </div>
 
-        {/* Display API Error */}
+        {/* API Error */}
         {apiError && <p className='text-red-500 text-sm'>{apiError.message}</p>}
 
         {/* Buttons */}

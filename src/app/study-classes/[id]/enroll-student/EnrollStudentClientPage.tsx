@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { StudyClass } from '@/types';
+import { SpinLoader } from '@/components';
 
 export default function EnrollStudentClientPage({
   studyClass,
@@ -62,16 +63,24 @@ export default function EnrollStudentClientPage({
   // --- Derived State & Loading/Error Handling ---
 
   const selectedStudentName =
-    students.find(s => s.id === selectedStudentId)?.name || 'Select a student';
+    students.find(s => s.id === selectedStudentId)?.name ||
+    '-- Select a student --';
 
   const isLoading = isLoadingStudents;
   const queryError = studentsError;
-  const error = queryError || mutationError;
+  const apiError = queryError || mutationError;
+
+  // Consolidate error message for ARIA
+  const errorMessage = apiError
+    ? apiError instanceof Error
+      ? apiError.message
+      : 'An error occurred'
+    : null;
 
   if (isLoading) {
     return (
       <div className='text-center mt-8 text-foreground'>
-        Loading class and student data...
+        <SpinLoader />
       </div>
     );
   }
@@ -94,19 +103,34 @@ export default function EnrollStudentClientPage({
         {/* Student Dropdown */}
         <div className='relative'>
           <label
-            htmlFor='student-button'
+            htmlFor='student-input' // <-- FIXED: Points to hidden input
             className='block text-sm font-medium text-foreground/80 mb-1'
           >
             Student
           </label>
+          {/* ADDED: Hidden input to hold value and be target for label */}
+          <input
+            type='hidden'
+            id='student-input'
+            name='studentId'
+            value={selectedStudentId || ''}
+            readOnly
+          />
           <button
             type='button'
-            id='student-button'
             onClick={() =>
               setOpenDropdown(openDropdown === 'student' ? null : 'student')
             }
             className='w-full bg-card-background border border-border text-foreground rounded-md px-3 py-2 flex justify-between items-center shadow-sm hover:border-primary transition-colors'
             disabled={isSubmitting}
+            // --- ARIA ATTRIBUTES ADDED ---
+            role='combobox'
+            aria-haspopup='listbox'
+            aria-expanded={openDropdown === 'student'}
+            aria-controls='student-listbox'
+            aria-labelledby='student-input' // <-- FIXED: Uses label's target ID
+            aria-describedby={errorMessage ? 'student-error' : undefined}
+            // --- END ATTRIBUTES ---
           >
             <span
               className={
@@ -127,10 +151,17 @@ export default function EnrollStudentClientPage({
           </button>
 
           {openDropdown === 'student' && (
-            <ul className='absolute z-20 mt-1 w-full max-h-60 overflow-y-auto bg-card-background border border-border rounded-lg shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2'>
+            <ul
+              id='student-listbox' // <-- ADDED ID
+              role='listbox' // <-- ADDED ROLE
+              aria-labelledby='student-input' // <-- ADDED ARIA
+              className='absolute z-20 mt-1 w-full max-h-60 overflow-y-auto bg-card-background border border-border rounded-lg shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2'
+            >
               {students.map(student => (
                 <li
                   key={student.id}
+                  role='option' // <-- ADDED ROLE
+                  aria-selected={selectedStudentId === student.id} // <-- ADDED ARIA
                   onClick={() => handleStudentSelect(student.id)}
                   className={`px-3 py-2 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors ${
                     selectedStudentId === student.id
@@ -145,9 +176,12 @@ export default function EnrollStudentClientPage({
           )}
         </div>
 
-        {error && (
-          <p className='text-red-500 text-sm'>
-            {error instanceof Error ? error.message : 'An error occurred'}
+        {errorMessage && (
+          <p
+            id='student-error' // <-- ADDED ID
+            className='text-red-500 text-sm'
+          >
+            {errorMessage}
           </p>
         )}
 

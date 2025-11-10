@@ -3,18 +3,16 @@ import type { Metadata } from 'next';
 import CourseDetailsClientPage from './courseDetailsClientPage';
 
 type Props = {
-  params: { id: number };
+  params: Promise<{ id: string }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const id = params.id;
+  const { id } = await params;
 
-  const course = await getCourse(id);
+  const course = await getCourse(Number(id));
 
   if (!course) {
-    return {
-      title: 'Course Not Found',
-    };
+    return { title: 'Course Not Found' };
   }
 
   return {
@@ -22,8 +20,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function CourseDetailsPage({ params }: Props) {
-  const idAsNumber = Number(params.id);
+export default async function CourseDetailsPage({ params }: Props) {
+  const { id } = await params;
 
-  return <CourseDetailsClientPage id={idAsNumber} />;
+  return <CourseDetailsClientPage id={Number(id)} />;
 }

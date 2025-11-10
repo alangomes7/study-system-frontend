@@ -7,15 +7,16 @@ import {
   useGetAllStudyClasses,
   useCreateSubscription,
 } from '@/hooks';
+import { SpinLoader } from '@/components';
+import clsx from 'clsx';
 
 export default function EnrollStudentPage() {
   const [selectedStudent, setSelectedStudent] = useState<number | null>(null);
   const [selectedStudyClass, setSelectedStudyClass] = useState<number | null>(
     null,
   );
-  const [openDropdown, setOpenDropdown] = useState<
-    'student' | 'studyClass' | null
-  >(null);
+  const [studentDropdownOpen, setStudentDropdownOpen] = useState(false);
+  const [classDropdownOpen, setClassDropdownOpen] = useState(false);
 
   const { data: students = [], isLoading: isLoadingStudents } =
     useGetAllStudents();
@@ -33,7 +34,6 @@ export default function EnrollStudentPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedStudent || !selectedStudyClass) return;
-
     createSubscription({
       studentId: selectedStudent,
       studyClassId: selectedStudyClass,
@@ -43,144 +43,165 @@ export default function EnrollStudentPage() {
   if (isLoading) {
     return (
       <div className='text-center mt-8 text-foreground'>
-        Loading students and study classes...
+        <SpinLoader />
       </div>
     );
   }
 
+  const selectedStudentObj = students.find(s => s.id === selectedStudent);
+  const selectedClassObj = studyClasses.find(c => c.id === selectedStudyClass);
+
   return (
     <div className='container mx-auto px-4 py-8 max-w-2xl'>
-      <h1 className='text-2xl md:text-3xl font-bold mb-6 text-foreground'>
-        Enroll Student
-      </h1>
+      <div className='card p-6 bg-card-background border border-border rounded-xl shadow-md'>
+        <h1 className='text-2xl md:text-3xl font-semibold mb-6 text-foreground'>
+          Enroll Student
+        </h1>
 
-      <form onSubmit={handleSubmit} className='card p-6 space-y-4'>
-        {/* Student Dropdown */}
-        <div className='relative'>
-          <label className='block text-sm font-medium text-foreground/80 mb-1'>
-            Student
-          </label>
-          <button
-            type='button'
-            onClick={() => {
-              setOpenDropdown(openDropdown === 'student' ? null : 'student');
-            }}
-            className='w-full bg-card-background border border-border text-foreground rounded-md px-3 py-2 flex justify-between items-center shadow-sm hover:border-primary transition-colors'
-            disabled={isSubmitting}
-          >
-            <span
-              className={
-                selectedStudent
-                  ? 'text-foreground'
-                  : 'text-muted-foreground italic'
-              }
+        <form onSubmit={handleSubmit} className='space-y-6'>
+          {/* ─────── Student Selector ─────── */}
+          <div className='relative'>
+            <label
+              htmlFor='student-select'
+              className='block text-sm font-medium text-muted-foreground mb-1'
             >
-              {selectedStudent
-                ? students.find(s => s.id === selectedStudent)?.name
-                : '-- Select a student --'}
-            </span>
-            <ChevronDown
-              className={`w-4 h-4 transition-transform duration-200 ${
-                openDropdown === 'student'
-                  ? 'rotate-180 text-primary'
-                  : 'text-muted-foreground'
-              }`}
-            />
-          </button>
-          {openDropdown === 'student' && (
-            <ul className='absolute z-20 mt-1 w-full bg-card-background border border-border rounded-lg shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2 max-h-60 overflow-y-auto'>
-              {students.map(student => (
-                <li
-                  key={student.id}
-                  onClick={studyClasses => {
-                    setSelectedStudent(student.id);
-                    setOpenDropdown(null);
-                    console.log(studyClasses);
-                  }}
-                  className={`px-3 py-2 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors ${
-                    selectedStudent === student.id
-                      ? 'bg-primary/20 text-primary-foreground'
-                      : 'text-foreground'
-                  }`}
-                >
-                  {student.name}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+              Student
+            </label>
 
-        {/* Study Class Dropdown */}
-        <div className='relative'>
-          <label className='block text-sm font-medium text-foreground/80 mb-1'>
-            Study Class
-          </label>
-          <button
-            type='button'
-            onClick={() =>
-              setOpenDropdown(
-                openDropdown === 'studyClass' ? null : 'studyClass',
-              )
-            }
-            className='w-full bg-card-background border border-border text-foreground rounded-md px-3 py-2 flex justify-between items-center shadow-sm hover:border-primary transition-colors'
-            disabled={isSubmitting}
-          >
-            <span
-              className={
-                selectedStudyClass
-                  ? 'text-foreground'
-                  : 'text-muted-foreground italic'
-              }
+            <button
+              id='student-select'
+              type='button'
+              disabled={isSubmitting}
+              onClick={() => {
+                setStudentDropdownOpen(prev => !prev);
+                setClassDropdownOpen(false);
+              }}
+              className='w-full bg-card-background border border-border text-foreground rounded-md px-3 py-2 flex justify-between items-center shadow-sm hover:border-primary transition-colors'
             >
-              {selectedStudyClass
-                ? studyClasses.find(sc => sc.id === selectedStudyClass)
-                    ?.classCode
-                : '-- Select a study class --'}
-            </span>
-            <ChevronDown
-              className={`w-4 h-4 transition-transform duration-200 ${
-                openDropdown === 'studyClass'
-                  ? 'rotate-180 text-primary'
-                  : 'text-muted-foreground'
-              }`}
-            />
-          </button>
+              <span
+                className={
+                  selectedStudentObj
+                    ? 'text-foreground'
+                    : 'text-muted-foreground italic'
+                }
+              >
+                {selectedStudentObj
+                  ? `${selectedStudentObj.name}`
+                  : '-- Select a student --'}
+              </span>
+              <ChevronDown
+                className={`w-4 h-4 transition-transform duration-200 ${
+                  studentDropdownOpen
+                    ? 'rotate-180 text-primary'
+                    : 'text-muted-foreground'
+                }`}
+              />
+            </button>
 
-          {openDropdown === 'studyClass' && (
-            <ul className='absolute z-20 mt-1 w-full bg-card-background border border-border rounded-lg shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2 max-h-60 overflow-y-auto'>
-              {studyClasses.map(studyClass => (
-                <li
-                  key={studyClass.id}
-                  onClick={() => {
-                    setSelectedStudyClass(studyClass.id);
-                    setOpenDropdown(null);
-                  }}
-                  className={`px-3 py-2 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors ${
-                    selectedStudyClass === studyClass.id
-                      ? 'bg-primary/20 text-primary-foreground'
-                      : 'text-foreground'
-                  }`}
-                >
-                  {studyClass.classCode}
-                </li>
-              ))}
-            </ul>
+            {studentDropdownOpen && (
+              <ul className='absolute z-20 mt-1 w-full bg-card-background border border-border rounded-lg shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2 max-h-60 overflow-y-auto'>
+                {students.map(student => (
+                  <li
+                    key={student.id}
+                    onClick={() => {
+                      setSelectedStudent(student.id);
+                      setStudentDropdownOpen(false);
+                    }}
+                    className={clsx(
+                      'px-3 py-2 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors',
+                      selectedStudent === student.id
+                        ? 'bg-primary/20 text-primary-foreground'
+                        : 'text-foreground',
+                    )}
+                  >
+                    {student.name}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          {/* ─────── Study Class Selector ─────── */}
+          <div className='relative'>
+            <label
+              htmlFor='study-class-select'
+              className='block text-sm font-medium text-muted-foreground mb-1'
+            >
+              Study Class
+            </label>
+
+            <button
+              id='study-class-select'
+              type='button'
+              disabled={isSubmitting}
+              onClick={() => {
+                setClassDropdownOpen(prev => !prev);
+                setStudentDropdownOpen(false);
+              }}
+              className='w-full bg-card-background border border-border text-foreground rounded-md px-3 py-2 flex justify-between items-center shadow-sm hover:border-primary transition-colors'
+            >
+              <span
+                className={
+                  selectedClassObj
+                    ? 'text-foreground'
+                    : 'text-muted-foreground italic'
+                }
+              >
+                {selectedClassObj
+                  ? `${selectedClassObj.classCode} - ${selectedClassObj.courseName}`
+                  : '-- Select a study class --'}
+              </span>
+              <ChevronDown
+                className={`w-4 h-4 transition-transform duration-200 ${
+                  classDropdownOpen
+                    ? 'rotate-180 text-primary'
+                    : 'text-muted-foreground'
+                }`}
+              />
+            </button>
+
+            {classDropdownOpen && (
+              <ul className='absolute z-20 mt-1 w-full bg-card-background border border-border rounded-lg shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2 max-h-60 overflow-y-auto'>
+                {studyClasses.map(studyClass => (
+                  <li
+                    key={studyClass.id}
+                    onClick={() => {
+                      setSelectedStudyClass(studyClass.id);
+                      setClassDropdownOpen(false);
+                    }}
+                    className={clsx(
+                      'px-3 py-2 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors',
+                      selectedStudyClass === studyClass.id
+                        ? 'bg-primary/20 text-primary-foreground'
+                        : 'text-foreground',
+                    )}
+                  >
+                    {studyClass.classCode} - {studyClass.courseName}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          {/* ─────── Error Message ─────── */}
+          {error && (
+            <p className='text-error text-sm' role='alert'>
+              {error.message}
+            </p>
           )}
-        </div>
 
-        {error && <p className='text-red-500 text-sm'>{error.message}</p>}
-
-        {/* Submit Button */}
-        <div className='pt-2'>
-          <button
-            type='submit'
-            className='btn btn-primary disabled:opacity-50'
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? 'Enrolling...' : 'Enroll Student'}
-          </button>
-        </div>
-      </form>
+          {/* ─────── Submit Button ─────── */}
+          <div className='pt-2'>
+            <button
+              type='submit'
+              className='btn btn-primary w-full disabled:opacity-50'
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Enrolling...' : 'Enroll Student'}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

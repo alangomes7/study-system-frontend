@@ -5,6 +5,7 @@ import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useGetAllStudents } from '@/hooks';
 import { ChevronDown } from 'lucide-react';
+import { SpinLoader } from '@/components';
 
 export default function StudentsClientPage() {
   const {
@@ -50,7 +51,7 @@ export default function StudentsClientPage() {
   if (isLoading) {
     return (
       <div className='text-center mt-8 text-foreground'>
-        Loading students...
+        <SpinLoader />
       </div>
     );
   }
@@ -109,6 +110,8 @@ export default function StudentsClientPage() {
           </div>
           <input
             type='text'
+            id='student-search'
+            name='student-search'
             placeholder='Search by student name...'
             className='input w-full sm:w-auto'
             value={searchTerm}

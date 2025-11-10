@@ -7,6 +7,7 @@ import { useState, useMemo } from 'react';
 
 import { useGetAllStudyClasses, useGetStudentsByStudyClass } from '@/hooks';
 import { StudyClass } from '@/types';
+import { SpinLoader } from '@/components';
 
 export default function StudyClassesClientPage() {
   const [selectedStudyClass, setSelectedStudyClass] =
@@ -69,7 +70,7 @@ export default function StudyClassesClientPage() {
   if (isClassesLoading) {
     return (
       <div className='text-center mt-8 text-foreground'>
-        Loading study classes...
+        <SpinLoader />
       </div>
     );
   }
@@ -93,6 +94,8 @@ export default function StudyClassesClientPage() {
           </h2>
           <input
             type='text'
+            id='class-search'
+            name='class-search'
             placeholder='Search by class code...'
             className='input mb-4'
             value={studyClassSearchTerm}
@@ -207,6 +210,8 @@ export default function StudyClassesClientPage() {
 
                   <input
                     type='text'
+                    id='student-search'
+                    name='student-search'
                     placeholder='Search by student name'
                     className='input w-full sm:w-auto'
                     value={studentSearchTerm}
@@ -218,7 +223,7 @@ export default function StudyClassesClientPage() {
               {/* Students Table */}
               {isStudentsLoading ? (
                 <div className='text-center p-6 text-foreground'>
-                  Loading students...
+                  <SpinLoader />
                 </div>
               ) : filteredStudents.length > 0 ? (
                 <>

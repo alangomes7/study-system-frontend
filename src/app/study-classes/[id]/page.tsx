@@ -3,13 +3,13 @@ import StudyClassDetailsClientPage from './StudyClassDetailsClientPage';
 import { getStudyClass } from '@/lib/api';
 
 type Props = {
-  params: { id: number };
+  params: Promise<{ id: string }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const id = Number(params.id);
+  const { id } = await params;
 
-  const studyClass = await getStudyClass(id);
+  const studyClass = await getStudyClass(Number(id));
 
   return {
     title: `Study Classes | ${studyClass.courseName}`,
@@ -17,8 +17,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function StudyClassDetailsPage({ params }: Props) {
-  const id = params.id;
+  const { id } = await params;
 
-  const studyClass = await getStudyClass(id);
+  const studyClass = await getStudyClass(Number(id));
   return <StudyClassDetailsClientPage studyClass={studyClass} />;
 }

@@ -1,5 +1,6 @@
 'use client';
 
+import { SpinLoader } from '@/components';
 import { useGetStudent } from '@/hooks';
 import Link from 'next/link';
 
@@ -9,7 +10,7 @@ export default function StudenteDetailsClientPage({ id }: { id: number }) {
   if (isLoading) {
     return (
       <div className='container mx-auto px-4 py-8 text-center'>
-        Loading student details...
+        <SpinLoader />
       </div>
     );
   }

@@ -1,5 +1,6 @@
 'use client';
 
+import { SpinLoader } from '@/components';
 import { useGetProfessor } from '@/hooks';
 import Link from 'next/link';
 import { use } from 'react';
@@ -16,7 +17,7 @@ export default function ProfessorDetailsPage({
   if (isLoading) {
     return (
       <div className='container mx-auto px-4 py-8 text-center'>
-        Loading professor details...
+        <SpinLoader />
       </div>
     );
   }

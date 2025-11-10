@@ -1,5 +1,6 @@
 'use client';
 
+import { SpinLoader } from '@/components';
 import { useGetCourses } from '@/hooks';
 import Link from 'next/link';
 import { useState, useMemo } from 'react';
@@ -19,7 +20,7 @@ export default function CoursesClientPage() {
   if (isLoading)
     return (
       <div className='container mx-auto px-4 py-8 text-center'>
-        Loading courses...
+        <SpinLoader />
       </div>
     );
 
@@ -34,6 +35,8 @@ export default function CoursesClientPage() {
         <h1 className='text-3xl font-bold text-foreground'>Courses</h1>
         <input
           type='text'
+          id='course-search'
+          name='course-search'
           placeholder='Search by course name...'
           className='input w-full md:w-1/3'
           value={searchTerm}

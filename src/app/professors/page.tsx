@@ -5,6 +5,7 @@ import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useGetProfessors } from '@/hooks';
 import { ChevronDown } from 'lucide-react';
+import { SpinLoader } from '@/components';
 
 export default function ProfessorsPage() {
   const { data: professors = [], isLoading, error } = useGetProfessors();
@@ -49,7 +50,7 @@ export default function ProfessorsPage() {
   if (isLoading) {
     return (
       <div className='text-center mt-8 text-foreground'>
-        Loading professors...
+        <SpinLoader />
       </div>
     );
   }
@@ -108,6 +109,8 @@ export default function ProfessorsPage() {
           </div>
           <input
             type='text'
+            id='professor-search'
+            name='professor-search'
             placeholder='Search by professor name...'
             className='input w-full sm:w-auto'
             value={searchTerm}

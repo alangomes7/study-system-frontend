@@ -3,13 +3,13 @@ import type { Metadata } from 'next';
 import StudentDetailsClientPage from './studentDetailsClientPage';
 
 type Props = {
-  params: { id: number };
+  params: Promise<{ id: string }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const id = params.id;
+  const { id } = await params;
 
-  const student = await getStudent(id);
+  const student = await getStudent(Number(id));
 
   if (!student) {
     return {
@@ -22,8 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function CourseDetailsPage({ params }: Props) {
-  const idAsNumber = Number(params.id);
-
-  return <StudentDetailsClientPage id={idAsNumber} />;
+export default async function CourseDetailsPage({ params }: Props) {
+  const { id } = await params;
+  return <StudentDetailsClientPage id={Number(id)} />;
 }

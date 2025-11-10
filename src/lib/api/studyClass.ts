@@ -19,9 +19,8 @@ export async function getAllStudyClasses(): Promise<StudyClass[]> {
  */
 export async function getStudyClass(id: number): Promise<StudyClass> {
   const response = await fetch(`${API_BASE_URL}/study-classes/${id}`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch study class details');
-  }
+  if (!response.ok)
+    throw new Error(`Failed to fetch study class with id ${id}`);
   return response.json();
 }
 

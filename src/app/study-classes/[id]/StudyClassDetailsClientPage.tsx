@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useGetSubscriptionsByStudyClass } from '@/hooks';
 import { StudyClass } from '@/types';
+import { SpinLoader } from '@/components';
 
 export default function StudyClassDetailsClientPage({
   studyClass,
@@ -21,7 +22,7 @@ export default function StudyClassDetailsClientPage({
   if (isLoading) {
     return (
       <div className='container mx-auto px-4 py-8 text-center'>
-        Loading enrolled students...
+        <SpinLoader />
       </div>
     );
   }

@@ -39,24 +39,28 @@ export default function UserForm({
     type: string;
     mask?: string;
     inputType?: string;
+    autocomplete?: string;
   };
 
+  // 2. UPDATED fields array
   const fields: FieldConfig[] = [
-    { label: 'Name', name: 'name', type: 'text' },
+    { label: 'Name', name: 'name', type: 'text', autocomplete: 'name' },
     {
       label: 'Phone',
       name: 'phone',
       type: 'mask',
       mask: '(00) 0 0000-0000',
       inputType: 'tel',
+      autocomplete: 'tel',
     },
-    { label: 'Email', name: 'email', type: 'email' },
+    { label: 'Email', name: 'email', type: 'email', autocomplete: 'email' },
     {
       label: 'Register (CPF)',
       name: 'register',
       type: 'mask',
       mask: '000.000.000-00',
       inputType: 'tel',
+      autocomplete: 'off',
     },
   ];
 
@@ -82,6 +86,11 @@ export default function UserForm({
                 onAccept={value => handleMaskedChange(field.name, value)}
                 className='input'
                 disabled={isSubmitting}
+                aria-invalid={!!errors[field.name]}
+                aria-describedby={
+                  errors[field.name] ? `${field.name}-error` : undefined
+                }
+                autoComplete={field.autocomplete}
               />
             ) : (
               <input
@@ -92,11 +101,19 @@ export default function UserForm({
                 onChange={handleChange}
                 className='input'
                 disabled={isSubmitting}
+                aria-invalid={!!errors[field.name]}
+                aria-describedby={
+                  errors[field.name] ? `${field.name}-error` : undefined
+                }
+                autoComplete={field.autocomplete}
               />
             )}
 
             {errors[field.name] && (
-              <p className='text-red-500 text-sm mt-1'>
+              <p
+                id={`${field.name}-error`}
+                className='text-red-500 text-sm mt-1'
+              >
                 {errors[field.name]?.[0]}
               </p>
             )}

@@ -8,6 +8,7 @@ import {
   useGetAllStudyClasses,
   useGetStudentsByStudyClass,
 } from '@/hooks';
+import { SpinLoader } from '@/components';
 
 export default function StudentGroupClientPage() {
   const [selectedClassId, setSelectedClassId] = useState<number | null>(null);
@@ -35,7 +36,7 @@ export default function StudentGroupClientPage() {
 
   // ──────────────────────── Class Selector ────────────────────────
   const renderClassSelector = () => {
-    if (isClassesLoading) return <p>Loading classes...</p>;
+    if (isClassesLoading) return <SpinLoader />;
     if (classesError)
       return (
         <p className='text-error'>
@@ -109,7 +110,7 @@ export default function StudentGroupClientPage() {
         </p>
       );
 
-    if (isStudentsLoading) return <p>Loading students...</p>;
+    if (isStudentsLoading) return <SpinLoader />;
 
     if (studentsError)
       return (

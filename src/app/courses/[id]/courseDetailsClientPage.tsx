@@ -10,6 +10,7 @@ import clsx from 'clsx';
 import Link from 'next/link';
 import { useState, useMemo } from 'react';
 import { ChevronDown } from 'lucide-react';
+import { SpinLoader } from '@/components';
 
 export default function CourseDetailsClientPage({ id }: { id: number }) {
   // --- Local UI State ---
@@ -86,7 +87,7 @@ export default function CourseDetailsClientPage({ id }: { id: number }) {
   if (isCourseLoading || isStudyClassesLoading) {
     return (
       <div className='text-center mt-8 text-foreground'>
-        Loading course details...
+        <SpinLoader />
       </div>
     );
   }
@@ -120,6 +121,8 @@ export default function CourseDetailsClientPage({ id }: { id: number }) {
           </h2>
           <input
             type='text'
+            id='class-search'
+            name='class-search'
             placeholder='Search by class code...'
             className='input w-full mb-4'
             value={studyClassSearchTerm}
@@ -232,6 +235,8 @@ export default function CourseDetailsClientPage({ id }: { id: number }) {
 
                   <input
                     type='text'
+                    id='student-search'
+                    name='student-search'
                     placeholder='Search by student name'
                     className='input w-full sm:w-auto'
                     value={searchTerm}
@@ -243,7 +248,7 @@ export default function CourseDetailsClientPage({ id }: { id: number }) {
               {/* --- Students Table / Cards --- */}
               {isStudentsLoading ? (
                 <div className='text-center mt-8 text-foreground'>
-                  Loading students...
+                  <SpinLoader />
                 </div>
               ) : filteredStudents.length > 0 ? (
                 <>

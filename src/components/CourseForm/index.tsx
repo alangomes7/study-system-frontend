@@ -1,6 +1,7 @@
 'use client';
 
 import { useCourseForm } from '@/hooks';
+import SpinLoader from '../SpinLoader';
 
 type CourseFormState = {
   name: string;
@@ -13,6 +14,7 @@ interface FieldConfig {
   label: string;
   name: CourseFormField;
   type: 'text' | 'textarea';
+  autocomplete?: string;
 }
 
 export default function CreateCourseForm() {
@@ -26,8 +28,13 @@ export default function CreateCourseForm() {
   } = useCourseForm();
 
   const fields: FieldConfig[] = [
-    { label: 'Course Name', name: 'name', type: 'text' },
-    { label: 'Course Description', name: 'description', type: 'textarea' },
+    { label: 'Course Name', name: 'name', type: 'text', autocomplete: 'off' },
+    {
+      label: 'Course Description',
+      name: 'description',
+      type: 'textarea',
+      autocomplete: 'off',
+    },
   ];
 
   return (
@@ -62,6 +69,7 @@ export default function CreateCourseForm() {
                 aria-describedby={
                   errors[field.name] ? `${field.name}-error` : undefined
                 }
+                autoComplete={field.autocomplete} // <-- 3. ADDED
               />
             ) : (
               <input
@@ -76,6 +84,7 @@ export default function CreateCourseForm() {
                 aria-describedby={
                   errors[field.name] ? `${field.name}-error` : undefined
                 }
+                autoComplete={field.autocomplete}
               />
             )}
 
