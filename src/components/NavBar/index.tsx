@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
+import { usePathname } from 'next/navigation';
 import { MenuIcon, XIcon } from 'lucide-react';
 import { ButtonTheme } from '@/components';
 
@@ -9,6 +10,10 @@ export default function NavBar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isManageOpen, setIsManageOpen] = useState(false);
+
+  // State for closing animation
+  const [isClosing, setIsClosing] = useState(false);
+  const animationDuration = 500;
 
   // --- mounted state ---
   const [mounted, setMounted] = useState(false);
@@ -19,6 +24,9 @@ export default function NavBar() {
   const manageMenuRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLDivElement>(null);
 
+  // --- Get current path ---
+  const pathname = usePathname();
+
   // --- Set mounted and THEN check mobile ---
   useEffect(() => {
     setMounted(true); // Signal client mount
@@ -28,6 +36,18 @@ export default function NavBar() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  const handleCloseMenu = useCallback(() => {
+    if (isClosing) return;
+
+    setIsClosing(true);
+    setTimeout(() => {
+      setIsOpen(false);
+      setIsClosing(false);
+      setIsCreateOpen(false);
+      setIsManageOpen(false);
+    }, animationDuration);
+  }, [isClosing]);
 
   // Handle click outside (for menus)
   useEffect(() => {
@@ -44,23 +64,44 @@ export default function NavBar() {
       ) {
         setIsManageOpen(false);
       }
-      if (navRef.current && !navRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
+      if (
+        navRef.current &&
+        !navRef.current.contains(event.target as Node) &&
+        isOpen
+      ) {
+        handleCloseMenu();
       }
     }
 
-    // Only add listener if mounted
     if (mounted) {
       document.addEventListener('mousedown', handleClickOutside);
       return () =>
         document.removeEventListener('mousedown', handleClickOutside);
     }
-  }, [mounted]);
+  }, [mounted, isOpen, handleCloseMenu]);
 
+  // --- Base and Active Link Styles ---
   const navLinkClass =
-    'text-sm font-medium text-foreground/80 hover:text-foreground transition-colors';
+    'text-sm font-medium text-foreground/80 hover:text-foreground transition-all px-3 py-2 rounded-md hover:bg-foreground/5';
   const menuItemClass =
     'block px-4 py-2 text-sm text-foreground hover:bg-foreground/10 rounded-md';
+
+  // --- Active class styles ---
+  const activeNavLinkClass =
+    'text-sm font-medium text-primary font-semibold transition-all bg-primary/10 px-3 py-2 rounded-md';
+  const activeMenuItemClass =
+    'block px-4 py-2 text-sm text-primary bg-primary/10 rounded-md';
+
+  // --- Logic for active dropdowns ---
+  const isCreateActive =
+    pathname === '/students/create' ||
+    pathname === '/professors/create' ||
+    pathname === '/courses/create' ||
+    pathname === '/study-classes/create';
+
+  const isManageActive =
+    pathname === '/students/enroll' ||
+    pathname === '/study-classes/student-group';
 
   return (
     <nav
@@ -71,23 +112,59 @@ export default function NavBar() {
         {/* Left section */}
         <div className='flex items-center space-x-4'>
           <ButtonTheme />
-          <Link href='/' className='text-lg font-bold text-foreground'>
+          <Link
+            href='/'
+            // --- Conditional style for Home ---
+            className={
+              pathname === '/'
+                ? 'text-lg font-bold text-primary transition-colors'
+                : 'text-lg font-bold text-foreground transition-colors'
+            }
+          >
             StudySystem
           </Link>
         </div>
 
         {/* Desktop Menu */}
-        <div className='hidden md:flex items-center space-x-6'>
-          <Link href='/courses' className={navLinkClass}>
+        <div className='hidden md:flex items-center space-x-2'>
+          {' '}
+          {/* Reduced space-x-6 to space-x-2 to accommodate padding */}
+          <Link
+            href='/courses'
+            // --- Conditional style ---
+            className={
+              pathname == '/courses' ? activeNavLinkClass : navLinkClass
+            }
+          >
             Courses
           </Link>
-          <Link href='/students' className={navLinkClass}>
+          <Link
+            href='/professors'
+            // --- Conditional style ---
+            className={
+              pathname == '/professors' ? activeNavLinkClass : navLinkClass
+            }
+          >
+            Professors
+          </Link>
+          <Link
+            href='/students'
+            // --- Conditional style ---
+            className={
+              pathname == '/students' ? activeNavLinkClass : navLinkClass
+            }
+          >
             Students
           </Link>
-          <Link href='/study-classes' className={navLinkClass}>
+          <Link
+            href='/study-classes'
+            // --- Conditional style ---
+            className={
+              pathname == '/study-classes' ? activeNavLinkClass : navLinkClass
+            }
+          >
             Study Classes
           </Link>
-
           {/* Create Dropdown (Desktop) */}
           <div
             ref={createMenuRef}
@@ -97,29 +174,63 @@ export default function NavBar() {
           >
             <button
               onClick={() => isMobile && setIsCreateOpen(!isCreateOpen)}
-              className={navLinkClass}
+              // --- Conditional style for dropdown button ---
+              className={`${
+                isCreateActive ? activeNavLinkClass : navLinkClass
+              } w-full`} // Added w-full for consistent button appearance
             >
               Create
             </button>
 
             {isCreateOpen && (
-              <div className='absolute right-0 w-48 bg-card-background border border-border rounded-md shadow-lg py-1 p-1 z-50'>
-                <Link href='/students/create' className={menuItemClass}>
+              <div className='absolute right-0 w-48 bg-card-background border border-border rounded-md shadow-lg py-1 p-1 z-50 animate-dropdown-in'>
+                <Link
+                  href='/students/create'
+                  // --- Conditional style ---
+                  className={
+                    pathname === '/students/create'
+                      ? activeMenuItemClass
+                      : menuItemClass
+                  }
+                >
                   Create Student
                 </Link>
-                <Link href='/professors/create' className={menuItemClass}>
+                <Link
+                  href='/professors/create'
+                  // --- Conditional style ---
+                  className={
+                    pathname === '/professors/create'
+                      ? activeMenuItemClass
+                      : menuItemClass
+                  }
+                >
                   Create Professor
                 </Link>
-                <Link href='/courses/create' className={menuItemClass}>
+                <Link
+                  href='/courses/create'
+                  // --- Conditional style ---
+                  className={
+                    pathname === '/courses/create'
+                      ? activeMenuItemClass
+                      : menuItemClass
+                  }
+                >
                   Create Course
                 </Link>
-                <Link href='/study-classes/create' className={menuItemClass}>
+                <Link
+                  href='/study-classes/create'
+                  // --- Conditional style ---
+                  className={
+                    pathname === '/study-classes/create'
+                      ? activeMenuItemClass
+                      : menuItemClass
+                  }
+                >
                   Create Study Class
                 </Link>
               </div>
             )}
           </div>
-
           {/* Manage Dropdown (Desktop) */}
           <div
             ref={manageMenuRef}
@@ -129,45 +240,69 @@ export default function NavBar() {
           >
             <button
               onClick={() => isMobile && setIsManageOpen(!isManageOpen)}
-              className={navLinkClass}
+              // --- Conditional style for dropdown button ---
+              className={`${
+                isManageActive ? activeNavLinkClass : navLinkClass
+              } w-full`} // Added w-full for consistent button appearance
             >
               Manage
             </button>
 
             {isManageOpen && (
-              <div className='absolute right-0 w-48 bg-card-background border border-border rounded-md shadow-lg py-1 p-1 z-50'>
-                <Link href='/students/enroll' className={menuItemClass}>
+              <div className='absolute right-0 w-48 bg-card-background border border-border rounded-md shadow-lg py-1 p-1 z-50 animate-dropdown-in'>
+                <Link
+                  href='/students/enroll'
+                  // --- Conditional style ---
+                  className={
+                    pathname === '/students/enroll'
+                      ? activeMenuItemClass
+                      : menuItemClass
+                  }
+                >
                   Enroll Student
                 </Link>
                 <Link
                   href='/study-classes/student-group'
-                  className={menuItemClass}
+                  // --- Conditional style ---
+                  className={
+                    pathname === '/study-classes/student-group'
+                      ? activeMenuItemClass
+                      : menuItemClass
+                  }
                 >
                   Student Groups
                 </Link>
               </div>
             )}
           </div>
-
-          <Link href='/about' className={navLinkClass}>
+          <Link
+            href='/about'
+            // --- Conditional style ---
+            className={pathname == '/about' ? activeNavLinkClass : navLinkClass}
+          >
             About
           </Link>
         </div>
 
-        {/* Desktop Login */}
         <div className='hidden md:block'>
-          <Link href='/login' className='btn btn-primary'>
+          <Link
+            href='/login'
+            // --- Conditional style ---
+            className={`btn btn-primary ${
+              pathname === '/login' ? 'opacity-75' : ''
+            }`}
+          >
             Login
           </Link>
         </div>
 
-        {/* Mobile Menu Toggle */}
+        {/* ... Mobile menu button ... */}
         <div className='md:hidden'>
           {!mounted ? (
             <div className='h-6 w-6' />
           ) : (
             <button
-              onClick={() => setIsOpen(!isOpen)}
+              onClick={() => (isOpen ? handleCloseMenu() : setIsOpen(true))}
               className='text-foreground focus:outline-none'
             >
               {isOpen ? (
@@ -180,80 +315,121 @@ export default function NavBar() {
         </div>
       </div>
 
-      {/* --- Mobile Overlay + Menu Together --- */}
-      {mounted && isOpen && (
-        <div className='fixed inset-0 z-40 bg-black/30 backdrop-blur-xs flex justify-end'>
-          {/* Clicking the overlay area closes the menu */}
-          <div
-            className='flex-1'
-            onClick={() => {
-              setIsOpen(false);
-              setIsCreateOpen(false);
-              setIsManageOpen(false);
-            }}
-          />
+      {/* --- Mobile Menu Drawer --- */}
+      {mounted && (isOpen || isClosing) && (
+        <div
+          className={`fixed inset-0 z-40 bg-black/30 backdrop-blur-xs flex justify-end ${
+            isClosing ? 'animate-fade-out' : 'animate-fade-in'
+          }`}
+        >
+          <div className='flex-1' onClick={handleCloseMenu} />
 
-          {/* Slide-in Mobile Menu */}
-          <div className='w-3/4 sm:w-2/5 h-full bg-background border-l border-border shadow-xl p-4 space-y-2 overflow-y-auto animate-slide-in'>
-            {/* --- Main Links --- */}
+          <div
+            className={`w-3/4 sm:w-2/5 h-full bg-background border-l border-border shadow-xl p-4 space-y-2 overflow-y-auto ${
+              isClosing ? 'animate-slide-out' : 'animate-slide-in'
+            }`}
+          >
             <Link
               href='/courses'
-              className={menuItemClass}
-              onClick={() => setIsOpen(false)}
+              // --- Conditional style ---
+              className={
+                pathname == '/courses' ? activeMenuItemClass : menuItemClass
+              }
+              onClick={handleCloseMenu}
             >
               Courses
             </Link>
             <Link
+              href='/professors'
+              // --- Conditional style ---
+              className={
+                pathname == '/professors' ? activeMenuItemClass : menuItemClass
+              }
+              onClick={handleCloseMenu}
+            >
+              Professors
+            </Link>
+            <Link
               href='/students'
-              className={menuItemClass}
-              onClick={() => setIsOpen(false)}
+              // --- Conditional style ---
+              className={
+                pathname == '/students' ? activeMenuItemClass : menuItemClass
+              }
+              onClick={handleCloseMenu}
             >
               Students
             </Link>
             <Link
               href='/study-classes'
-              className={menuItemClass}
-              onClick={() => setIsOpen(false)}
+              // --- Conditional style ---
+              className={
+                pathname == '/study-classes'
+                  ? activeMenuItemClass
+                  : menuItemClass
+              }
+              onClick={handleCloseMenu}
             >
               Study Classes
             </Link>
 
-            {/* --- Create Section (Click to toggle) --- */}
+            {/* Mobile Create Submenu */}
             <div ref={createMenuRef} className='border-t border-border pt-2'>
               <button
                 onClick={() => setIsCreateOpen(!isCreateOpen)}
-                className='w-full text-left font-semibold text-foreground/70 mb-1 px-4 py-2'
+                className={`w-full text-left font-semibold mb-1 px-4 py-2 ${
+                  isCreateActive ? 'text-primary' : 'text-foreground/70'
+                }`}
               >
                 Create
               </button>
 
               {isCreateOpen && (
-                <div className='pl-2 space-y-1'>
+                <div className='pl-2 space-y-1 animate-accordion-down animate-fade-in'>
                   <Link
                     href='/students/create'
-                    className={menuItemClass}
-                    onClick={() => setIsOpen(false)}
+                    // --- Conditional style ---
+                    className={
+                      pathname === '/students/create'
+                        ? activeMenuItemClass
+                        : menuItemClass
+                    }
+                    onClick={handleCloseMenu}
                   >
                     Create Student
                   </Link>
                   <Link
                     href='/professors/create'
-                    className={menuItemClass}
-                    onClick={() => setIsOpen(false)}
+                    // --- Conditional style ---
+                    className={
+                      pathname === '/professors/create'
+                        ? activeMenuItemClass
+                        : menuItemClass
+                    }
+                    onClick={handleCloseMenu}
                   >
                     Create Professor
                   </Link>
                   <Link
                     href='/courses/create'
-                    className={menuItemClass}
-                    onClick={() => setIsOpen(false)}
+                    // --- Conditional style ---
+                    className={
+                      pathname === '/courses/create'
+                        ? activeMenuItemClass
+                        : menuItemClass
+                    }
+                    onClick={handleCloseMenu}
                   >
                     Create Course
                   </Link>
                   <Link
                     href='/study-classes/create'
-                    className={menuItemClass}
-                    onClick={() => setIsOpen(false)}
+                    // --- Conditional style ---
+                    className={
+                      pathname === '/study-classes/create'
+                        ? activeMenuItemClass
+                        : menuItemClass
+                    }
+                    onClick={handleCloseMenu}
                   >
                     Create Study Class
                   </Link>
@@ -261,28 +437,40 @@ export default function NavBar() {
               )}
             </div>
 
-            {/* --- Manage Section (Click to toggle) --- */}
+            {/* Mobile Manage Submenu */}
             <div ref={manageMenuRef} className='border-t border-border pt-2'>
               <button
                 onClick={() => setIsManageOpen(!isManageOpen)}
-                className='w-full text-left font-semibold text-foreground/70 mb-1 px-4 py-2'
+                className={`w-full text-left font-semibold mb-1 px-4 py-2 ${
+                  isManageActive ? 'text-primary' : 'text-foreground/70'
+                }`}
               >
                 Manage
               </button>
 
               {isManageOpen && (
-                <div className='pl-2 space-y-1'>
+                <div className='pl-2 space-y-1 animate-accordion-down animate-fade-in'>
                   <Link
                     href='/students/enroll'
-                    className={menuItemClass}
-                    onClick={() => setIsOpen(false)}
+                    // --- Conditional style ---
+                    className={
+                      pathname === '/students/enroll'
+                        ? activeMenuItemClass
+                        : menuItemClass
+                    }
+                    onClick={handleCloseMenu}
                   >
                     Enroll Student
                   </Link>
                   <Link
                     href='/study-classes/student-group'
-                    className={menuItemClass}
-                    onClick={() => setIsOpen(false)}
+                    // --- Conditional style ---
+                    className={
+                      pathname === '/study-classes/student-group'
+                        ? activeMenuItemClass
+                        : menuItemClass
+                    }
+                    onClick={handleCloseMenu}
                   >
                     Student Groups
                   </Link>
@@ -290,11 +478,13 @@ export default function NavBar() {
               )}
             </div>
 
-            {/* --- Other Links --- */}
             <Link
               href='/about'
-              className={`${menuItemClass} border-t border-border`}
-              onClick={() => setIsOpen(false)}
+              // --- Conditional style ---
+              className={`${
+                pathname == '/about' ? activeMenuItemClass : menuItemClass
+              } border-t border-border`}
+              onClick={handleCloseMenu}
             >
               About
             </Link>
@@ -303,7 +493,7 @@ export default function NavBar() {
               <Link
                 href='/login'
                 className='btn btn-primary w-full'
-                onClick={() => setIsOpen(false)}
+                onClick={handleCloseMenu}
               >
                 Login
               </Link>

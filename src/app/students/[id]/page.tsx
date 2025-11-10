@@ -1,67 +1,29 @@
-'use client';
+import { getStudent } from '@/lib/api';
+import type { Metadata } from 'next';
+import StudentDetailsClientPage from './studentDetailsClientPage';
 
-import { useGetStudent } from '@/hooks';
-import Link from 'next/link';
-import { use } from 'react';
+type Props = {
+  params: { id: number };
+};
 
-export default function StudentDetailsPage({
-  params,
-}: {
-  params: Promise<{ id: number }>;
-}) {
-  const { id: studentId } = use(params);
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const id = params.id;
 
-  const { data: student, isLoading, error } = useGetStudent(studentId);
-
-  if (isLoading) {
-    return (
-      <div className='container mx-auto px-4 py-8 text-center'>
-        Loading student details...
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <p className='text-center mt-8 text-red-500'>Error: {error.message}</p>
-    );
-  }
+  const student = await getStudent(id);
 
   if (!student) {
-    return (
-      <div className='container mx-auto px-4 py-8 text-center'>
-        Student not found.
-      </div>
-    );
+    return {
+      title: 'Students',
+    };
   }
 
-  return (
-    <div className='container mx-auto px-4 py-8 max-w-2xl'>
-      <div className='flex justify-end mb-4'>
-        <Link
-          href='/students'
-          className='btn border border-border hover:bg-foreground/5'
-        >
-          Back to List
-        </Link>
-      </div>
+  return {
+    title: `Student | ${student.name}`,
+  };
+}
 
-      <div className='card p-6'>
-        <h1 className='text-3xl font-bold mb-4 text-foreground'>
-          {student.name}
-        </h1>
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-4 text-lg'>
-          <p className='text-foreground'>
-            <strong>Email:</strong> {student.email}
-          </p>
-          <p className='text-foreground'>
-            <strong>CPF:</strong> {student.register}
-          </p>
-          <p className='text-foreground'>
-            <strong>Phone Number:</strong> {student.phone}
-          </p>
-        </div>
-      </div>
-    </div>
-  );
+export default function CourseDetailsPage({ params }: Props) {
+  const idAsNumber = Number(params.id);
+
+  return <StudentDetailsClientPage id={idAsNumber} />;
 }

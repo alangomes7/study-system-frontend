@@ -9,6 +9,7 @@ export const queryKeys = {
     courseId,
   ],
   professors: ['professors'],
+  professor: (id: number) => ['professors', id],
   students: ['students'],
   student: (id: number) => ['students', id],
   subscriptionsByClass: (studyClassId: number | null) => [

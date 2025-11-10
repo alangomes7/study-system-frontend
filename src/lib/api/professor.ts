@@ -1,10 +1,6 @@
 import { Professor, ProfessorCreationData } from '@/types';
 import { API_BASE_URL } from './client';
 
-/* -------------------------------------------------------------------------- */
-/* PROFESSORS                                                                 */
-/* -------------------------------------------------------------------------- */
-
 /**
  * Fetches a list of all professors.
  * @returns A promise that resolves to an array of Professor objects.
@@ -30,5 +26,16 @@ export async function createProfessor(
   });
 
   if (!response.ok) throw new Error('Failed to create professor');
+  return response.json();
+}
+
+/**
+ * Fetches details for a single professor by ID.
+ * @param id The ID of the professor to fetch.
+ * @returns A promise that resolves to the Professor object.
+ */
+export async function getProfessor(id: number): Promise<Professor> {
+  const response = await fetch(`${API_BASE_URL}/professors/${id}`);
+  if (!response.ok) throw new Error(`Failed to fetch professor with id ${id}`);
   return response.json();
 }

@@ -15,7 +15,7 @@ export const useGetCourses = () => {
 export const useGetCourse = (id: number) => {
   return useQuery<Course, Error>({
     queryKey: queryKeys.course(id),
-    queryFn: () => api.getCourse(String(id)),
+    queryFn: () => api.getCourse(id),
     enabled: !!id,
   });
 };

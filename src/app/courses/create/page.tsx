@@ -1,7 +1,10 @@
-'use client';
-
 import { CreateCourseForm } from '@/components';
+import { Metadata } from 'next';
 
-export default function CreateCoursePage() {
+export const metadata: Metadata = {
+  title: 'Create Course',
+};
+
+export default function CreateCourseClientPage() {
   return <CreateCourseForm />;
 }

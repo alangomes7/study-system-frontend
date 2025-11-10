@@ -18,7 +18,7 @@ export async function getCourses(): Promise<Course[]> {
  * @returns A promise that resolves to the Course object.
  * @throws Throws an error if the course is not found (404) or on API failure.
  */
-export async function getCourse(id: string): Promise<Course> {
+export async function getCourse(id: number): Promise<Course> {
   const response = await fetch(`${API_BASE_URL}/courses/${id}`);
 
   if (!response.ok) {

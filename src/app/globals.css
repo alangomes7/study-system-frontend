@@ -1,79 +1,68 @@
 /* -------------------------------------------------------------------------- */
-/* 🖌️GLOBALS.CSS (Tailwind CSS v4.1 + Next.js 15)                            */
+/* 🖌️ GLOBALS.CSS (Tailwind CSS v4.1 + Next.js 15)                            */
 /* -------------------------------------------------------------------------- */
-/* This file is the main Tailwind entrypoint for your application.            */
-/* It does four things:                                                       */
-/*   1️⃣ Imports your theme variables (from theme.css)                        */
-/*   2️⃣ Defines Tailwind theme tokens using CSS custom properties             */
-/*   3️⃣ Imports Tailwind core styles (base, components, utilities)           */
-/*   4️⃣ Applies global UI defaults and resets                                */
+/* Main Tailwind entrypoint for the app.                                      */
+/* Steps:                                                                     */
+/*  1️⃣ Import theme variables                                                */
+/*  2️⃣ Define Tailwind theme tokens                                          */
+/*  3️⃣ Import Tailwind core                                                 */
+/*  4️⃣ Apply global UI defaults & resets                                    */
 /* -------------------------------------------------------------------------- */
 
-/* -------------------------------------------------------------------------- */
-/* 🎨 1. Import Custom Theme Variables (Light & Dark Modes)                   */
-/* -------------------------------------------------------------------------- */
+/* 🎨 1. Import Custom Theme Variables */
 @import './themes.css';
 
-/* -------------------------------------------------------------------------- */
-/* 🎨 2. Define Tailwind Theme Using CSS Custom Properties                    */
-/* -------------------------------------------------------------------------- */
-/* Tailwind v4.1 reads these variables automatically as theme tokens.         */
-/* Use --color-* variables so Tailwind maps them to bg-*, text-*, etc.        */
-
+/* 🎨 2. Define Tailwind Theme Using CSS Custom Properties */
 @theme {
-  /* ─────────────── Semantic Colors ─────────────── */
+  /* Semantic Colors */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-card-background: var(--card-background);
-  --color-card-text: var(--text-card);
   --color-border: var(--border);
+  --color-card-background: var(--card-background);
+
+  --color-card-text: var(--foreground);
   --color-muted-foreground: var(--muted-foreground);
 
-  /* ─────────────── Brand Colors ─────────────── */
+  /* Brand Colors */
   --color-primary: var(--primary);
   --color-primary-light: var(--primary-light);
   --color-primary-dark: var(--primary-dark);
-  --color-primary-foreground: var(--primary-foreground);
 
-  /* ─────────────── Status Colors ─────────────── */
+  /* --- FIX --- */
+  --color-primary-foreground: var(--text-over-primary);
+
+  /* Status Colors */
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-error: var(--error);
   --color-info: var(--info);
 
-  /* ─────────────── Utility Colors ─────────────── */
+  /* Utility Colors */
   --color-disabled: var(--disabled);
   --color-text-disabled: var(--text-disabled);
   --color-link: var(--link-color);
   --color-link-hover: var(--link-hover);
 
-  /* ─────────────── Typography & Radius ─────────────── */
-  --font-sans: 'ui-sans-serif, system-ui, sans-serif';
-  --font-mono: 'ui-monospace, SFMono-Regular, monospace';
+  /* Typography & Radius */
+  --font-sans: ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, monospace;
   --radius-sm: 0.375rem;
   --radius-default: 0.5rem;
   --radius-lg: 1rem;
   --radius-xl: 1.5rem;
 }
 
-/* -------------------------------------------------------------------------- */
-/* 🧱 3. Import Tailwind Core                                                 */
-/* -------------------------------------------------------------------------- */
-/* Automatically brings in base, components, and utilities.                   */
+/* 🧱 3. Import Tailwind Core */
 @import 'tailwindcss';
 
-/* -------------------------------------------------------------------------- */
-/* 🪄 4. Global Reset & Application Defaults                                  */
-/* -------------------------------------------------------------------------- */
-/* Basic layout, font smoothing, and color transitions.                       */
-
+/* 🪄 4. Global Reset & Application Defaults */
 html,
 body {
   height: 100%;
   margin: 0;
-  background-color: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans, ui-sans-serif), system-ui, sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   transition: background-color 0.3s ease, color 0.3s ease;
@@ -84,11 +73,11 @@ body {
 }
 
 ::selection {
-  background-color: var(--primary);
-  color: var(--primary-foreground);
+  background-color: var(--color-primary);
+  color: var(--color-primary-foreground);
 }
 
-/* ─────────────── Disabled Elements ─────────────── */
+/* Disabled Elements */
 [disabled],
 .disabled {
   cursor: not-allowed;
@@ -96,23 +85,26 @@ body {
   pointer-events: none;
 }
 
-/* ─────────────── Links ─────────────── */
+/* Links */
 a {
-  color: var(--link-color);
+  color: var(--color-link);
   text-decoration: none;
   transition: color 0.2s ease;
 }
+
 a:hover {
-  color: var(--link-hover);
+  color: var(--color-link-hover);
 }
-/* ─────────────── Forms ─────────────── */
+
+/* Forms */
 .labelForm {
   @apply block text-sm font-medium text-foreground/80 mb-1;
 }
 
-/* ─────────────── Buttons ─────────────── */
+/* Buttons */
 .btn {
-  @apply inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2;
+  @apply inline-flex items-center justify-center rounded-md px-4 py-2 text-sm 
+  font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2;
 }
 
 .btn-primary {
@@ -123,7 +115,7 @@ a:hover {
   background-color: var(--color-primary-dark);
 }
 
-/* ─────────────── Cards ─────────────── */
+/* Cards */
 .card {
   @apply bg-card-background border border-border rounded-lg p-4 shadow-sm;
 }
@@ -132,7 +124,7 @@ a:hover {
   color: var(--color-card-text);
 }
 
-/* ─────────────── Tables ─────────────── */
+/* Tables */
 table {
   @apply min-w-full bg-card-background rounded-lg shadow-sm overflow-hidden;
 }
@@ -157,8 +149,7 @@ tbody tr:last-child td {
   @apply border-b-0;
 }
 
-/* ─────────────── Combox ─────────────── */
-/* Style the select field itself */
+/* Select (Combobox) */
 select.input {
   @apply bg-card-background text-foreground border border-border rounded-md px-3 py-2;
   appearance: none;
@@ -173,20 +164,107 @@ select.input:focus {
   @apply border-primary ring-2 ring-primary/20;
 }
 
-/* Options (partial support) */
 select.input option {
-  background-color: var(--card-background);
-  color: var(--foreground);
-  border-radius: 0.5rem; /* only visible in some browsers (mainly Firefox) */
+  background-color: var(--color-card-background);
+  color: var(--color-foreground);
+  border-radius: var(--radius-default);
 }
 
-/* Firefox-only tweak for rounded dropdown drawer */
+/* Firefox-only tweak */
 @-moz-document url-prefix() {
   select.input {
     border-radius: var(--radius-default);
   }
+}
 
-  select.input option {
-    border-radius: var(--radius-default);
+/* Animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
   }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-out {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes dropdown-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes dropdown-out {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.96);
+  }
+}
+@keyframes accordion-down {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 20rem;
+  }
+}
+/* Animation Utilities */
+.animate-fade-in {
+  animation: fade-in 0.3s ease forwards;
+}
+.animate-fade-out {
+  animation: fade-out 0.3s ease forwards;
+}
+.animate-slide-in {
+  animation: slide-in 0.3s ease forwards;
+}
+.animate-slide-out {
+  animation: slide-out 0.3s ease forwards;
+}
+.animate-dropdown-in {
+  animation: dropdown-in 0.25s ease-out forwards;
+}
+.animate-dropdown-out {
+  animation: dropdown-out 0.2s ease-in forwards;
+}
+.animate-accordion-down {
+  overflow: hidden;
+  animation: accordion-down 0.5s ease-out forwards;
 }

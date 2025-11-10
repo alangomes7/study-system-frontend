@@ -1,6 +1,9 @@
-'use client';
-
 import { UserForm } from '@/components';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Create Professor',
+};
 
 export default function CreateProfessorPage() {
   return <UserForm userType='professor' title='Create Professor' />;

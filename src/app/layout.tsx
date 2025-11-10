@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     default: 'Study System Dashboard',
 
     // The "%s" will be replaced by the title set in page.tsx files
-    template: '%s | Study System',
+    template: 'Study System | %s',
   },
   description: 'Manage students, professors, and courses.',
 };

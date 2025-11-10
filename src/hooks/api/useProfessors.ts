@@ -17,6 +17,14 @@ export const useGetProfessors = () => {
   });
 };
 
+export const useGetProfessor = (id: number) => {
+  return useQuery<Professor, Error>({
+    queryKey: queryKeys.professor(id),
+    queryFn: () => api.getProfessor(id),
+    enabled: !!id,
+  });
+};
+
 export const useCreateProfessor = (options?: CreateProfessorOptions) => {
   const queryClient = useQueryClient();
   const router = useRouter();
@@ -25,7 +33,7 @@ export const useCreateProfessor = (options?: CreateProfessorOptions) => {
     mutationFn: api.createProfessor,
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.professors });
-      router.push('/');
+      router.push('/professors'); // Changed from '/'
 
       options?.onSuccess?.(data, variables, context);
     },
