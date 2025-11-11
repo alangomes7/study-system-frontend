@@ -6,6 +6,7 @@ import React from 'react';
 import { Student, SortConfig, DropdownType } from '../types';
 import { StudentTableSearch } from './StudentTableSearch';
 import { StudentTablePagination } from './StudentTablePagination';
+import { useRouter } from 'next/navigation'; // Import useRouter
 
 interface StudyClass {
   year: number;
@@ -48,6 +49,8 @@ export function EnrolledStudentsTable({
   handlers,
   computed,
 }: Props) {
+  const router = useRouter(); // Initialize router
+
   const {
     requestSort,
     handlePaginationLengthChange,
@@ -73,6 +76,11 @@ export function EnrolledStudentsTable({
     ) : (
       <ArrowDown className='w-4 h-4' />
     );
+  };
+
+  // Handle navigation
+  const handleRowClick = (studentId: number) => {
+    router.push(`/students/${studentId}`);
   };
 
   if (isLoadingEnrolledStudents) {
@@ -150,7 +158,8 @@ export function EnrolledStudentsTable({
                 {enrolledStudents.map(student => (
                   <tr
                     key={student.id}
-                    className='hover:bg-foreground/5 border-b border-border'
+                    className='hover:bg-foreground/5 border-b border-border cursor-pointer'
+                    onClick={() => handleRowClick(student.id)}
                   >
                     <td className='py-3 px-4 text-foreground text-left'>
                       {student.id}

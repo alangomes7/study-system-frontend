@@ -27,7 +27,6 @@ export const useGetStudentsByStudyClass = (studyClassId: number | null) => {
     error: subscriptionsError,
   } = useGetSubscriptionsByStudyClass(studyClassId);
 
-  // Then, use those subscriptions to fetch the students
   const {
     data: students,
     isLoading: isLoadingStudents,
@@ -45,12 +44,11 @@ export const useGetStudentsByStudyClass = (studyClassId: number | null) => {
   };
 };
 
-export const useCreateSubscription = () => {
+export const useCreateSubscription = (p0: { onSuccess: () => void }) => {
   const queryClient = useQueryClient();
   return useMutation<Subscription, Error, SubscriptionCreationData>({
     mutationFn: api.createSubscription,
     onSuccess: data => {
-      // Invalidate subscriptions, which will auto-refetch students
       queryClient.invalidateQueries({
         queryKey: queryKeys.subscriptionsByClass(data.studyClassId),
       });

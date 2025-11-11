@@ -2,10 +2,11 @@
 
 import { SpinLoader } from '@/components';
 import { useGetStudent } from '@/hooks';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation'; // Import useRouter
 
 export default function StudenteDetailsClientPage({ id }: { id: number }) {
   const { data: student, isLoading, error } = useGetStudent(id);
+  const router = useRouter();
 
   if (isLoading) {
     return (
@@ -32,12 +33,12 @@ export default function StudenteDetailsClientPage({ id }: { id: number }) {
   return (
     <div className='container mx-auto px-4 py-8 max-w-2xl'>
       <div className='flex justify-end mb-4'>
-        <Link
-          href='/students'
+        <button
+          onClick={() => router.back()}
           className='btn border border-border hover:bg-foreground/5'
         >
-          Back to List
-        </Link>
+          Back
+        </button>
       </div>
 
       <div className='card p-6'>

@@ -1,79 +1,46 @@
-// src/stores/useSubscribeStudentStore.ts
 import { create } from 'zustand';
-import {
-  getCourses,
-  getStudyClassesByCourse,
-  getAllStudents,
-  getSubscriptionsByStudyClass,
-  getStudentsInBatches,
-  createSubscription as apiCreateSubscription,
-} from '@/lib/api'; //
-import { Course, StudyClass, Student, SubscriptionCreationData } from '@/types';
+import { Student } from '@/types';
 
-// Define the shape of your state
-interface SubscribeStudentState {
+export type DropdownType =
+  | 'course'
+  | 'studyClass'
+  | 'student'
+  | 'pagination'
+  | null;
+
+export interface SortConfig<T> {
+  key: keyof T;
+  direction: 'ascending' | 'descending';
+}
+
+// 1. Define the shape of the UI state ONLY
+interface SubscribeStudentUIState {
   // UI State
   selectedCourseId: number | null;
   selectedStudyClassId: number | null;
   selectedStudentId: number | null;
-  openDropdown: 'course' | 'studyClass' | 'student' | 'pagination' | null;
+  openDropdown: DropdownType;
   studentSearchTerm: string;
   tableSearchTerm: string;
   currentPage: number;
   paginationLength: number;
-  sortConfig: {
-    key: keyof Student;
-    direction: 'ascending' | 'descending';
-  } | null;
+  sortConfig: SortConfig<Student> | null;
 
-  // Data & Server State
-  courses: Course[];
-  studyClasses: StudyClass[];
-  allStudents: Student[];
-  enrolledStudents: Student[];
-
-  // Loading States
-  isLoadingCourses: boolean;
-  isLoadingStudyClasses: boolean;
-  isLoadingAllStudents: boolean;
-  isLoadingEnrolledStudents: boolean;
-  isSubmitting: boolean;
-
-  // Error States
-  coursesError: Error | null;
-  studyClassesError: Error | null;
-  allStudentsError: Error | null;
-  enrolledStudentsError: Error | null;
-  mutationError: Error | null;
-
-  // Actions (functions to update state)
-  setDropdown: (
-    dropdown: 'course' | 'studyClass' | 'student' | 'pagination' | null,
-  ) => void;
-  setSearchTerms: (type: 'student' | 'table', term: string) => void;
+  // Actions
+  setDropdown: (dropdown: DropdownType) => void;
+  setStudentSearchTerm: (term: string) => void;
+  setTableSearchTerm: (term: string) => void;
   setPagination: (page: number, length?: number) => void;
-  setSortConfig: (
-    config: {
-      key: keyof Student;
-      direction: 'ascending' | 'descending';
-    } | null,
-  ) => void;
-
+  setSortConfig: (config: SortConfig<Student> | null) => void;
   selectCourse: (courseId: number | null) => void;
   selectStudyClass: (studyClassId: number | null) => void;
   selectStudent: (studentId: number | null) => void;
-
-  // Data Fetching Actions
-  fetchCourses: () => Promise<void>;
-  fetchStudyClasses: (courseId: number) => Promise<void>;
-  fetchAllStudents: () => Promise<void>;
-  fetchEnrolledStudents: (studyClassId: number) => Promise<void>;
-  createSubscription: () => Promise<void>;
+  resetStudentSelection: () => void;
 }
 
-export const useSubscribeStudentStore = create<SubscribeStudentState>(
+export const useSubscribeStudentStore = create<SubscribeStudentUIState>(
   (set, get) => ({
-    // --- Initial State ---
+    // --- Initial UI State ---
     selectedCourseId: null,
     selectedStudyClassId: null,
     selectedStudentId: null,
@@ -84,33 +51,15 @@ export const useSubscribeStudentStore = create<SubscribeStudentState>(
     paginationLength: 10,
     sortConfig: null,
 
-    courses: [],
-    studyClasses: [],
-    allStudents: [],
-    enrolledStudents: [],
-
-    isLoadingCourses: false,
-    isLoadingStudyClasses: false,
-    isLoadingAllStudents: false,
-    isLoadingEnrolledStudents: false,
-    isSubmitting: false,
-
-    coursesError: null,
-    studyClassesError: null,
-    allStudentsError: null,
-    enrolledStudentsError: null,
-    mutationError: null,
-
     // --- UI Actions ---
     setDropdown: dropdown => set({ openDropdown: dropdown }),
-    setSearchTerms: (type, term) => {
-      if (type === 'student') set({ studentSearchTerm: term });
-      if (type === 'table') set({ tableSearchTerm: term });
-    },
+    setStudentSearchTerm: term => set({ studentSearchTerm: term }),
+    setTableSearchTerm: term => set({ tableSearchTerm: term }),
     setPagination: (page, length) => {
       set({
         currentPage: page,
         paginationLength: length ?? get().paginationLength,
+        openDropdown: null, // Close dropdown on change
       });
     },
     setSortConfig: config => set({ sortConfig: config }),
@@ -118,102 +67,26 @@ export const useSubscribeStudentStore = create<SubscribeStudentState>(
     selectCourse: courseId => {
       set({
         selectedCourseId: courseId,
-        selectedStudyClassId: null,
+        selectedStudyClassId: null, // Reset dependent state
         selectedStudentId: null,
-        enrolledStudents: [],
+        openDropdown: null,
       });
-      if (courseId) {
-        get().fetchStudyClasses(courseId);
-      } else {
-        set({ studyClasses: [] });
-      }
     },
 
     selectStudyClass: studyClassId => {
-      set({ selectedStudyClassId: studyClassId, currentPage: 1 });
-      if (studyClassId) {
-        get().fetchEnrolledStudents(studyClassId);
-      } else {
-        set({ enrolledStudents: [] });
-      }
+      set({
+        selectedStudyClassId: studyClassId,
+        currentPage: 1, // Reset pagination
+        openDropdown: null,
+      });
     },
 
-    selectStudent: studentId => set({ selectedStudentId: studentId }),
-
-    // --- Data Fetching Actions ---
-    fetchCourses: async () => {
-      set({ isLoadingCourses: true, coursesError: null });
-      try {
-        const courses = await getCourses();
-        set({ courses, isLoadingCourses: false });
-      } catch (error) {
-        set({ coursesError: error as Error, isLoadingCourses: false });
-      }
+    selectStudent: studentId => {
+      set({ selectedStudentId: studentId, openDropdown: null });
     },
 
-    fetchStudyClasses: async (courseId: number) => {
-      set({ isLoadingStudyClasses: true, studyClassesError: null });
-      try {
-        const studyClasses = await getStudyClassesByCourse(String(courseId)); //
-        set({ studyClasses, isLoadingStudyClasses: false });
-      } catch (error) {
-        set({
-          studyClassesError: error as Error,
-          isLoadingStudyClasses: false,
-        });
-      }
-    },
-
-    fetchAllStudents: async () => {
-      set({ isLoadingAllStudents: true, allStudentsError: null });
-      try {
-        const allStudents = await getAllStudents(); //
-        set({ allStudents, isLoadingAllStudents: false });
-      } catch (error) {
-        set({ allStudentsError: error as Error, isLoadingAllStudents: false });
-      }
-    },
-
-    fetchEnrolledStudents: async (studyClassId: number) => {
-      set({ isLoadingEnrolledStudents: true, enrolledStudentsError: null });
-      try {
-        // This logic mirrors the 'useGetStudentsByStudyClass' hook
-        const subscriptions = await getSubscriptionsByStudyClass(studyClassId); //
-        if (subscriptions.length === 0) {
-          set({ enrolledStudents: [], isLoadingEnrolledStudents: false });
-          return;
-        }
-        const students = await getStudentsInBatches(subscriptions); //
-        set({ enrolledStudents: students, isLoadingEnrolledStudents: false });
-      } catch (error) {
-        set({
-          enrolledStudentsError: error as Error,
-          isLoadingEnrolledStudents: false,
-        });
-      }
-    },
-
-    createSubscription: async () => {
-      const { selectedStudentId, selectedStudyClassId } = get();
-      if (!selectedStudentId || !selectedStudyClassId) return;
-
-      set({ isSubmitting: true, mutationError: null });
-      try {
-        const data: SubscriptionCreationData = {
-          studentId: selectedStudentId,
-          studyClassId: selectedStudyClassId,
-        };
-        await apiCreateSubscription(data); //
-        set({
-          isSubmitting: false,
-          selectedStudentId: null,
-          studentSearchTerm: '',
-        });
-        // On success, refresh the enrolled students list
-        await get().fetchEnrolledStudents(selectedStudyClassId);
-      } catch (error) {
-        set({ mutationError: error as Error, isSubmitting: false });
-      }
+    resetStudentSelection: () => {
+      set({ selectedStudentId: null, studentSearchTerm: '' });
     },
   }),
 );

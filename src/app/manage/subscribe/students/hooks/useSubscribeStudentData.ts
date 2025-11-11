@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import {
   useGetCourses,
   useGetStudyClassesByCourse,
@@ -6,58 +6,77 @@ import {
   useGetStudentsByStudyClass,
   useCreateSubscription,
 } from '@/hooks';
-import { SortConfig, Student, DropdownType } from '../types';
-import { useSubscribeStudentHandlers } from './useSubscribeStudentHandlers';
+import {
+  useSubscribeStudentStore,
+  DropdownType,
+  SortConfig,
+} from '@/stores/useSubscribeStudentStore';
+import { Student } from '../types';
 
 export function useSubscribeStudentData() {
-  // --- Core State ---
-  const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
-  const [selectedStudyClassId, setSelectedStudyClassId] = useState<
-    number | null
-  >(null);
-  const [selectedStudentId, setSelectedStudentId] = useState<number | null>(
-    null,
-  );
-  const [openDropdown, setOpenDropdown] = useState<DropdownType>(null);
-  const [studentSearchTerm, setStudentSearchTerm] = useState('');
-  const [tableSearchTerm, setTableSearchTerm] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [paginationLength, setPaginationLength] = useState(10);
-  const [sortConfig, setSortConfig] = useState<SortConfig<Student> | null>(
-    null,
-  );
+  // --- UI State (from Zustand) ---
+  const {
+    selectedCourseId,
+    selectedStudyClassId,
+    selectedStudentId,
+    openDropdown,
+    studentSearchTerm,
+    tableSearchTerm,
+    currentPage,
+    paginationLength,
+    sortConfig,
+  } = useSubscribeStudentStore();
 
-  // --- Data Fetching ---
+  // --- UI Actions (from Zustand) ---
+  const {
+    selectCourse,
+    selectStudyClass,
+    selectStudent,
+    setDropdown,
+    setStudentSearchTerm,
+    setTableSearchTerm,
+    setPagination,
+    setSortConfig,
+    resetStudentSelection,
+  } = useSubscribeStudentStore();
+
+  // --- Server State (from React Query) ---
   const {
     data: courses = [],
     isLoading: isLoadingCourses,
     error: coursesError,
   } = useGetCourses();
+
   const {
     data: studyClasses = [],
     isLoading: isLoadingStudyClasses,
     error: studyClassesError,
   } = useGetStudyClassesByCourse(selectedCourseId || 0);
+
   const {
     data: allStudents = [],
     isLoading: isLoadingAllStudents,
     error: allStudentsError,
   } = useGetAllStudents();
-  const { data: enrolledStudents = [], error: enrolledStudentsError } =
-    useGetStudentsByStudyClass(selectedStudyClassId);
+
+  const {
+    data: enrolledStudents = [],
+    isLoading: isLoadingEnrolledStudents,
+    error: enrolledStudentsError,
+  } = useGetStudentsByStudyClass(selectedStudyClassId);
+
+  // --- Mutation (from React Query) ---
   const {
     mutateAsync: createSubscriptionMutate,
     isPending: isSubmitting,
     error: mutationError,
-  } = useCreateSubscription();
+  } = useCreateSubscription({
+    onSuccess: () => {
+      resetStudentSelection();
+    },
+  });
 
-  const createSubscriptionAdapter = async (
-    studentId: number,
-    studyClassId: number,
-  ) => {
-    await createSubscriptionMutate({ studentId, studyClassId });
-  };
-
+  // --- Combined Loading & Error ---
   const isLoading =
     isLoadingCourses || isLoadingAllStudents || isLoadingStudyClasses;
   const error =
@@ -67,7 +86,51 @@ export function useSubscribeStudentData() {
     enrolledStudentsError ||
     mutationError;
 
-  // --- Derived Data ---
+  // --- Event Handlers (Connecting Actions) ---
+
+  const handleSelectCourse = (courseId: number) => {
+    selectCourse(courseId);
+  };
+
+  const handleSelectStudyClass = (studyClassId: number) => {
+    selectStudyClass(studyClassId);
+  };
+
+  const handleSelectStudent = (studentId: number) => {
+    selectStudent(studentId);
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (selectedStudentId && selectedStudyClassId) {
+      await createSubscriptionMutate({
+        studentId: selectedStudentId,
+        studyClassId: selectedStudyClassId,
+      });
+    }
+  };
+
+  const requestSort = (key: keyof Student) => {
+    let direction: 'ascending' | 'descending' = 'ascending';
+    if (
+      sortConfig &&
+      sortConfig.key === key &&
+      sortConfig.direction === 'ascending'
+    ) {
+      direction = 'descending';
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const handlePaginationLengthChange = (length: number) => {
+    setPagination(1, length); // Resets to page 1
+  };
+
+  const paginate = (pageNumber: number) => {
+    setPagination(pageNumber);
+  };
+
+  // --- Derived Data (Memos) ---
   const selectedStudyClass = useMemo(
     () => studyClasses.find(sc => sc.id === selectedStudyClassId) || null,
     [studyClasses, selectedStudyClassId],
@@ -91,61 +154,50 @@ export function useSubscribeStudentData() {
 
   const sortedEnrolledStudents = useMemo(() => {
     const sortableStudents = [...filteredEnrolledStudents];
-
     if (sortConfig !== null) {
       sortableStudents.sort((a, b) => {
-        const key = sortConfig.key;
-
-        if (a[key] < b[key]) {
+        if (a[sortConfig.key] < b[sortConfig.key]) {
           return sortConfig.direction === 'ascending' ? -1 : 1;
         }
-        if (a[key] > b[key]) {
+        if (a[sortConfig.key] > b[sortConfig.key]) {
           return sortConfig.direction === 'ascending' ? 1 : -1;
         }
         return 0;
       });
     }
-
     return sortableStudents;
   }, [filteredEnrolledStudents, sortConfig]);
 
-  const indexOfLastStudent = currentPage * paginationLength;
-  const indexOfFirstStudent = indexOfLastStudent - paginationLength;
-  const currentEnrolledStudents = sortedEnrolledStudents.slice(
-    indexOfFirstStudent,
-    indexOfLastStudent,
-  );
+  const currentEnrolledStudents = useMemo(() => {
+    const indexOfLastStudent = currentPage * paginationLength;
+    const indexOfFirstStudent = indexOfLastStudent - paginationLength;
+    return sortedEnrolledStudents.slice(
+      indexOfFirstStudent,
+      indexOfLastStudent,
+    );
+  }, [sortedEnrolledStudents, currentPage, paginationLength]);
 
-  // --- Base handlers from the hook ---
-  const baseHandlers = useSubscribeStudentHandlers({
-    setSelectedCourseId,
-    setSelectedStudyClassId,
-    setSelectedStudentId,
-    setOpenDropdown,
-    setCurrentPage,
-    setPaginationLength,
-    setSortConfig,
-    setStudentSearchTerm,
-    setTableSearchTerm,
-    createSubscription: createSubscriptionAdapter,
-  });
-
+  // --- Return Values ---
   const handlers = {
-    ...baseHandlers,
+    handleSelectCourse,
+    handleSelectStudyClass,
+    handleSelectStudent,
+    handleSubmit,
+    requestSort,
+    handlePaginationLengthChange,
+    paginate,
     setStudentSearchTerm,
     setTableSearchTerm,
-    setOpenDropdown,
+    setOpenDropdown: setDropdown,
   };
 
   const computed = {
     courses,
     studyClasses,
     allStudents,
-    enrolledStudents,
     filteredStudentsForDropdown,
     filteredEnrolledStudents,
     sortedEnrolledStudents,
-    currentEnrolledStudents,
     selectedCourseId,
     selectedStudyClassId,
     selectedStudentId,
@@ -156,7 +208,8 @@ export function useSubscribeStudentData() {
     sortConfig,
     isSubmitting,
     currentPage,
-    isLoadingEnrolledStudents: isLoadingStudyClasses,
+    isLoadingEnrolledStudents,
+    enrolledStudents: filteredEnrolledStudents,
   };
 
   return {
