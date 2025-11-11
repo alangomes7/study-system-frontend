@@ -10,6 +10,7 @@ export default function NavBar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isManageOpen, setIsManageOpen] = useState(false);
+  const [isSubscribeOpen, setIsSubscribeOpen] = useState(false);
 
   // State for closing animation
   const [isClosing, setIsClosing] = useState(false);
@@ -22,17 +23,11 @@ export default function NavBar() {
 
   const createMenuRef = useRef<HTMLDivElement>(null);
   const manageMenuRef = useRef<HTMLDivElement>(null);
+  const subscribeMenuRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLDivElement>(null);
 
   // --- Get current path ---
   const pathname = usePathname();
-
-  // --- Static Paths ---
-  const pathCourses = '/courses';
-  const pathProfessors = '/professors';
-  const pathStudents = '/students';
-  const pathStudyClasses = '/study-classes';
-  const pathManage = '/manage';
 
   // --- Set mounted and THEN check mobile ---
   useEffect(() => {
@@ -53,6 +48,7 @@ export default function NavBar() {
       setIsClosing(false);
       setIsCreateOpen(false);
       setIsManageOpen(false);
+      setIsSubscribeOpen(false);
     }, animationDuration);
   }, [isClosing]);
 
@@ -64,6 +60,12 @@ export default function NavBar() {
         !createMenuRef.current.contains(event.target as Node)
       ) {
         setIsCreateOpen(false);
+      }
+      if (
+        subscribeMenuRef.current &&
+        !subscribeMenuRef.current.contains(event.target as Node)
+      ) {
+        setIsSubscribeOpen(false);
       }
       if (
         manageMenuRef.current &&
@@ -100,15 +102,9 @@ export default function NavBar() {
     'block px-4 py-2 text-sm text-primary bg-primary/10 rounded-md';
 
   // --- Logic for active dropdowns ---
-  const isCreateActive =
-    pathname === '/students/create' ||
-    pathname === '/professors/create' ||
-    pathname === '/courses/create' ||
-    pathname === '/study-classes/create';
-
-  const isManageActive =
-    pathname === '/students/enroll' ||
-    pathname === '/study-classes/student-group';
+  const isManageActive = pathname.startsWith('/manage');
+  const isCreateActive = pathname.startsWith('/manage/create');
+  const isSubscribeActive = pathname.startsWith('/manage/subscribe');
 
   return (
     <nav
@@ -135,12 +131,13 @@ export default function NavBar() {
         {/* Desktop Menu */}
         <div className='hidden md:flex items-center space-x-2'>
           {' '}
-          {/* Reduced space-x-6 to space-x-2 to accommodate padding */}
           <Link
             href='/courses'
             // --- Conditional style ---
             className={
-              pathname == '/courses' ? activeNavLinkClass : navLinkClass
+              pathname.startsWith('/courses')
+                ? activeNavLinkClass
+                : navLinkClass
             }
           >
             Courses
@@ -149,7 +146,9 @@ export default function NavBar() {
             href='/professors'
             // --- Conditional style ---
             className={
-              pathname == '/professors' ? activeNavLinkClass : navLinkClass
+              pathname.startsWith('/professors')
+                ? activeNavLinkClass
+                : navLinkClass
             }
           >
             Professors
@@ -158,7 +157,9 @@ export default function NavBar() {
             href='/students'
             // --- Conditional style ---
             className={
-              pathname == '/students' ? activeNavLinkClass : navLinkClass
+              pathname.startsWith('/students')
+                ? activeNavLinkClass
+                : navLinkClass
             }
           >
             Students
@@ -167,78 +168,13 @@ export default function NavBar() {
             href='/study-classes'
             // --- Conditional style ---
             className={
-              pathname == '/study-classes' ? activeNavLinkClass : navLinkClass
+              pathname.startsWith('/study-classes')
+                ? activeNavLinkClass
+                : navLinkClass
             }
           >
             Study Classes
           </Link>
-          {/* Create Dropdown (Desktop) */}
-          <div
-            ref={createMenuRef}
-            className='relative'
-            onMouseEnter={() => !isMobile && setIsCreateOpen(true)}
-            onMouseLeave={() => !isMobile && setIsCreateOpen(false)}
-          >
-            <button
-              onClick={() => isMobile && setIsCreateOpen(!isCreateOpen)}
-              // --- Conditional style for dropdown button ---
-              className={`${
-                isCreateActive ? activeNavLinkClass : navLinkClass
-              } w-full`} // Added w-full for consistent button appearance
-            >
-              Create
-            </button>
-
-            {isCreateOpen && (
-              <div className='absolute right-0 w-48 bg-card-background border border-border rounded-md shadow-lg py-1 p-1 z-50 animate-dropdown-in'>
-                <Link
-                  href='/students/create'
-                  // --- Conditional style ---
-                  className={
-                    pathname === '/students/create'
-                      ? activeMenuItemClass
-                      : menuItemClass
-                  }
-                >
-                  Create Student
-                </Link>
-                <Link
-                  href='/professors/create'
-                  // --- Conditional style ---
-                  className={
-                    pathname === '/professors/create'
-                      ? activeMenuItemClass
-                      : menuItemClass
-                  }
-                >
-                  Create Professor
-                </Link>
-                <Link
-                  href='/courses/create'
-                  // --- Conditional style ---
-                  className={
-                    pathname === '/courses/create'
-                      ? activeMenuItemClass
-                      : menuItemClass
-                  }
-                >
-                  Create Course
-                </Link>
-                <Link
-                  href='/study-classes/create'
-                  // --- Conditional style ---
-                  className={
-                    pathname === '/study-classes/create'
-                      ? activeMenuItemClass
-                      : menuItemClass
-                  }
-                >
-                  Create Study Class
-                </Link>
-              </div>
-            )}
-          </div>
-          {/* Manage Dropdown (Desktop) */}
           <div
             ref={manageMenuRef}
             className='relative'
@@ -247,37 +183,83 @@ export default function NavBar() {
           >
             <button
               onClick={() => isMobile && setIsManageOpen(!isManageOpen)}
-              // --- Conditional style for dropdown button ---
+              // --- active logic ---
               className={`${
                 isManageActive ? activeNavLinkClass : navLinkClass
-              } w-full`} // Added w-full for consistent button appearance
+              } w-full`}
             >
               Manage
             </button>
 
+            {/* Dropdown Content */}
             {isManageOpen && (
-              <div className='absolute right-0 w-48 bg-card-background border border-border rounded-md shadow-lg py-1 p-1 z-50 animate-dropdown-in'>
+              <div className='absolute right-0 w-56 bg-card-background border border-border rounded-md shadow-lg py-1 p-1 z-50 animate-dropdown-in'>
+                <p className='px-4 py-2 text-xs font-semibold text-foreground/60'>
+                  Create
+                </p>
                 <Link
-                  href='/students/enroll'
-                  // --- Conditional style ---
+                  href='/manage/create/student'
                   className={
-                    pathname === '/students/enroll'
+                    pathname === '/manage/create/student'
                       ? activeMenuItemClass
                       : menuItemClass
                   }
                 >
-                  Enroll Student
+                  Create Student
                 </Link>
                 <Link
-                  href='/study-classes/student-group'
-                  // --- Conditional style ---
+                  href='/manage/create/professor'
                   className={
-                    pathname === '/study-classes/student-group'
+                    pathname === '/manage/create/professor'
+                      ? activeMenuItemClass
+                      : menuItemClass
+                  }
+                >
+                  Create Professor
+                </Link>
+                <Link
+                  href='/manage/create/course'
+                  className={
+                    pathname === '/manage/create/course'
+                      ? activeMenuItemClass
+                      : menuItemClass
+                  }
+                >
+                  Create Course
+                </Link>
+                <Link
+                  href='/manage/create/study-class'
+                  className={
+                    pathname === '/manage/create/study-class'
+                      ? activeMenuItemClass
+                      : menuItemClass
+                  }
+                >
+                  Create Study Class
+                </Link>
+                <Link
+                  href='/manage/create/study-class/student-group'
+                  className={
+                    pathname === '/manage/create/study-class/student-group'
                       ? activeMenuItemClass
                       : menuItemClass
                   }
                 >
                   Student Groups
+                </Link>
+                <div className='my-1 border-t border-border' />
+                <p className='px-4 py-2 text-xs font-semibold text-foreground/60'>
+                  Subscribe
+                </p>
+                <Link
+                  href='/manage/subscribe/students'
+                  className={
+                    pathname === '/manage/subscribe/students'
+                      ? activeMenuItemClass
+                      : menuItemClass
+                  }
+                >
+                  Enroll Student
                 </Link>
               </div>
             )}
@@ -338,9 +320,10 @@ export default function NavBar() {
           >
             <Link
               href='/courses'
-              // --- Conditional style ---
               className={
-                pathname == '/courses' ? activeMenuItemClass : menuItemClass
+                pathname.startsWith('/courses')
+                  ? activeMenuItemClass
+                  : menuItemClass
               }
               onClick={handleCloseMenu}
             >
@@ -348,9 +331,10 @@ export default function NavBar() {
             </Link>
             <Link
               href='/professors'
-              // --- Conditional style ---
               className={
-                pathname == '/professors' ? activeMenuItemClass : menuItemClass
+                pathname.startsWith('/professors')
+                  ? activeMenuItemClass
+                  : menuItemClass
               }
               onClick={handleCloseMenu}
             >
@@ -358,9 +342,10 @@ export default function NavBar() {
             </Link>
             <Link
               href='/students'
-              // --- Conditional style ---
               className={
-                pathname == '/students' ? activeMenuItemClass : menuItemClass
+                pathname.startsWith('/students')
+                  ? activeMenuItemClass
+                  : menuItemClass
               }
               onClick={handleCloseMenu}
             >
@@ -368,9 +353,8 @@ export default function NavBar() {
             </Link>
             <Link
               href='/study-classes'
-              // --- Conditional style ---
               className={
-                pathname == '/study-classes'
+                pathname.startsWith('/study-classes')
                   ? activeMenuItemClass
                   : menuItemClass
               }
@@ -379,72 +363,6 @@ export default function NavBar() {
               Study Classes
             </Link>
 
-            {/* Mobile Create Submenu */}
-            <div ref={createMenuRef} className='border-t border-border pt-2'>
-              <button
-                onClick={() => setIsCreateOpen(!isCreateOpen)}
-                className={`w-full text-left font-semibold mb-1 px-4 py-2 ${
-                  isCreateActive ? 'text-primary' : 'text-foreground/70'
-                }`}
-              >
-                Create
-              </button>
-
-              {isCreateOpen && (
-                <div className='pl-2 space-y-1 animate-accordion-down animate-fade-in'>
-                  <Link
-                    href='/students/create'
-                    // --- Conditional style ---
-                    className={
-                      pathname === '/students/create'
-                        ? activeMenuItemClass
-                        : menuItemClass
-                    }
-                    onClick={handleCloseMenu}
-                  >
-                    Create Student
-                  </Link>
-                  <Link
-                    href='/professors/create'
-                    // --- Conditional style ---
-                    className={
-                      pathname === '/professors/create'
-                        ? activeMenuItemClass
-                        : menuItemClass
-                    }
-                    onClick={handleCloseMenu}
-                  >
-                    Create Professor
-                  </Link>
-                  <Link
-                    href='/courses/create'
-                    // --- Conditional style ---
-                    className={
-                      pathname === '/courses/create'
-                        ? activeMenuItemClass
-                        : menuItemClass
-                    }
-                    onClick={handleCloseMenu}
-                  >
-                    Create Course
-                  </Link>
-                  <Link
-                    href='/study-classes/create'
-                    // --- Conditional style ---
-                    className={
-                      pathname === '/study-classes/create'
-                        ? activeMenuItemClass
-                        : menuItemClass
-                    }
-                    onClick={handleCloseMenu}
-                  >
-                    Create Study Class
-                  </Link>
-                </div>
-              )}
-            </div>
-
-            {/* Mobile Manage Submenu */}
             <div ref={manageMenuRef} className='border-t border-border pt-2'>
               <button
                 onClick={() => setIsManageOpen(!isManageOpen)}
@@ -457,30 +375,106 @@ export default function NavBar() {
 
               {isManageOpen && (
                 <div className='pl-2 space-y-1 animate-accordion-down animate-fade-in'>
-                  <Link
-                    href='/students/enroll'
-                    // --- Conditional style ---
-                    className={
-                      pathname === '/students/enroll'
-                        ? activeMenuItemClass
-                        : menuItemClass
-                    }
-                    onClick={handleCloseMenu}
-                  >
-                    Enroll Student
-                  </Link>
-                  <Link
-                    href='/study-classes/student-group'
-                    // --- Conditional style ---
-                    className={
-                      pathname === '/study-classes/student-group'
-                        ? activeMenuItemClass
-                        : menuItemClass
-                    }
-                    onClick={handleCloseMenu}
-                  >
-                    Student Groups
-                  </Link>
+                  {/* --- Create Sub-menu --- */}
+                  <div ref={createMenuRef}>
+                    <button
+                      onClick={() => setIsCreateOpen(!isCreateOpen)}
+                      className={`w-full text-left font-semibold mb-1 px-2 py-2 ${
+                        isCreateActive ? 'text-primary' : 'text-foreground/70'
+                      }`}
+                    >
+                      Create
+                    </button>
+                    {isCreateOpen && (
+                      <div className='pl-4 space-y-1 animate-accordion-down animate-fade-in'>
+                        <Link
+                          href='/manage/create/student'
+                          className={
+                            pathname === '/manage/create/student'
+                              ? activeMenuItemClass
+                              : menuItemClass
+                          }
+                          onClick={handleCloseMenu}
+                        >
+                          Create Student
+                        </Link>
+                        <Link
+                          href='/manage/create/professor'
+                          className={
+                            pathname === '/manage/create/professor'
+                              ? activeMenuItemClass
+                              : menuItemClass
+                          }
+                          onClick={handleCloseMenu}
+                        >
+                          Create Professor
+                        </Link>
+                        <Link
+                          href='/manage/create/course'
+                          className={
+                            pathname === '/manage/create/course'
+                              ? activeMenuItemClass
+                              : menuItemClass
+                          }
+                          onClick={handleCloseMenu}
+                        >
+                          Create Course
+                        </Link>
+                        <Link
+                          href='/manage/create/study-class'
+                          className={
+                            pathname === '/manage/create/study-class'
+                              ? activeMenuItemClass
+                              : menuItemClass
+                          }
+                          onClick={handleCloseMenu}
+                        >
+                          Create Study Class
+                        </Link>
+                        <Link
+                          href='/manage/create/study-class/student-group'
+                          className={
+                            pathname ===
+                            '/manage/create/study-class/student-group'
+                              ? activeMenuItemClass
+                              : menuItemClass
+                          }
+                          onClick={handleCloseMenu}
+                        >
+                          Student Groups
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* --- Subscribe Sub-menu --- */}
+                  <div ref={subscribeMenuRef}>
+                    <button
+                      onClick={() => setIsSubscribeOpen(!isSubscribeOpen)}
+                      className={`w-full text-left font-semibold mb-1 px-2 py-2 ${
+                        isSubscribeActive
+                          ? 'text-primary'
+                          : 'text-foreground/70'
+                      }`}
+                    >
+                      Subscribe
+                    </button>
+                    {isSubscribeOpen && (
+                      <div className='pl-4 space-y-1 animate-accordion-down animate-fade-in'>
+                        <Link
+                          href='/manage/subscribe/students'
+                          className={
+                            pathname === '/manage/subscribe/students'
+                              ? activeMenuItemClass
+                              : menuItemClass
+                          }
+                          onClick={handleCloseMenu}
+                        >
+                          Enroll Student
+                        </Link>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>

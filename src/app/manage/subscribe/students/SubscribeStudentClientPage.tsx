@@ -11,12 +11,7 @@ import {
 import { SpinLoader } from '@/components';
 import { ChevronDown, ArrowUp, ArrowDown } from 'lucide-react';
 import clsx from 'clsx';
-import { Course, StudyClass, Student } from '@/types';
-
-type SortConfig = {
-  key: keyof Student;
-  direction: 'ascending' | 'descending';
-};
+import { SortConfig, Student } from './types';
 
 export default function SubscribeStudentClientPage() {
   // --- Component State ---
@@ -38,7 +33,9 @@ export default function SubscribeStudentClientPage() {
   // --- Table State ---
   const [currentPage, setCurrentPage] = useState(1);
   const [paginationLength, setPaginationLength] = useState(10);
-  const [sortConfig, setSortConfig] = useState<SortConfig | null>(null);
+  const [sortConfig, setSortConfig] = useState<SortConfig<Student> | null>(
+    null,
+  );
 
   // --- Data Fetching ---
   const {
