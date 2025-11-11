@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function CourseDetailsPage({ params }: Props) {
+export default async function StudentDetailsPage({ params }: Props) {
   const { id } = await params;
   return <StudentDetailsClientPage id={Number(id)} />;
 }

@@ -27,6 +27,13 @@ export default function NavBar() {
   // --- Get current path ---
   const pathname = usePathname();
 
+  // --- Static Paths ---
+  const pathCourses = '/courses';
+  const pathProfessors = '/professors';
+  const pathStudents = '/students';
+  const pathStudyClasses = '/study-classes';
+  const pathManage = '/manage';
+
   // --- Set mounted and THEN check mobile ---
   useEffect(() => {
     setMounted(true); // Signal client mount
