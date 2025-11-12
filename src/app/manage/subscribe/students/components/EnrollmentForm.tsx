@@ -222,11 +222,11 @@ export function EnrollmentForm({ data, handlers, error }: EnrollmentFormProps) {
           <button
             type='button'
             id='student-button'
-            disabled={isSubmitting}
+            disabled={isSubmitting || !selectedStudyClassId}
             onClick={() =>
               setOpenDropdown(openDropdown === 'student' ? null : 'student')
             }
-            className='w-full bg-card-background border border-border text-foreground rounded-md px-3 py-2 flex justify-between items-center shadow-sm hover:border-primary transition-colors'
+            className='w-full bg-card-background border border-border text-foreground rounded-md px-3 py-2 flex justify-between items-center shadow-sm hover:border-primary transition-colors disabled:opacity-50'
           >
             <span
               className={clsx(

@@ -7,7 +7,7 @@ import {
   type userFormErrors,
 } from '@/lib/schemas';
 import { z } from 'zod';
-import { type UseMutationResult } from '@tanstack/react-query'; // Assuming
+import { type UseMutationResult } from '@tanstack/react-query';
 
 const unmask = (value: string) => value.replace(/\D/g, '');
 

@@ -73,6 +73,8 @@ export function useSubscribeStudentData() {
   } = useCreateSubscription({
     onSuccess: () => {
       resetStudentSelection();
+      // Set sort order after successful subscription
+      setSortConfig({ key: 'id', direction: 'descending' });
     },
   });
 
@@ -123,7 +125,7 @@ export function useSubscribeStudentData() {
   };
 
   const handlePaginationLengthChange = (length: number) => {
-    setPagination(1, length); // Resets to page 1
+    setPagination(1, length);
   };
 
   const paginate = (pageNumber: number) => {
@@ -136,12 +138,22 @@ export function useSubscribeStudentData() {
     [studyClasses, selectedStudyClassId],
   );
 
+  // Create a Set of enrolled student IDs for efficient lookup
+  const enrolledStudentIds = useMemo(
+    () => new Set(enrolledStudents.map(s => s.id)),
+    [enrolledStudents],
+  );
+
   const filteredStudentsForDropdown = useMemo(
     () =>
-      allStudents.filter(student =>
-        student.name.toLowerCase().includes(studentSearchTerm.toLowerCase()),
+      allStudents.filter(
+        student =>
+          // Filter 1: Student is not already enrolled
+          !enrolledStudentIds.has(student.id) &&
+          // Filter 2: Student name matches search term
+          student.name.toLowerCase().includes(studentSearchTerm.toLowerCase()),
       ),
-    [allStudents, studentSearchTerm],
+    [allStudents, studentSearchTerm, enrolledStudentIds],
   );
 
   const filteredEnrolledStudents = useMemo(
@@ -156,6 +168,13 @@ export function useSubscribeStudentData() {
     const sortableStudents = [...filteredEnrolledStudents];
     if (sortConfig !== null) {
       sortableStudents.sort((a, b) => {
+        // Handle 'id' sorting as numbers ---
+        if (sortConfig.key === 'id') {
+          return sortConfig.direction === 'ascending'
+            ? a.id - b.id
+            : b.id - a.id;
+        }
+
         if (a[sortConfig.key] < b[sortConfig.key]) {
           return sortConfig.direction === 'ascending' ? -1 : 1;
         }
