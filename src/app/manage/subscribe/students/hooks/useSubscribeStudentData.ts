@@ -73,7 +73,6 @@ export function useSubscribeStudentData() {
   } = useCreateSubscription({
     onSuccess: () => {
       resetStudentSelection();
-      // Set sort order after successful subscription
       setSortConfig({ key: 'id', direction: 'descending' });
     },
   });

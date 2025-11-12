@@ -44,7 +44,7 @@ export const useGetStudentsByStudyClass = (studyClassId: number | null) => {
   };
 };
 
-export const useCreateSubscription = (p0: { onSuccess: () => void }) => {
+export const useCreateSubscription = (options: { onSuccess: () => void }) => {
   const queryClient = useQueryClient();
   return useMutation<Subscription, Error, SubscriptionCreationData>({
     mutationFn: api.createSubscription,
@@ -52,6 +52,7 @@ export const useCreateSubscription = (p0: { onSuccess: () => void }) => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.subscriptionsByClass(data.studyClassId),
       });
+      options.onSuccess();
     },
   });
 };
