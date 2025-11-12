@@ -6,7 +6,7 @@ import { Student, DropdownType } from '../types';
 
 type Props = {
   openDropdown: DropdownType;
-  setOpenDropdown: React.Dispatch<React.SetStateAction<DropdownType>>;
+  setOpenDropdown: (dropdown: DropdownType) => void;
   paginationLength: number;
   handlePaginationLengthChange: (length: number) => void;
   currentPage: number;

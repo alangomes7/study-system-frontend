@@ -27,6 +27,8 @@ interface ComponentData {
   studentSearchTerm: string;
   isSubmitting: boolean;
   enrolledStudents: Student[];
+  setStudentSearchTerm: (term: string) => void;
+  setOpenDropdown: (dropdown: DropdownType) => void;
 }
 
 interface ComponentHandlers {
@@ -38,8 +40,6 @@ interface ComponentHandlers {
     studentId: number | null,
     studyClassId: number | null,
   ) => Promise<void>;
-  setStudentSearchTerm: React.Dispatch<React.SetStateAction<string>>;
-  setOpenDropdown: React.Dispatch<React.SetStateAction<DropdownType>>;
 }
 
 type EnrollmentFormProps = {
@@ -61,6 +61,8 @@ export function EnrollmentForm({ data, handlers, error }: EnrollmentFormProps) {
     studentSearchTerm,
     isSubmitting,
     enrolledStudents,
+    setStudentSearchTerm,
+    setOpenDropdown,
   } = data;
 
   const {
@@ -68,8 +70,6 @@ export function EnrollmentForm({ data, handlers, error }: EnrollmentFormProps) {
     handleSelectStudyClass,
     handleSelectStudent,
     handleSubmit,
-    setStudentSearchTerm,
-    setOpenDropdown,
   } = handlers;
 
   const selectedCourseName =
@@ -88,7 +88,7 @@ export function EnrollmentForm({ data, handlers, error }: EnrollmentFormProps) {
       onSubmit={e => handleSubmit(e, selectedStudentId, selectedStudyClassId)}
       className='card p-6 space-y-4'
     >
-      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-4 items-end'>
         {/* Course Dropdown */}
         <div className='relative'>
           <label
@@ -147,9 +147,16 @@ export function EnrollmentForm({ data, handlers, error }: EnrollmentFormProps) {
 
         {/* Study Class Dropdown */}
         <div className='relative'>
+          <p className='text-sm text-muted-foreground mb-1'>
+            <span className='font-medium text-foreground'>
+              {isSubmitting ? '...' : enrolledStudents.length}
+            </span>{' '}
+            students enrolled in this class.
+          </p>
+
           <label
             htmlFor='studyclass-button'
-            className='block text-sm font-medium text-foreground/80 mb-1'
+            className='block text-sm font-medium text-foreground/80 mb-1 sr-only'
           >
             Study Class
           </label>
@@ -274,14 +281,6 @@ export function EnrollmentForm({ data, handlers, error }: EnrollmentFormProps) {
               </ul>
             </div>
           )}
-        </div>
-
-        {/* Student Count */}
-        <div className='text-sm text-muted-foreground'>
-          <span className='font-medium text-foreground'>
-            {isSubmitting ? '...' : enrolledStudents.length}
-          </span>{' '}
-          students enrolled in this class.
         </div>
       </div>
 

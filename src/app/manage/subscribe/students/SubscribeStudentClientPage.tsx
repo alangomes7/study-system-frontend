@@ -42,7 +42,7 @@ export default function SubscribeStudentClientPage() {
       {/* --- Enrolled Student List --- */}
       <EnrolledStudentsTable
         studyClass={selectedStudyClass}
-        enrolledStudents={enrolledStudents} // Pass the paginated list
+        enrolledStudents={enrolledStudents}
         handlers={handlers}
         computed={computed}
       />

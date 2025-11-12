@@ -205,9 +205,6 @@ export function useSubscribeStudentData() {
     requestSort,
     handlePaginationLengthChange,
     paginate,
-    setStudentSearchTerm,
-    setTableSearchTerm,
-    setOpenDropdown: setDropdown,
   };
 
   const computed = {
@@ -229,6 +226,9 @@ export function useSubscribeStudentData() {
     currentPage,
     isLoadingEnrolledStudents,
     enrolledStudents: filteredEnrolledStudents,
+    setStudentSearchTerm,
+    setTableSearchTerm,
+    setOpenDropdown: setDropdown,
   };
 
   return {

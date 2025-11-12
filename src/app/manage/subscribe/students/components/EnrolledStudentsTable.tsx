@@ -6,7 +6,7 @@ import React from 'react';
 import { Student, SortConfig, DropdownType } from '../types';
 import { StudentTableSearch } from './StudentTableSearch';
 import { StudentTablePagination } from './StudentTablePagination';
-import { useRouter } from 'next/navigation'; // Import useRouter
+import { useRouter } from 'next/navigation';
 
 interface StudyClass {
   year: number;
@@ -22,8 +22,6 @@ interface ComponentHandlers {
   ) => void;
   handlePaginationLengthChange: (length: number) => void;
   paginate: (pageNumber: number) => void;
-  setTableSearchTerm: React.Dispatch<React.SetStateAction<string>>;
-  setOpenDropdown: React.Dispatch<React.SetStateAction<DropdownType>>;
 }
 
 interface ComponentComputed {
@@ -34,6 +32,8 @@ interface ComponentComputed {
   currentPage: number;
   openDropdown: DropdownType;
   isLoadingEnrolledStudents: boolean;
+  setTableSearchTerm: (term: string) => void;
+  setOpenDropdown: (dropdown: DropdownType) => void;
 }
 
 type Props = {
@@ -49,15 +49,9 @@ export function EnrolledStudentsTable({
   handlers,
   computed,
 }: Props) {
-  const router = useRouter(); // Initialize router
+  const router = useRouter();
 
-  const {
-    requestSort,
-    handlePaginationLengthChange,
-    paginate,
-    setTableSearchTerm,
-    setOpenDropdown,
-  } = handlers;
+  const { requestSort, handlePaginationLengthChange, paginate } = handlers;
 
   const {
     tableSearchTerm,
@@ -67,6 +61,8 @@ export function EnrolledStudentsTable({
     currentPage,
     openDropdown,
     isLoadingEnrolledStudents,
+    setTableSearchTerm,
+    setOpenDropdown,
   } = computed;
 
   const getSortIcon = (key: keyof Student) => {
@@ -78,7 +74,6 @@ export function EnrolledStudentsTable({
     );
   };
 
-  // Handle navigation
   const handleRowClick = (studentId: number) => {
     router.push(`/students/${studentId}`);
   };
@@ -103,7 +98,6 @@ export function EnrolledStudentsTable({
 
   return (
     <div className='space-y-4'>
-      {/* Search */}
       <StudentTableSearch
         tableSearchTerm={tableSearchTerm}
         setTableSearchTerm={setTableSearchTerm}
@@ -179,7 +173,6 @@ export function EnrolledStudentsTable({
             </table>
           </div>
 
-          {/* Pagination Controls */}
           <StudentTablePagination
             openDropdown={openDropdown}
             setOpenDropdown={setOpenDropdown}

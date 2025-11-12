@@ -2,7 +2,7 @@ import React from 'react';
 
 type Props = {
   tableSearchTerm: string;
-  setTableSearchTerm: React.Dispatch<React.SetStateAction<string>>;
+  setTableSearchTerm: (term: string) => void;
 };
 
 export function StudentTableSearch({
