@@ -1,7 +1,6 @@
 'use client';
 
 import { useCourseForm } from '@/hooks';
-import SpinLoader from '../SpinLoader';
 
 type CourseFormState = {
   name: string;

@@ -113,6 +113,7 @@ a:hover {
 
 .btn-primary:hover {
   background-color: var(--color-primary-dark);
+  color: var(--color-primary-light);
 }
 
 /* Cards */

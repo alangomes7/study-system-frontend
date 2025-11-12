@@ -1,76 +1,34 @@
 'use client';
 
-import { useState } from 'react';
-import {
-  courseSchema,
-  type CourseFormData,
-  type CourseFormErrors,
-} from '@/lib/schemas/index';
-import { z } from 'zod';
-import { useCreateCourse } from '@/hooks';
+import { useCourseFormData } from './data/useCourseFormData';
+import { useCourseFormHandlers } from './handler/useCourseFormHandlers';
 
-const INITIAL_STATE: CourseFormData = {
-  name: '',
-  description: '',
-};
-
-// -----------------------------
-// Hook definition
-// -----------------------------
+/**
+ * Manages the state and logic for creating a new course.
+ */
 export default function useCourseForm() {
-  const [formData, setFormData] = useState<CourseFormData>(INITIAL_STATE);
-  const [errors, setErrors] = useState<CourseFormErrors>({});
+  const {
+    formData,
+    setFormData,
+    errors,
+    setErrors,
+    courseMutation,
+    isSubmitting,
+    apiError,
+  } = useCourseFormData();
 
-  const courseMutation = useCreateCourse({
-    onSuccess: () => {
-      resetForm();
-      alert('Course created successfully!');
-    },
-    onError: (error: Error) => {
-      console.error('Failed to create course:', error);
-    },
+  const { handleChange, handleSubmit } = useCourseFormHandlers({
+    formData,
+    setFormData,
+    setErrors,
+    courseMutation,
   });
 
-  const resetForm = () => {
-    setFormData(INITIAL_STATE);
-    setErrors({});
-  };
-
-  // -----------------------------
-  // Handlers
-  // -----------------------------
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrors({});
-
-    const validationResult = courseSchema.safeParse(formData);
-
-    if (!validationResult.success) {
-      const flattenedErrors = z.flattenError(
-        validationResult.error,
-      ).fieldErrors;
-      setErrors(flattenedErrors);
-      return;
-    }
-
-    courseMutation.mutate(validationResult.data);
-  };
-
-  // -----------------------------
-  // Return API
-  // -----------------------------
   return {
     formData,
     errors,
-    isSubmitting: courseMutation.isPending,
-    apiError: courseMutation.error,
+    isSubmitting,
+    apiError,
     handleChange,
     handleSubmit,
   };
