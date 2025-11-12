@@ -2,7 +2,8 @@
 
 import { SpinLoader } from '@/components';
 import { useGetStudent } from '@/hooks';
-import { useRouter } from 'next/navigation'; // Import useRouter
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function StudenteDetailsClientPage({ id }: { id: number }) {
   const { data: student, isLoading, error } = useGetStudent(id);
@@ -32,7 +33,10 @@ export default function StudenteDetailsClientPage({ id }: { id: number }) {
 
   return (
     <div className='container mx-auto px-4 py-8 max-w-2xl'>
-      <div className='flex justify-end mb-4'>
+      <div className='flex justify-end mb-4 gap-2'>
+        <Link href={`/students/${student.id}/edit`} className='btn btn-primary'>
+          Edit Student
+        </Link>
         <button
           onClick={() => router.back()}
           className='btn border border-border hover:bg-foreground/5'

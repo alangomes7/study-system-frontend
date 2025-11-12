@@ -41,6 +41,26 @@ export async function createStudent(
 }
 
 /**
+ * Updates an existing student.
+ * @param id The ID of the student to update.
+ * @param studentData The data to update.
+ * @returns A promise that resolves to the updated Student object.
+ */
+export async function updateStudent(
+  id: number,
+  studentData: StudentCreationData,
+): Promise<Student> {
+  const response = await fetch(`${API_BASE_URL}/students/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(studentData),
+  });
+
+  if (!response.ok) throw new Error('Failed to update student');
+  return response.json();
+}
+
+/**
  * Fetches student details for a list of subscriptions in batches.
  * @param subscriptions An array of Subscription objects.
  * @param batchSize The number of student requests to make in parallel (default: 20).

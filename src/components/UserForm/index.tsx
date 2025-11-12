@@ -2,6 +2,7 @@
 
 import { IMaskInput } from 'react-imask';
 import { useUserForm } from '@/hooks/index';
+import { Student, Professor } from '@/types';
 
 type UserFormState = {
   name: string;
@@ -15,13 +16,15 @@ type UserFormField = keyof UserFormState;
 interface UserFormProps {
   userType: 'student' | 'professor';
   title: string;
+  user?: Student | Professor | null;
   submitLabel?: string;
 }
 
 export default function UserForm({
   userType,
   title,
-  submitLabel = 'Create',
+  user = null,
+  submitLabel,
 }: UserFormProps) {
   const {
     formData,
@@ -31,7 +34,16 @@ export default function UserForm({
     handleChange,
     handleMaskedChange,
     handleSubmit,
-  } = useUserForm(userType);
+  } = useUserForm({ userType, user });
+
+  // Determine label based on edit mode
+  const isEditMode = !!user;
+  const inProgressLabel = isEditMode ? 'Updating' : 'Creating';
+  const buttonLabel = submitLabel
+    ? submitLabel
+    : isEditMode
+    ? 'Update'
+    : 'Create';
 
   type FieldConfig = {
     label: string;
@@ -42,7 +54,6 @@ export default function UserForm({
     autocomplete?: string;
   };
 
-  // 2. UPDATED fields array
   const fields: FieldConfig[] = [
     { label: 'Name', name: 'name', type: 'text', autocomplete: 'name' },
     {
@@ -125,7 +136,7 @@ export default function UserForm({
           className='btn btn-primary disabled:opacity-50'
           disabled={isSubmitting}
         >
-          {isSubmitting ? `${submitLabel}ing...` : submitLabel}
+          {isSubmitting ? `${inProgressLabel}...` : buttonLabel}
         </button>
       </form>
     </div>
