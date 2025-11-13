@@ -1,48 +1,16 @@
 'use client';
 
-import { MoonIcon, SunIcon } from 'lucide-react';
-import { useState, useEffect } from 'react';
-
-type Theme = 'light' | 'dark';
+import { useThemeData } from './hooks/data/useThemeData';
+import { useThemeHandlers } from './hooks/handlers/useThemeHandlers';
+import { ThemeIcon } from './subcomponents/ThemeIcon';
 
 /**
- * Button component to toggle between light and dark themes.
- * Persists selection in localStorage.
+ * Button to toggle between light and dark themes.
+ * Persists theme in localStorage and updates the document root attribute.
  */
 export default function ButtonTheme() {
-  const [mounted, setMounted] = useState(false);
-  const [theme, setTheme] = useState<Theme>('light');
-
-  // --- Initialize theme after mount ---
-  useEffect(() => {
-    setMounted(true);
-
-    const savedTheme = localStorage.getItem('theme') as Theme | null;
-    const prefersDark = window.matchMedia(
-      '(prefers-color-scheme: dark)',
-    ).matches;
-
-    if (savedTheme === 'light' || savedTheme === 'dark') {
-      setTheme(savedTheme);
-    } else {
-      setTheme(prefersDark ? 'dark' : 'light');
-    }
-  }, []);
-
-  // --- Apply theme to document root ---
-  useEffect(() => {
-    if (!mounted) return;
-
-    const root = window.document.documentElement;
-    root.setAttribute('data-theme', theme);
-
-    localStorage.setItem('theme', theme);
-  }, [theme, mounted]);
-
-  // --- Toggle between themes ---
-  const handleThemeSwitch = () => {
-    setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
-  };
+  const { theme, setTheme, mounted } = useThemeData();
+  const { handleThemeSwitch } = useThemeHandlers(setTheme);
 
   const buttonClasses = `
     p-2 rounded-full bg-card-background text-foreground border border-border
@@ -54,18 +22,10 @@ export default function ButtonTheme() {
   if (!mounted) {
     return (
       <button aria-label='Toggle theme' className={buttonClasses} disabled>
-        <MoonIcon className='h-5 w-5' /> {/* Default icon */}
+        <ThemeIcon theme='light' />
       </button>
     );
   }
-
-  // --- Show icon for next theme ---
-  const renderIcon = () =>
-    theme === 'light' ? (
-      <MoonIcon className='h-5 w-5' />
-    ) : (
-      <SunIcon className='h-5 w-5' />
-    );
 
   return (
     <button
@@ -73,7 +33,7 @@ export default function ButtonTheme() {
       aria-label='Toggle theme'
       className={buttonClasses}
     >
-      {renderIcon()}
+      <ThemeIcon theme={theme} />
     </button>
   );
 }

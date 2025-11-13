@@ -21,6 +21,7 @@ export function useStudentsPageHandlers() {
 
   const handlePaginationLengthChange = (length: number) => {
     setPagination(1, length);
+    setOpenDropdown(null);
   };
 
   const paginate = (pageNumber: number) => {

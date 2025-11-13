@@ -53,7 +53,9 @@ export function StudentTablePagination({
             {[5, 10, 20].map(length => (
               <li
                 key={length}
-                onClick={() => handlePaginationLengthChange(length)}
+                onClick={() => {
+                  handlePaginationLengthChange(length);
+                }}
                 className={`px-3 py-2 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors ${
                   paginationLength === length
                     ? 'bg-primary/20 text-primary-foreground'
