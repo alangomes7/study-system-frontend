@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { DropdownType } from './types';
+import { DropdownType } from '@/stores';
 
 /**
  * Interface for the subscription form's state.

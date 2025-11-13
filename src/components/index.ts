@@ -22,3 +22,4 @@ export { default as NavBar } from './NavBar';
 export { default as UserForm } from './UserForm';
 export { default as Message } from './Message';
 export { default as SpinLoader } from './SpinLoader';
+export { default as ErrorLayout } from './ErrorLayout';

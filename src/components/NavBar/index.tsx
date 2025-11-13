@@ -249,7 +249,7 @@ export default function NavBar() {
                 </Link>
                 <div className='my-1 border-t border-border' />
                 <p className='px-4 py-2 text-xs font-semibold text-foreground/60'>
-                  Subscribe
+                  Enroll
                 </p>
                 <Link
                   href='/manage/subscribe/students'
@@ -260,6 +260,16 @@ export default function NavBar() {
                   }
                 >
                   Enroll Student
+                </Link>
+                <Link
+                  href='/manage/subscribe/professor'
+                  className={
+                    pathname === '/manage/subscribe/professor'
+                      ? activeMenuItemClass
+                      : menuItemClass
+                  }
+                >
+                  Enroll Professor
                 </Link>
               </div>
             )}
@@ -457,7 +467,7 @@ export default function NavBar() {
                           : 'text-foreground/70'
                       }`}
                     >
-                      Subscribe
+                      Enroll
                     </button>
                     {isSubscribeOpen && (
                       <div className='pl-4 space-y-1 animate-accordion-down animate-fade-in'>
@@ -471,6 +481,17 @@ export default function NavBar() {
                           onClick={handleCloseMenu}
                         >
                           Enroll Student
+                        </Link>
+                        <Link
+                          href='/manage/subscribe/professor'
+                          className={
+                            pathname === '/manage/subscribe/professor'
+                              ? activeMenuItemClass
+                              : menuItemClass
+                          }
+                          onClick={handleCloseMenu}
+                        >
+                          Enroll Professor
                         </Link>
                       </div>
                     )}
