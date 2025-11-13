@@ -7,10 +7,11 @@ import {
   useCreateSubscription,
 } from '@/hooks';
 import {
-  useSubscribeStudentStore,
+  useSubscribeFormStore,
+  useEnrolledTableStore,
   DropdownType,
   SortConfig,
-} from '@/stores/useSubscribeStudentStore';
+} from '@/stores';
 import { Student } from '../types';
 
 export function useSubscribeStudentData() {
@@ -21,24 +22,23 @@ export function useSubscribeStudentData() {
     selectedStudentId,
     openDropdown,
     studentSearchTerm,
-    tableSearchTerm,
-    currentPage,
-    paginationLength,
-    sortConfig,
-  } = useSubscribeStudentStore();
-
-  // --- UI Actions (from Zustand) ---
-  const {
     selectCourse,
     selectStudyClass,
     selectStudent,
     setDropdown,
     setStudentSearchTerm,
+    resetStudentSelection,
+  } = useSubscribeFormStore();
+
+  const {
+    tableSearchTerm,
+    currentPage,
+    paginationLength,
+    sortConfig,
     setTableSearchTerm,
     setPagination,
     setSortConfig,
-    resetStudentSelection,
-  } = useSubscribeStudentStore();
+  } = useEnrolledTableStore();
 
   // --- Server State (from React Query) ---
   const {

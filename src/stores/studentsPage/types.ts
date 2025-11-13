@@ -31,7 +31,7 @@ export interface PaginationSlice {
  * State and actions for sorting.
  */
 export interface SortSlice {
-  sortConfig: SortConfig;
+  sortConfig: SortConfigStudent;
   setSortConfig: (key: keyof Student) => void;
 }
 

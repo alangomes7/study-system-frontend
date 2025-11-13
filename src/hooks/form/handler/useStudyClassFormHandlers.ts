@@ -7,18 +7,21 @@ import {
   type StudyClassFormErrors,
   type StudyClassFormData,
 } from '@/lib/schemas';
-import { type UseMutationResult } from '@tanstack/react-query';
+// Import 'UseMutateFunction' instead of 'UseMutationResult'
+import { type UseMutateFunction } from '@tanstack/react-query';
 
 type UseStudyClassFormHandlersProps = {
   formData: StudyClassFormData;
   setFormData: React.Dispatch<React.SetStateAction<StudyClassFormData>>;
   setErrors: React.Dispatch<React.SetStateAction<StudyClassFormErrors>>;
-  createStudyClass: UseMutationResult<
+
+  createStudyClass: UseMutateFunction<
     unknown,
     Error,
     StudyClassFormData,
     unknown
   >;
+  // ------------------------------
 };
 
 /**
@@ -46,8 +49,9 @@ export function useStudyClassFormHandlers({
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
-      setErrors({}); // Clear previous errors // --- Validate with Zod ---
+      setErrors({});
 
+      // --- Validate with Zod ---
       const validationResult = studyClassSchema.safeParse(formData);
 
       if (!validationResult.success) {
@@ -58,7 +62,8 @@ export function useStudyClassFormHandlers({
         return;
       }
 
-      createStudyClass.mutate(validationResult.data);
+      createStudyClass(validationResult.data);
+      // ------------------------------------------
     },
     [formData, setErrors, createStudyClass],
   );

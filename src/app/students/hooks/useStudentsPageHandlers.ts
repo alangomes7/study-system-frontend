@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useStudentsPageStore } from '@/stores/useStudentsPageStore';
+import { useStudentsPageStore } from '@/stores';
 import { Student } from '@/types';
 
 export function useStudentsPageHandlers() {

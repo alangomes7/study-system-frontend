@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import React from 'react';
 import { useGetCourses } from '@/hooks';
 import { SpinLoader } from '@/components';
+import { useSubscribeFormStore } from '@/stores';
 
 export function CourseDropdown() {
   const { data: courses = [], isLoading, error } = useGetCourses();
@@ -14,7 +15,7 @@ export function CourseDropdown() {
     isSubmitting,
     selectCourse,
     setDropdown,
-  } = useSubscribeStudentStore();
+  } = useSubscribeFormStore();
 
   const selectedCourseName =
     courses.find(course => course.id === selectedCourseId)?.name ||

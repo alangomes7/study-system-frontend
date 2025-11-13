@@ -8,6 +8,7 @@ import {
   useGetStudentsByStudyClass,
 } from '@/hooks';
 import { SpinLoader } from '@/components';
+import { useSubscribeFormStore } from '@/stores';
 
 export function StudyClassDropdown() {
   const {
@@ -17,7 +18,7 @@ export function StudyClassDropdown() {
     isSubmitting,
     selectStudyClass,
     setDropdown,
-  } = useSubscribeStudentStore();
+  } = useSubscribeFormStore();
 
   const {
     data: studyClasses = [],

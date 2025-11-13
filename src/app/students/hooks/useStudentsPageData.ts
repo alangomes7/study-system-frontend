@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import { useGetAllStudents } from '@/hooks';
-import { useStudentsPageStore } from '@/stores/useStudentsPageStore';
+import { useStudentsPageStore } from '@/stores/studentsPage';
 
 export function useStudentsPageData() {
   const { searchTerm, currentPage, paginationLength, sortConfig } =

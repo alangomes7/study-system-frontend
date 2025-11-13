@@ -5,17 +5,20 @@ import { useCreateSubscription } from '@/hooks';
 import { CourseDropdown } from './CourseDropdown';
 import { StudyClassDropdown } from './StudyClassDropdown';
 import { StudentDropdown } from './StudentDropdown';
+import { useSubscribeFormStore, useEnrolledTableStore } from '@/stores';
 
 export function EnrollmentForm() {
-  // Get state and actions needed for the form submission logic
+  // Get state and actions from the form store
   const {
     selectedStudentId,
     selectedStudyClassId,
     resetStudentSelection,
-    setSortConfig,
     setIsSubmitting,
     isSubmitting,
-  } = useSubscribeStudentStore();
+  } = useSubscribeFormStore();
+
+  // Get state and actions from the table store
+  const { setSortConfig } = useEnrolledTableStore();
 
   const {
     mutateAsync: createSubscriptionMutate,

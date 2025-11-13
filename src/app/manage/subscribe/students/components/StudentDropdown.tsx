@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import React, { useMemo } from 'react';
 import { useGetAllStudents, useGetStudentsByStudyClass } from '@/hooks';
 import { SpinLoader } from '@/components';
+import { useSubscribeFormStore } from '@/stores';
 
 export function StudentDropdown() {
   const {
@@ -16,7 +17,7 @@ export function StudentDropdown() {
     selectStudent,
     setDropdown,
     setStudentSearchTerm,
-  } = useSubscribeStudentStore();
+  } = useSubscribeFormStore();
 
   const {
     data: allStudents = [],
