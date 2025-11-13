@@ -4,9 +4,9 @@ import { useState, useEffect } from 'react';
 import { type userFormData, type userFormErrors } from '@/lib/schemas';
 import {
   useCreateStudent,
-  //useCreateProfessor,
+  useCreateProfessor,
   useUpdateStudent,
-  //useUpdateProfessor,
+  useUpdateProfessor,
 } from '@/hooks';
 import { Student, Professor } from '@/types';
 
@@ -27,7 +27,8 @@ const INITIAL_STATE: userFormData = {
 /**
  * Manages the state, mutations, and side-effects for the user form.
  */
-export function useUserFormData({ user }: UseUserFormProps) {
+export function useUserFormData({ user, userType }: UseUserFormProps) {
+  // <-- Added userType
   const [formData, setFormData] = useState<userFormData>(INITIAL_STATE);
   const [errors, setErrors] = useState<userFormErrors>({});
 
@@ -43,13 +44,28 @@ export function useUserFormData({ user }: UseUserFormProps) {
   const studentCreateMutation = useCreateStudent({
     onSuccess: () => resetForm(),
   });
+  // Added createProfessor mutation
+  const professorCreateMutation = useCreateProfessor({
+    onSuccess: () => resetForm(),
+  });
 
   // --- Mutations for Updating ---
   const studentUpdateMutation = useUpdateStudent(user?.id || 0);
-  //const professorUpdateMutation = useUpdateProfessor(user?.id || 0);
+  // Added updateProfessor mutation
+  const professorUpdateMutation = useUpdateProfessor(user?.id || 0);
 
-  // --- Select the correct mutation based on original file logic ---
-  const mutation = isEditMode ? studentUpdateMutation : studentCreateMutation;
+  // --- Select the correct mutation based on mode AND userType ---
+  const mutation = (() => {
+    if (isEditMode) {
+      return userType === 'student'
+        ? studentUpdateMutation
+        : professorUpdateMutation;
+    } else {
+      return userType === 'student'
+        ? studentCreateMutation
+        : professorCreateMutation;
+    }
+  })();
 
   // --- Populate form if user data changes (for edit mode) ---
   useEffect(() => {
@@ -61,7 +77,6 @@ export function useUserFormData({ user }: UseUserFormProps) {
         register: user.register,
       });
     } else if (!isEditMode) {
-      // If user is cleared and we're not in edit mode, reset
       resetForm();
     }
   }, [user, isEditMode]);

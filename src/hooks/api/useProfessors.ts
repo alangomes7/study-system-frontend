@@ -39,3 +39,20 @@ export const useCreateProfessor = (options?: CreateProfessorOptions) => {
     },
   });
 };
+
+/**
+ * Hook for updating an existing professor.
+ */
+export const useUpdateProfessor = (id: number) => {
+  const queryClient = useQueryClient();
+  const router = useRouter();
+
+  return useMutation<Professor, Error, ProfessorCreationData>({
+    mutationFn: professorData => api.updateProfessor(id, professorData),
+    onSuccess: data => {
+      queryClient.setQueryData(queryKeys.professor(id), data);
+      queryClient.invalidateQueries({ queryKey: queryKeys.professors });
+      router.push(`/professors/${id}`);
+    },
+  });
+};

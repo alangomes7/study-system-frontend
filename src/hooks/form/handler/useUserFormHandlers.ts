@@ -10,12 +10,13 @@ import { z } from 'zod';
 import { type UseMutationResult } from '@tanstack/react-query';
 
 const unmask = (value: string) => value.replace(/\D/g, '');
+type ValidatedUserData = z.infer<typeof userSchema>;
 
 type UseUserFormHandlersProps = {
   formData: userFormData;
   setFormData: React.Dispatch<React.SetStateAction<userFormData>>;
   setErrors: React.Dispatch<React.SetStateAction<userFormErrors>>;
-  mutation: UseMutationResult<unknown, Error, unknown, unknown>;
+  mutation: UseMutationResult<unknown, Error, ValidatedUserData, unknown>;
 };
 
 /**
@@ -63,7 +64,6 @@ export function useUserFormHandlers({
         return;
       }
 
-      // Call the selected mutation
       mutation.mutate(validationResult.data);
     },
     [formData, setErrors, mutation],

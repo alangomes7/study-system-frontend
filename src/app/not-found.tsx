@@ -1,7 +1,10 @@
+'use client';
 import clsx from 'clsx';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function NotFoundPage() {
+  const router = useRouter();
+
   return (
     <>
       <title>Page not found</title>
@@ -28,9 +31,12 @@ export default function NotFoundPage() {
             website.
           </p>
 
-          <Link href='/' className='btn btn-primary mt-8 inline-block'>
-            Return to Home
-          </Link>
+          <button
+            onClick={() => router.back()}
+            className='btn btn-primary mt-8 inline-block'
+          >
+            Go Back
+          </button>
         </div>
       </div>
     </>

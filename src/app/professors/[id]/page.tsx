@@ -38,7 +38,13 @@ export default function ProfessorDetailsPage({
 
   return (
     <div className='container mx-auto px-4 py-8 max-w-2xl'>
-      <div className='flex justify-end mb-4'>
+      <div className='flex justify-end mb-4 gap-2'>
+        <Link
+          href={`/manage/update/professor/${professorId}`}
+          className='btn border border-border hover:bg-foreground/5'
+        >
+          Update
+        </Link>
         <Link
           href='/professors'
           className='btn border border-border hover:bg-foreground/5'

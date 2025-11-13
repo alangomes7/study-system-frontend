@@ -34,7 +34,10 @@ export default function StudenteDetailsClientPage({ id }: { id: number }) {
   return (
     <div className='container mx-auto px-4 py-8 max-w-2xl'>
       <div className='flex justify-end mb-4 gap-2'>
-        <Link href={`/students/${student.id}/edit`} className='btn btn-primary'>
+        <Link
+          href={`/manage/update/student/${student.id}`}
+          className='btn btn-primary'
+        >
           Edit Student
         </Link>
         <button

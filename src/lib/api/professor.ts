@@ -39,3 +39,25 @@ export async function getProfessor(id: number): Promise<Professor> {
   if (!response.ok) throw new Error(`Failed to fetch professor with id ${id}`);
   return response.json();
 }
+
+/**
+ * Updates an existing professor by ID.
+ * @param id The ID of the professor to update.
+ * @param professorData The data to update the professor with.
+ * @returns A promise that resolves to the updated Professor object.
+ */
+export async function updateProfessor(
+  id: number,
+  professorData: ProfessorCreationData,
+): Promise<Professor> {
+  const response = await fetch(`${API_BASE_URL}/professors/${id}`, {
+    method: 'PUT', // or 'PATCH' depending on your API's preference
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(professorData),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to update professor with id ${id}`);
+  }
+  return response.json();
+}
