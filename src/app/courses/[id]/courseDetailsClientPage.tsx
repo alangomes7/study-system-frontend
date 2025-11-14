@@ -10,7 +10,7 @@ import clsx from 'clsx';
 import Link from 'next/link';
 import { useState, useMemo } from 'react';
 import { ChevronDown } from 'lucide-react';
-import { SpinLoader } from '@/components';
+import { SpinLoaderAnimation } from '@/components';
 
 export default function CourseDetailsClientPage({ id }: { id: number }) {
   // --- Local UI State ---
@@ -87,14 +87,14 @@ export default function CourseDetailsClientPage({ id }: { id: number }) {
   if (isCourseLoading || isStudyClassesLoading) {
     return (
       <div className='text-center mt-8 text-foreground'>
-        <SpinLoader />
+        <SpinLoaderAnimation />
       </div>
     );
   }
 
   const error = courseError || studyClassesError;
   if (error) {
-    return <div className='text-center mt-8 text-red-500'>{error.message}</div>;
+    throw new Error(error.message);
   }
 
   if (!course) {
@@ -124,7 +124,7 @@ export default function CourseDetailsClientPage({ id }: { id: number }) {
             id='class-search'
             name='class-search'
             placeholder='Search by class code...'
-            className='input w-full mb-4'
+            className={clsx('input w-full mb-4 sm:w-auto', 'input-search')}
             value={studyClassSearchTerm}
             onChange={e => setStudyClassSearchTerm(e.target.value)}
           />
@@ -238,7 +238,7 @@ export default function CourseDetailsClientPage({ id }: { id: number }) {
                     id='student-search'
                     name='student-search'
                     placeholder='Search by student name'
-                    className='input w-full sm:w-auto'
+                    className={clsx('input w-full sm:w-auto', 'input-search')}
                     value={searchTerm}
                     onChange={e => setSearchTerm(e.target.value)}
                   />
@@ -248,7 +248,7 @@ export default function CourseDetailsClientPage({ id }: { id: number }) {
               {/* --- Students Table / Cards --- */}
               {isStudentsLoading ? (
                 <div className='text-center mt-8 text-foreground'>
-                  <SpinLoader />
+                  <SpinLoaderAnimation />
                 </div>
               ) : filteredStudents.length > 0 ? (
                 <>

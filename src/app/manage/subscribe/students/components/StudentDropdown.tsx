@@ -4,7 +4,7 @@ import { ChevronDown } from 'lucide-react';
 import clsx from 'clsx';
 import React, { useMemo } from 'react';
 import { useGetAllStudents, useGetStudentsByStudyClass } from '@/hooks';
-import { SpinLoader } from '@/components';
+import { SpinLoaderAnimation } from '@/components';
 import { useSubscribeFormStore } from '@/stores';
 
 export function StudentDropdown() {
@@ -75,7 +75,7 @@ export function StudentDropdown() {
           )}
         >
           {isLoadingAll || isLoadingEnrolled ? (
-            <SpinLoader className='w-4 h-4 mr-2' />
+            <SpinLoaderAnimation className='w-4 h-4 mr-2' />
           ) : (
             selectedStudentName
           )}

@@ -1,6 +1,6 @@
 'use client';
 
-import { SpinLoader } from '@/components';
+import { SpinLoaderAnimation } from '@/components';
 import React from 'react';
 import { useGetStudyClass } from '@/hooks';
 import { useSubscribeProfessorStore } from '@/stores';
@@ -29,7 +29,7 @@ export function EnrolledProfessorDisplay() {
   if (isLoading) {
     return (
       <div className='card p-6 text-center'>
-        <SpinLoader />
+        <SpinLoaderAnimation />
       </div>
     );
   }
@@ -48,7 +48,7 @@ export function EnrolledProfessorDisplay() {
         <h2 className='text-xl font-semibold text-foreground'>
           Current Professor for {studyClass?.classCode}
         </h2>
-        {isFetching && <SpinLoader className='w-5 h-5' />}
+        {isFetching && <SpinLoaderAnimation className='w-5 h-5' />}
       </div>
 
       {studyClass?.professorId ? (

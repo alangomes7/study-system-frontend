@@ -7,7 +7,7 @@ import {
   useGetStudyClassesByCourse,
   useGetStudentsByStudyClass,
 } from '@/hooks';
-import { SpinLoader } from '@/components';
+import { SpinLoaderAnimation } from '@/components';
 import { useSubscribeFormStore } from '@/stores';
 
 export function StudyClassDropdown() {
@@ -68,7 +68,7 @@ export function StudyClassDropdown() {
           )}
         >
           {isLoadingClasses ? (
-            <SpinLoader className='w-4 h-4 mr-2' />
+            <SpinLoaderAnimation className='w-4 h-4 mr-2' />
           ) : (
             selectedStudyClassName
           )}

@@ -95,7 +95,7 @@ export default function UserForm({
                 name={field.name}
                 value={formData[field.name]}
                 onAccept={value => handleMaskedChange(field.name, value)}
-                className='input'
+                className='input-form'
                 disabled={isSubmitting}
                 aria-invalid={!!errors[field.name]}
                 aria-describedby={
@@ -110,7 +110,7 @@ export default function UserForm({
                 name={field.name}
                 value={formData[field.name]}
                 onChange={handleChange}
-                className='input'
+                className='input-form'
                 disabled={isSubmitting}
                 aria-invalid={!!errors[field.name]}
                 aria-describedby={

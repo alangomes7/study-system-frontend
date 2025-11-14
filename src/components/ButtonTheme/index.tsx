@@ -37,3 +37,6 @@ export default function ButtonTheme() {
     </button>
   );
 }
+
+export * from './hooks/data/useThemeData';
+export * from './types';

@@ -5,7 +5,8 @@ import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useGetProfessors } from '@/hooks';
 import { ChevronDown } from 'lucide-react';
-import { SpinLoader } from '@/components';
+import { SpinLoaderAnimation } from '@/components';
+import clsx from 'clsx';
 
 export default function ProfessorsPage() {
   const { data: professors = [], isLoading, error } = useGetProfessors();
@@ -48,17 +49,11 @@ export default function ProfessorsPage() {
   // --- Render Logic ---
 
   if (isLoading) {
-    return (
-      <div className='text-center mt-8 text-foreground'>
-        <SpinLoader />
-      </div>
-    );
+    return <SpinLoaderAnimation className={clsx('scale-60')} />;
   }
 
   if (error) {
-    return (
-      <p className='text-center mt-8 text-red-500'>Error: {error.message}</p>
-    );
+    throw new Error(error.message);
   }
 
   return (
@@ -112,7 +107,7 @@ export default function ProfessorsPage() {
             id='professor-search'
             name='professor-search'
             placeholder='Search by professor name...'
-            className='input w-full sm:w-auto'
+            className={clsx('input w-full sm:w-auto', 'input-search')}
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
           />

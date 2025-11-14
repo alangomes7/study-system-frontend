@@ -1,27 +1,52 @@
-/* GLOBAL COLOR PALETTE (shared for all themes) */
+/* GLOBAL & SHARED VARIABLES
+  All variables that are *defined identically* for both themes are placed here.
+  This makes your themes "DRY" (Don't Repeat Yourself).
+*/
 :root {
   /* ---- Transition ---- */
+  /* Note: For this transition to affect all elements, you might
+    want to apply it to 'body, body *' or a similar selector,
+    not just :root (which is the <html> tag).
+  */
   transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease,
     fill 0.3s ease, stroke 0.3s ease;
+
+  /* ---- Shared Derived Variables ---- */
+  /* Renamed from --brand-secondary-1 */
+  --brand-secondary-lightest: color-mix(in srgb, var(--brand-main) 80%, white);
+
+  /* These "semantic" variables are also defined identically
+    across themes, so they live in the base :root.
+  */
+  --primary: var(--brand-main);
+  /* Updated to use the new semantic name */
+  --primary-light: var(--brand-secondary-lightest);
+  /* Updated to use the new semantic name */
+  --primary-dark: var(--brand-secondary-dark);
+  --text-over-primary: #ffffff;
 }
 
+/* LIGHT THEME
+  This block now *only* contains the variables that are
+  unique to the light theme.
+*/
 :root[data-theme='light'] {
+  /* ---- Base Colors ---- */
   --brand-main: #f25749;
-  --brand-secondary-1: #d9415d;
-  --brand-secondary-2: #d9306e;
-  --brand-secondary-3: #d92387;
   --base-dark: #0d0d0d;
 
+  /* ---- Derived Colors (Unique to Light) ---- */
+  /* Renamed from --brand-secondary-2 */
+  --brand-secondary-light: color-mix(in srgb, var(--brand-main) 60%, white);
+  /* Renamed from --brand-secondary-3 */
+  --brand-secondary-dark: color-mix(in srgb, var(--brand-main) 40%, black);
+
+  /* ---- Semantic Colors (Unique to Light) ---- */
   --background: #ffffff;
   --foreground: var(--base-dark);
   --border: #e5e7eb;
   --card-background: #ffffff;
   --muted-foreground: #6b7280;
-
-  --primary: var(--brand-main);
-  --primary-light: var(--brand-secondary-1);
-  --primary-dark: var(--brand-secondary-3);
-  --text-over-primary: #ffffff;
 
   --success: #22c55e;
   --warning: #f59e0b;
@@ -34,31 +59,36 @@
   --link-hover: var(--primary-dark);
 }
 
+/* DARK THEME
+  This block now *only* contains the variables that are
+  unique to the dark theme.
+*/
 :root[data-theme='dark'] {
+  /* ---- Base Colors ---- */
   --brand-main: #0f758c;
-  --brand-secondary-1: #18358c;
-  --brand-secondary-2: #14548c;
-  --brand-secondary-3: #0b8c8c;
-  --brand-accent: #05a678;
 
+  /* ---- Derived Colors (Unique to Dark) ---- */
+  /* Renamed from --brand-secondary-2 */
+  --brand-secondary-light: color-mix(in srgb, var(--brand-main) 65%, white);
+  /* Renamed from --brand-secondary-3 */
+  --brand-secondary-dark: color-mix(in srgb, var(--brand-main) 45%, black);
+  --brand-accent: color-mix(in srgb, var(--brand-main) 55%, #05a678);
+
+  /* ---- Semantic Colors (Unique to Dark) ---- */
   --background: #111827;
   --foreground: #f9fafb;
   --border: #374151;
   --card-background: #1f2937;
   --muted-foreground: #9ca3af;
 
-  --primary: var(--brand-main);
-  --primary-light: var(--brand-secondary-3);
-  --primary-dark: var(--brand-secondary-1);
-  --text-over-primary: #ffffff;
-
   --success: var(--brand-accent);
   --warning: #fbbf24;
   --error: #f87171;
-  --info: var(--brand-secondary-3);
+  --info: var(--brand-secondary-dark); /* Updated this from ...-3 */
 
   --disabled: #374151;
   --text-disabled: #6b7280;
   --link-color: var(--primary-light);
-  --link-hover: var(--info);
+  /* Updated to use the new semantic name */
+  --link-hover: var(--brand-secondary-light);
 }

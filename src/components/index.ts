@@ -12,7 +12,8 @@
  *  - NavBar
  *  - UserForm
  *  -  Message
- *  - SpinLoader
+ *  - AnimatedJson
+ *  - Animations
  */
 
 export { default as Logo } from './Logo';
@@ -21,5 +22,7 @@ export { default as CreateCourseForm } from './CourseForm';
 export { default as NavBar } from './NavBar';
 export { default as UserForm } from './UserForm';
 export { default as Message } from './Message';
-export { default as SpinLoader } from './SpinLoader';
 export { default as ErrorLayout } from './ErrorLayout';
+export { default as AnimatedJson } from './AnimatedJson';
+export * from './Animations';
+export * from './ButtonTheme';

@@ -1,6 +1,6 @@
 'use client';
 
-import { SpinLoader } from '@/components';
+import { SpinLoaderAnimation } from '@/components';
 import { useSubscribeStudentData } from './hooks/useSubscribeStudentData';
 import { EnrollmentForm } from './components/EnrollmentForm';
 import { EnrolledStudentsTable } from './components/EnrolledStudentsTable';
@@ -19,7 +19,7 @@ export default function SubscribeStudentClientPage() {
   if (isLoading && !computed.courses.length && !computed.allStudents.length) {
     return (
       <div className='container mx-auto px-4 py-8 text-center'>
-        <SpinLoader />
+        <SpinLoaderAnimation />
       </div>
     );
   }

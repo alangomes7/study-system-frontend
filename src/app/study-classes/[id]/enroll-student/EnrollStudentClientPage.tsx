@@ -80,7 +80,7 @@ export default function EnrollStudentClientPage({
   if (isLoading) {
     return (
       <div className='text-center mt-8 text-foreground'>
-        <SpinLoader />
+        <SpinLoaderAnimationq>
       </div>
     );
   }

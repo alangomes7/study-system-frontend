@@ -1,6 +1,6 @@
 'use client';
 
-import { SpinLoader } from '@/components';
+import { SpinLoaderAnimation } from '@/components';
 import { useStudentsPageData } from './hooks/useStudentsPageData';
 import { useStudentsPageHandlers } from './hooks/useStudentsPageHandlers';
 import StudentsCardList from './components/StudentsCardList';
@@ -8,6 +8,7 @@ import StudentsEmptyState from './components/StudentsEmptyState';
 import StudentsHeader from './components/StudentsHeader';
 import StudentsPagination from './components/StudentsPagination';
 import StudentsTable from './components/StudentsTable';
+import { clsx } from 'clsx';
 
 export default function StudentsClientPage() {
   const { isLoading, error, data, ui } = useStudentsPageData();
@@ -17,17 +18,11 @@ export default function StudentsClientPage() {
   const { currentPage, totalPages } = ui;
 
   if (isLoading) {
-    return (
-      <div className='text-center mt-8 text-foreground'>
-        <SpinLoader />
-      </div>
-    );
+    return <SpinLoaderAnimation className={clsx('scale-60')} />;
   }
 
   if (error) {
-    return (
-      <p className='text-center mt-8 text-red-500'>Error: {error.message}</p>
-    );
+    throw new Error(error.message);
   }
 
   return (

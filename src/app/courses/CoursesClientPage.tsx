@@ -1,7 +1,8 @@
 'use client';
 
-import { SpinLoader } from '@/components';
+import { SpinLoaderAnimation } from '@/components';
 import { useGetCourses } from '@/hooks';
+import clsx from 'clsx';
 import Link from 'next/link';
 import { useState, useMemo } from 'react';
 
@@ -17,20 +18,17 @@ export default function CoursesClientPage() {
     [searchTerm, courses],
   );
 
-  if (isLoading)
-    return (
-      <div className='container mx-auto px-4 py-8 text-center'>
-        <SpinLoader />
-      </div>
-    );
+  if (isLoading) {
+    return <SpinLoaderAnimation className={clsx('scale-60')} />;
+  }
 
-  if (error)
-    return (
-      <p className='text-center mt-8 text-red-500'>Error: {error.message}</p>
-    );
+  if (error) {
+    throw new Error(error.message || 'Failed to fetch courses');
+  }
 
   return (
     <div className='container mx-auto px-4 py-8'>
+      {/* Search Bar */}
       <div className='flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4'>
         <h1 className='text-3xl font-bold text-foreground'>Courses</h1>
         <input
@@ -38,11 +36,13 @@ export default function CoursesClientPage() {
           id='course-search'
           name='course-search'
           placeholder='Search by course name...'
-          className='input w-full md:w-1/3'
+          className={clsx('input w-full md:w-1/3', 'input-search')}
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}
         />
       </div>
+
+      {/* Courses Grid */}
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
         {filteredCourses.map(course => (
           <Link

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { ChevronDown } from 'lucide-react';
 import { useStudyClassForm } from '@/hooks';
-import { SpinLoader } from '@/components';
+import { SpinLoaderAnimation } from '@/components';
 
 export default function CreateStudyClassClientPage() {
   const {
@@ -25,7 +25,7 @@ export default function CreateStudyClassClientPage() {
   if (isLoading) {
     return (
       <div className='text-center mt-8 text-foreground'>
-        <SpinLoader />
+        <SpinLoaderAnimation />
       </div>
     );
   }

@@ -9,6 +9,18 @@ export const metadata: Metadata = {
     template: 'Study System | %s',
   },
   description: 'Manage students, professors, and courses.',
+  icons: {
+    icon: [
+      {
+        url: '/images/logo-light-batista-reviver.svg',
+        media: '(prefers-color-scheme: light)',
+      },
+      {
+        url: '/images/logo-dark-batista-reviver.svg',
+        media: '(prefers-color-scheme: dark)',
+      },
+    ],
+  },
 };
 
 /**
@@ -45,9 +57,7 @@ export default function RootLayout({
   return (
     <html lang='en' suppressHydrationWarning>
       <body>
-        {/* Run the theme script immediately */}
         <ThemeScript />
-
         <QueryProvider>
           <NavBar />
           {children}

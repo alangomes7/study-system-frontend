@@ -3,6 +3,7 @@
 import { ChevronDown } from 'lucide-react';
 import type { useStudentsPageHandlers } from '../hooks/useStudentsPageHandlers';
 import type { useStudentsPageData } from '../hooks/useStudentsPageData';
+import clsx from 'clsx';
 
 type Props = {
   ui: ReturnType<typeof useStudentsPageData>['ui'];
@@ -66,7 +67,7 @@ export default function StudentsHeader({ ui, handlers }: Props) {
         <input
           type='text'
           placeholder='Search by student name...'
-          className='input w-full sm:w-auto'
+          className={clsx('input w-full sm:w-auto', 'input-search')}
           value={searchTerm}
           onChange={handleSearchChange}
         />

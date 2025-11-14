@@ -61,7 +61,7 @@ export default function CreateCourseForm() {
                 name={field.name}
                 value={formData[field.name]}
                 onChange={handleChange}
-                className='input'
+                className='input-form'
                 rows={4}
                 disabled={isSubmitting}
                 aria-invalid={!!errors[field.name]}
@@ -77,7 +77,7 @@ export default function CreateCourseForm() {
                 name={field.name}
                 value={formData[field.name]}
                 onChange={handleChange}
-                className='input'
+                className='input-form'
                 disabled={isSubmitting}
                 aria-invalid={!!errors[field.name]}
                 aria-describedby={

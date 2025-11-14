@@ -7,7 +7,7 @@ import { useState, useMemo } from 'react';
 
 import { useGetAllStudyClasses, useGetStudentsByStudyClass } from '@/hooks';
 import { StudyClass } from '@/types';
-import { SpinLoader } from '@/components';
+import { SpinLoaderAnimation } from '@/components';
 
 export default function StudyClassesClientPage() {
   const [selectedStudyClass, setSelectedStudyClass] =
@@ -68,11 +68,7 @@ export default function StudyClassesClientPage() {
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   if (isClassesLoading) {
-    return (
-      <div className='text-center mt-8 text-foreground'>
-        <SpinLoader />
-      </div>
-    );
+    return <SpinLoaderAnimation className={clsx('scale-60')} />;
   }
 
   return (
@@ -81,11 +77,11 @@ export default function StudyClassesClientPage() {
         <h1 className='text-2xl font-bold md:text-3xl text-foreground'>
           Study Classes
         </h1>
-        <Link href='/study-classes/create' className='btn btn-primary'>
+        <Link href='/manage/create/study-class' className='btn btn-primary'>
           Create New Class
         </Link>
       </div>
-
+      {/* '/study-classes/create' */}
       <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
         {/* Class List */}
         <div className='md:col-span-1'>
@@ -97,7 +93,7 @@ export default function StudyClassesClientPage() {
             id='class-search'
             name='class-search'
             placeholder='Search by class code...'
-            className='input mb-4'
+            className={clsx('input w-full mb-4 sm:w-auto', 'input-search')}
             value={studyClassSearchTerm}
             onChange={e => setStudyClassSearchTerm(e.target.value)}
           />
@@ -213,7 +209,7 @@ export default function StudyClassesClientPage() {
                     id='student-search'
                     name='student-search'
                     placeholder='Search by student name'
-                    className='input w-full sm:w-auto'
+                    className={clsx('input w-full sm:w-auto', 'input-search')}
                     value={studentSearchTerm}
                     onChange={e => setStudentSearchTerm(e.target.value)}
                   />
@@ -223,7 +219,7 @@ export default function StudyClassesClientPage() {
               {/* Students Table */}
               {isStudentsLoading ? (
                 <div className='text-center p-6 text-foreground'>
-                  <SpinLoader />
+                  <SpinLoaderAnimation />
                 </div>
               ) : filteredStudents.length > 0 ? (
                 <>

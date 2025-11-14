@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import CoursesClientPage from './courses-client';
+import CoursesClientPage from './CoursesClientPage';
 
 export const metadata: Metadata = {
   title: 'Courses',

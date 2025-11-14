@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import ErrorLayout from '@/components/ErrorLayout';
+import { ErrorLayout, ErrorAnimation } from '@/components';
 import clsx from 'clsx';
 
 interface ErrorPageProps {
@@ -23,16 +23,17 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
       <ErrorLayout
         title='Oops!'
         subtitle='Something went wrong while loading this page.'
-        message={error.message || 'Unknown error occurred.'}
+        message={'Error: ' + error.message || 'Unknown error occurred.'}
+        animation={<ErrorAnimation />}
+        animationSize={{ width: 256, height: 256 }}
         tone='destructive'
-        animationSrc='/animations/Error-animation.json'
         actions={
           <>
             <button
               onClick={reset}
               className={clsx('btn', 'btn-primary', 'inline-block')}
             >
-              Try Again
+              Try again
             </button>
             <button
               onClick={() => router.push('/')}
