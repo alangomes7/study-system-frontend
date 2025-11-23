@@ -4,6 +4,8 @@ export interface Student {
   phone: string;
   email: string;
   register: string;
+  subscriptionId?: number;
+  subscriptionDate?: string;
 }
 
 export type StudentCreationData = Omit<Student, 'id'>;

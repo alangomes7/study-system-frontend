@@ -2,8 +2,8 @@
 
 import { ChevronDown } from 'lucide-react';
 import React from 'react';
-import { Student } from '../types';
 import { DropdownType } from '@/stores/types';
+import { Student } from '@/types';
 
 type Props = {
   openDropdown: DropdownType;

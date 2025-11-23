@@ -3,11 +3,12 @@
 import { ArrowUp, ArrowDown } from 'lucide-react';
 import { DotsAnimation } from '@/components';
 import React from 'react';
-import { Student, SortConfig } from '../types';
+import { SortConfig } from '../types';
 import { DropdownType } from '@/stores/types';
 import { StudentTableSearch } from './StudentTableSearch';
 import { StudentTablePagination } from './StudentTablePagination';
 import { useRouter } from 'next/navigation';
+import { Student } from '@/types';
 
 interface StudyClass {
   year: number;
@@ -127,21 +128,24 @@ export function EnrolledStudentsTable({
           <div className='overflow-x-auto bg-card-background rounded-lg border border-border shadow'>
             <table className='min-w-full border-collapse'>
               <thead>
-                <tr className='border-b border-border'>
+                <tr className='border-b border-border items-center'>
                   {[
                     { label: 'ID', key: 'id' },
                     { label: 'Name', key: 'name' },
                     { label: 'E-mail', key: 'email' },
                     { label: 'Register (CPF)', key: 'register' },
+                    { label: 'Enrolled At', key: 'subscriptionDate' },
                   ].map(header => (
                     <th
                       key={header.key}
-                      className='py-3 px-4 text-left text-foreground/80 cursor-pointer hover:text-foreground'
+                      // Changed text-left to text-center
+                      className='py-3 px-4 text-center text-foreground/80 cursor-pointer hover:text-foreground'
                       onClick={() =>
                         requestSort(header.key as keyof Student, sortConfig)
                       }
                     >
-                      <span className='flex items-center gap-2'>
+                      {/* Added justify-center to center the label and icon */}
+                      <span className='flex items-center justify-center gap-2'>
                         {header.label}
                         {getSortIcon(header.key as keyof Student)}
                       </span>
@@ -156,17 +160,23 @@ export function EnrolledStudentsTable({
                     className='hover:bg-foreground/5 border-b border-border cursor-pointer'
                     onClick={() => handleRowClick(student.id)}
                   >
-                    <td className='py-3 px-4 text-foreground text-left'>
+                    {/* Changed text-left to text-center for all cells */}
+                    <td className='py-3 px-4 text-foreground text-center'>
                       {student.id}
                     </td>
-                    <td className='py-3 px-4 text-foreground text-left'>
+                    <td className='py-3 px-4 text-foreground text-center'>
                       {student.name}
                     </td>
-                    <td className='py-3 px-4 text-foreground text-left'>
+                    <td className='py-3 px-4 text-foreground text-center'>
                       {student.email}
                     </td>
-                    <td className='py-3 px-4 text-foreground text-left'>
+                    <td className='py-3 px-4 text-foreground text-center'>
                       {student.register}
+                    </td>
+                    <td className='py-3 px-4 text-foreground text-center'>
+                      {student.subscriptionDate
+                        ? new Date(student.subscriptionDate).toLocaleString()
+                        : '-'}
                     </td>
                   </tr>
                 ))}

@@ -7,7 +7,7 @@ import {
   useCreateSubscription,
 } from '@/hooks';
 import { useSubscribeFormStore, useEnrolledTableStore } from '@/stores';
-import { Student } from '../types';
+import { Student } from '@/types';
 
 export function useSubscribeStudentData() {
   // --- UI State (from Zustand) ---
@@ -68,7 +68,8 @@ export function useSubscribeStudentData() {
   } = useCreateSubscription({
     onSuccess: () => {
       resetStudentSelection();
-      setSortConfig({ key: 'id', direction: 'descending' });
+      // Change sort to subscriptionId descending to show newest first
+      setSortConfig({ key: 'subscriptionId', direction: 'descending' });
     },
   });
 
@@ -162,17 +163,26 @@ export function useSubscribeStudentData() {
     const sortableStudents = [...filteredEnrolledStudents];
     if (sortConfig !== null) {
       sortableStudents.sort((a, b) => {
-        // Handle 'id' sorting as numbers ---
-        if (sortConfig.key === 'id') {
+        const key = sortConfig.key;
+
+        // Handle numeric fields
+        if (key === 'id' || key === 'subscriptionId') {
+          const valA = a[key] || 0;
+          const valB = b[key] || 0;
           return sortConfig.direction === 'ascending'
-            ? a.id - b.id
-            : b.id - a.id;
+            ? valA - valB
+            : valB - valA;
         }
 
-        if (a[sortConfig.key] < b[sortConfig.key]) {
+        // Handle string fields
+        // Use empty string as fallback for undefined/null values
+        const valA = (a[key] ?? '').toString();
+        const valB = (b[key] ?? '').toString();
+
+        if (valA < valB) {
           return sortConfig.direction === 'ascending' ? -1 : 1;
         }
-        if (a[sortConfig.key] > b[sortConfig.key]) {
+        if (valA > valB) {
           return sortConfig.direction === 'ascending' ? 1 : -1;
         }
         return 0;

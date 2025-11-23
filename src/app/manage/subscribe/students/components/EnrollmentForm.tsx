@@ -27,7 +27,7 @@ export function EnrollmentForm() {
   } = useCreateSubscription({
     onSuccess: () => {
       resetStudentSelection();
-      setSortConfig({ key: 'id', direction: 'descending' });
+      setSortConfig({ key: 'subscriptionDate', direction: 'descending' });
     },
   });
 

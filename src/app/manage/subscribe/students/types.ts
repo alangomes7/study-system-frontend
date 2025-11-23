@@ -1,3 +1,5 @@
+import { Student } from '@/types';
+
 type SetState<T> = React.Dispatch<React.SetStateAction<T>>;
 
 export type DropdownType =
@@ -10,14 +12,6 @@ export type DropdownType =
 export interface SortConfig<T> {
   key: keyof T;
   direction: 'ascending' | 'descending';
-}
-
-export interface Student {
-  id: number;
-  name: string;
-  phone: string;
-  email: string;
-  register: string;
 }
 
 export interface SubscriptionHandlersParams {

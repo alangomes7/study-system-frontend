@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from './queryKeys';
 import * as api from '@/lib/api';
 import { Subscription, Student, SubscriptionCreationData } from '@/types';
+import { useMemo } from 'react';
 
 export const useGetSubscriptionsByStudyClass = (
   studyClassId: number | null,
@@ -37,8 +38,24 @@ export const useGetStudentsByStudyClass = (studyClassId: number | null) => {
     enabled: !!subscriptions && subscriptions.length > 0,
   });
 
+  // Merge subscription info into student data
+  const studentsWithSubscription = useMemo(() => {
+    if (!students || !subscriptions) return [];
+
+    return students.map(student => {
+      const subscription = subscriptions.find(
+        sub => sub.studentId === student.id,
+      );
+      return {
+        ...student,
+        subscriptionId: subscription?.id,
+        subscriptionDate: subscription?.date,
+      };
+    });
+  }, [students, subscriptions]);
+
   return {
-    data: subscriptions?.length === 0 ? [] : students,
+    data: subscriptions?.length === 0 ? [] : studentsWithSubscription,
     isLoading: isLoadingSubscriptions || isLoadingStudents,
     error: subscriptionsError || studentsError,
   };

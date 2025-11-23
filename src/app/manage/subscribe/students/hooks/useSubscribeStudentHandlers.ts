@@ -1,6 +1,6 @@
+import { Student } from '@/types';
 import {
   SortConfig,
-  Student,
   SubscriptionHandlers,
   SubscriptionHandlersParams,
 } from '../types';
