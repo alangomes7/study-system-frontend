@@ -1,17 +1,19 @@
 'use client';
 
-import { UserForm, SpinLoader } from '@/components';
+import { UserForm, SpinLoaderAnimation } from '@/components';
 import { useGetStudent } from '@/hooks';
+import clsx from 'clsx';
 import { useRouter } from 'next/navigation';
 import { use } from 'react';
 
 export default function EditStudentPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const router = useRouter();
   const { id } = use(params);
+
   const studentId = Number(id);
 
   const { data: student, isLoading, error } = useGetStudent(studentId);
@@ -19,23 +21,15 @@ export default function EditStudentPage({
   if (isLoading) {
     return (
       <div className='container mx-auto px-4 py-8 text-center'>
-        <SpinLoaderAnimationq>
+        <SpinLoaderAnimation
+          className={clsx('flex h-60 items-center justify-center')}
+        />
       </div>
     );
   }
 
   if (error) {
-    return (
-      <div className='container mx-auto px-4 py-8 text-center'>
-        <p className='text-red-500'>Error: {error.message}</p>
-        <button
-          onClick={() => router.back()}
-          className='btn border border-border hover:bg-foreground/5 mt-4'
-        >
-          Back
-        </button>
-      </div>
-    );
+    throw new Error(error.message);
   }
 
   if (!student) {
@@ -57,7 +51,7 @@ export default function EditStudentPage({
       userType='student'
       title='Edit Student'
       user={student}
-      submitLabel='Update Student'
+      submitLabel={`Update Student ${student.name}`}
     />
   );
 }

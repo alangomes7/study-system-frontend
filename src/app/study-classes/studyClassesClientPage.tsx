@@ -68,7 +68,11 @@ export default function StudyClassesClientPage() {
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   if (isClassesLoading) {
-    return <SpinLoaderAnimation className={clsx('scale-60')} />;
+    return (
+      <SpinLoaderAnimation
+        className={clsx('flex h-60 items-center justify-center')}
+      />
+    );
   }
 
   return (
@@ -219,7 +223,7 @@ export default function StudyClassesClientPage() {
               {/* Students Table */}
               {isStudentsLoading ? (
                 <div className='text-center p-6 text-foreground'>
-                  <SpinLoaderAnimation />
+                  <SpinLoaderAnimation className={clsx('')} />
                 </div>
               ) : filteredStudents.length > 0 ? (
                 <>

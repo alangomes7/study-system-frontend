@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import React from 'react';
 
 type Props = {
@@ -21,7 +22,7 @@ export function StudentTableSearch({
         type='text'
         id='table-search'
         placeholder='Search enrolled students...'
-        className='input max-w-sm'
+        className={clsx('input max-w-sm', 'input-search')}
         value={tableSearchTerm}
         onChange={e => setTableSearchTerm(e.target.value)}
       />

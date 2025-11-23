@@ -19,7 +19,11 @@ export default function CoursesClientPage() {
   );
 
   if (isLoading) {
-    return <SpinLoaderAnimation className={clsx('scale-60')} />;
+    return (
+      <SpinLoaderAnimation
+        className={clsx('flex h-60 items-center justify-center')}
+      />
+    );
   }
 
   if (error) {

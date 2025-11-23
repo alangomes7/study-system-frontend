@@ -1,6 +1,8 @@
 'use client';
 
 import { useCourseForm } from '@/hooks';
+import { useRouter } from 'next/navigation';
+import { DotsAnimation } from '@/components';
 
 type CourseFormState = {
   name: string;
@@ -17,6 +19,7 @@ interface FieldConfig {
 }
 
 export default function CreateCourseForm() {
+  const router = useRouter();
   const {
     formData,
     errors,
@@ -98,13 +101,34 @@ export default function CreateCourseForm() {
           </div>
         ))}
 
-        <button
-          type='submit'
-          className='btn btn-primary disabled:opacity-50'
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? 'Creating...' : 'Create Course'}
-        </button>
+        {/* Buttons */}
+        <div className='flex items-center gap-4 pt-2'>
+          {/* --- SUBMIT BUTTON --- */}
+          <button
+            type='submit'
+            className='btn btn-primary'
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <>
+                {/* 2. LAYOUT SUGGESTION */}
+                <DotsAnimation className='w-4 h-4 mr-2' />
+                Creating...
+              </>
+            ) : (
+              'Create Course'
+            )}
+          </button>
+
+          {/* --- CANCEL BUTTON --- */}
+          <button
+            type='button'
+            onClick={() => router.back()}
+            className='btn border border-border hover:bg-foreground/5'
+          >
+            Cancel
+          </button>
+        </div>
       </form>
     </div>
   );

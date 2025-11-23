@@ -3,6 +3,8 @@
 import { IMaskInput } from 'react-imask';
 import { useUserForm } from '@/hooks/index';
 import { Student, Professor } from '@/types';
+import { DotsAnimation } from '@/components';
+import { useRouter } from 'next/navigation';
 
 type UserFormState = {
   name: string;
@@ -26,6 +28,7 @@ export default function UserForm({
   user = null,
   submitLabel,
 }: UserFormProps) {
+  const router = useRouter();
   const {
     formData,
     errors,
@@ -130,14 +133,33 @@ export default function UserForm({
             )}
           </div>
         ))}
+        {/* Buttons */}
+        <div className='flex items-center gap-4 pt-2'>
+          {/* --- SUBMIT BUTTON --- */}
+          <button
+            type='submit'
+            className='btn btn-primary'
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <span className='flex items-center gap-2'>
+                <DotsAnimation className='w-4 h-4' />
+                {`${inProgressLabel}...`}
+              </span>
+            ) : (
+              `${buttonLabel}`
+            )}
+          </button>
 
-        <button
-          type='submit'
-          className='btn btn-primary disabled:opacity-50'
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? `${inProgressLabel}...` : buttonLabel}
-        </button>
+          {/* --- CANCEL BUTTON --- */}
+          <button
+            type='button'
+            onClick={() => router.back()}
+            className='btn border border-border hover:bg-foreground/5'
+          >
+            Cancel
+          </button>
+        </div>
       </form>
     </div>
   );

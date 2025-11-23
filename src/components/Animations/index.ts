@@ -13,3 +13,4 @@
 export { default as SpinLoaderAnimation } from './SpinLoaderAnimation';
 export { default as ErrorAnimation } from './ErrorAnimation';
 export { default as NotFoundAnimation } from './NotFoundAnimation';
+export { default as DotsAnimation } from './DotsAnimation';

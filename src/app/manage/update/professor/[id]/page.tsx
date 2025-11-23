@@ -1,6 +1,6 @@
 'use client';
 
-import { UserForm, SpinLoader } from '@/components';
+import { UserForm, SpinLoaderAnimation } from '@/components';
 import { useGetProfessor } from '@/hooks';
 import { useRouter } from 'next/navigation';
 import { use } from 'react';
@@ -8,7 +8,7 @@ import { use } from 'react';
 export default function UpdateProfessorClientPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const router = useRouter();
   const { id } = use(params);
@@ -19,7 +19,7 @@ export default function UpdateProfessorClientPage({
   if (isLoading) {
     return (
       <div className='container mx-auto px-4 py-8 text-center'>
-        <SpinLoaderAnimationq>
+        <SpinLoaderAnimation />
       </div>
     );
   }
@@ -57,7 +57,7 @@ export default function UpdateProfessorClientPage({
       userType='professor'
       title='Edit Professor'
       user={professor}
-      submitLabel='Update Professor'
+      submitLabel={`Update Professor ${professor.name}`}
     />
   );
 }

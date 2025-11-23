@@ -7,7 +7,7 @@ import { AnimationProps } from '../types';
 export default function DotsAnimation({ className = '' }: AnimationProps) {
   return (
     <AnimatedJson
-      path='/animations/Dots-animation.json'
+      path='/animations/Dots-Loading.json'
       className={clsx(className)}
     />
   );

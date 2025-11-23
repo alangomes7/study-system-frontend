@@ -4,7 +4,7 @@ import { ChevronDown } from 'lucide-react';
 import clsx from 'clsx';
 import React from 'react';
 import { useGetCourses } from '@/hooks';
-import { SpinLoaderAnimation } from '@/components';
+import { DotsAnimation } from '@/components';
 import { useSubscribeFormStore } from '@/stores';
 
 export function CourseDropdown() {
@@ -47,7 +47,7 @@ export function CourseDropdown() {
           )}
         >
           {isLoading ? (
-            <SpinLoaderAnimation className='w-4 h-4 mr-2' />
+            <DotsAnimation className='w-4 h-4 mr-2' />
           ) : (
             selectedCourseName
           )}

@@ -1,9 +1,10 @@
 'use client';
 
 import { ArrowUp, ArrowDown } from 'lucide-react';
-import { SpinLoaderAnimation } from '@/components';
+import { DotsAnimation } from '@/components';
 import React from 'react';
-import { Student, SortConfig, DropdownType } from '../types';
+import { Student, SortConfig } from '../types';
+import { DropdownType } from '@/stores/types';
 import { StudentTableSearch } from './StudentTableSearch';
 import { StudentTablePagination } from './StudentTablePagination';
 import { useRouter } from 'next/navigation';
@@ -81,7 +82,7 @@ export function EnrolledStudentsTable({
   if (isLoadingEnrolledStudents) {
     return (
       <div className='text-center'>
-        <SpinLoaderAnimation />
+        <DotsAnimation />
       </div>
     );
   }

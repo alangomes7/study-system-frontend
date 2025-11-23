@@ -1,7 +1,8 @@
 'use client';
 
-import { SpinLoader } from '@/components';
+import { SpinLoaderAnimation } from '@/components';
 import { useGetProfessor } from '@/hooks';
+import clsx from 'clsx';
 import Link from 'next/link';
 import { use } from 'react';
 
@@ -17,7 +18,9 @@ export default function ProfessorDetailsPage({
   if (isLoading) {
     return (
       <div className='container mx-auto px-4 py-8 text-center'>
-        <SpinLoaderAnimationq>
+        <SpinLoaderAnimation
+          className={clsx('flex h-60 items-center justify-center')}
+        />
       </div>
     );
   }

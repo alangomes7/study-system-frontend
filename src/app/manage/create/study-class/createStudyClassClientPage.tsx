@@ -1,11 +1,12 @@
 'use client';
 
-import Link from 'next/link';
 import { ChevronDown } from 'lucide-react';
 import { useStudyClassForm } from '@/hooks';
-import { SpinLoaderAnimation } from '@/components';
+import { DotsAnimation, SpinLoaderAnimation } from '@/components';
+import { useRouter } from 'next/navigation';
 
 export default function CreateStudyClassClientPage() {
+  const router = useRouter();
   const {
     formData,
     setFormField,
@@ -359,19 +360,31 @@ export default function CreateStudyClassClientPage() {
 
         {/* Buttons */}
         <div className='flex items-center gap-4 pt-2'>
+          {/* --- SUBMIT BUTTON --- */}
           <button
             type='submit'
             className='btn btn-primary'
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Creating...' : 'Create Class'}
+            {isSubmitting ? (
+              <>
+                {/* 2. LAYOUT SUGGESTION */}
+                <DotsAnimation className='w-4 h-4 mr-2' />
+                Creating...
+              </>
+            ) : (
+              'Create Class'
+            )}
           </button>
-          <Link
-            href='/study-classes'
+
+          {/* --- CANCEL BUTTON --- */}
+          <button
+            type='button'
+            onClick={() => router.back()}
             className='btn border border-border hover:bg-foreground/5'
           >
             Cancel
-          </Link>
+          </button>
         </div>
       </form>
     </div>

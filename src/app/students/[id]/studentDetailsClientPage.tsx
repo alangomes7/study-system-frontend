@@ -1,7 +1,8 @@
 'use client';
 
-import { SpinLoader } from '@/components';
+import { SpinLoaderAnimation } from '@/components';
 import { useGetStudent } from '@/hooks';
+import clsx from 'clsx';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -12,7 +13,9 @@ export default function StudenteDetailsClientPage({ id }: { id: number }) {
   if (isLoading) {
     return (
       <div className='container mx-auto px-4 py-8 text-center'>
-        <SpinLoaderAnimationq>
+        <SpinLoaderAnimation
+          className={clsx('flex h-60 items-center justify-center')}
+        />
       </div>
     );
   }
