@@ -2,7 +2,7 @@
 
 import { IMaskInput } from 'react-imask';
 import { useUserForm } from '@/hooks/index';
-import { Student, Professor } from '@/types';
+import { Student, Professor, UserType } from '@/types';
 import { DotsAnimation } from '@/components';
 import { useRouter } from 'next/navigation';
 
@@ -16,7 +16,7 @@ type UserFormState = {
 type UserFormField = keyof UserFormState;
 
 interface UserFormProps {
-  userType: 'student' | 'professor';
+  userType: UserType;
   title: string;
   user?: Student | Professor | null;
   submitLabel?: string;

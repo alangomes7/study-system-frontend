@@ -8,9 +8,7 @@ import {
   useUpdateStudent,
   useUpdateProfessor,
 } from '@/hooks';
-import { Student, Professor } from '@/types';
-
-type UserType = 'student' | 'professor';
+import { Student, Professor, UserType } from '@/types';
 
 type UseUserFormProps = {
   userType: UserType;

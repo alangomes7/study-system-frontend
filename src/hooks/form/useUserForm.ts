@@ -1,10 +1,8 @@
 'use client';
 
-import { Student, Professor } from '@/types';
+import { Student, Professor, UserType } from '@/types';
 import { useUserFormData } from './data/useUserFormData';
 import { useUserFormHandlers } from './handler/useUserFormHandlers';
-
-type UserType = 'student' | 'professor';
 
 type UseUserFormProps = {
   userType: UserType;

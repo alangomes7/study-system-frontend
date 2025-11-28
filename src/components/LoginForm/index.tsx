@@ -43,7 +43,7 @@ export default function LoginForm() {
         <div className='text-center space-y-2'>
           <h1 className='text-3xl font-bold text-foreground'>Welcome!</h1>
           <p className='text-sm text-muted-foreground'>
-            Enter your email and password to sign in
+            Enter your email and password to login
           </p>
         </div>
 
@@ -66,18 +66,10 @@ export default function LoginForm() {
             />
           </div>
           <div className='space-y-2'>
-            <div className='flex items-center justify-between'>
-              <label htmlFor='password' className='labelForm'>
-                Password
-              </label>
+            <label htmlFor='password' className='labelForm'>
+              Password
+            </label>
 
-              <Link
-                href='/forgot-password'
-                className='text-sm text-primary hover:underline'
-              >
-                Forgot password?
-              </Link>
-            </div>
             <input
               id='password'
               name='password'
@@ -90,6 +82,12 @@ export default function LoginForm() {
               onChange={handleChange}
               disabled={isSubmitting}
             />
+            <Link
+              href='/forgot-password'
+              className='text-sm text-primary hover:underline'
+            >
+              Forgot password?
+            </Link>
           </div>
 
           <button
@@ -97,7 +95,7 @@ export default function LoginForm() {
             className='btn btn-primary w-full'
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Signing in...' : 'Sign in'}
+            {isSubmitting ? 'Loging in...' : 'Login'}
           </button>
         </form>
       </div>
