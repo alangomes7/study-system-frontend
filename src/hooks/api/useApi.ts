@@ -1,88 +1,102 @@
 'use client';
 
-import { FetchPaginated } from '@/types';
+import { useCallback } from 'react';
 import useFetchWithAuth from './useFetchWithAuth';
 import { API_BASE_URL } from '@/lib/api/client';
 
+/**
+ * Generic hook for interacting with RESTful API endpoints.
+ * @param endpoint The base endpoint (e.g., '/students', '/courses').
+ */
 const useApi = <T>(endpoint: string) => {
   const { fetchWithAuth } = useFetchWithAuth();
-  const fullUrl = `${API_BASE_URL}${endpoint}`;
+  const baseUrl = `${API_BASE_URL}${endpoint}`;
 
   const handleResponse = async (response: Response) => {
     if (!response.ok) {
-      // If 401/403, fetchWithAuth already handled the redirect.
-      // We return here to stop execution if needed, or handle other errors (400, 404, 500)
-
+      // 401/403 are handled by fetchWithAuth usually, but we check here too
       const errorData = await response.json().catch(() => null);
-
-      if (errorData && Object.keys(errorData).length > 0) {
-        throw errorData;
+      if (errorData && errorData.message) {
+        throw new Error(errorData.message);
       } else {
         throw new Error(
-          `Unknown error: ${response.statusText} - Status code: ${response.status}`,
+          `Request failed: ${response.statusText} (${response.status})`,
         );
       }
     }
-
-    // Return void if 204 No Content, otherwise parse JSON
     if (response.status === 204) return null;
-    return await response.json();
+    return response.json();
   };
 
-  const update = async (obj: T) => {
-    const response = await fetchWithAuth(fullUrl, {
-      method: 'PUT',
-      headers: {
-        'Content-type': 'application/json',
-      },
-      body: JSON.stringify(obj),
-    });
-
-    return handleResponse(response);
-  };
-
-  const fetchPaginated = async (
-    queryString: Record<string, string | number | boolean>, // Expanded type to accept numbers/booleans
-  ): Promise<FetchPaginated<T>> => {
-    // Convert all values to strings for URLSearchParams
-    const params = new URLSearchParams();
-    Object.entries(queryString).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        params.append(key, String(value));
+  const findAll = useCallback(
+    async (params?: Record<string, string | number | boolean>) => {
+      let url = baseUrl;
+      if (params) {
+        const searchParams = new URLSearchParams();
+        Object.entries(params).forEach(([key, value]) => {
+          if (value !== undefined && value !== null) {
+            searchParams.append(key, String(value));
+          }
+        });
+        url += `/${searchParams.toString()}`;
       }
-    });
+      const response = await fetchWithAuth(url);
+      console.log(url);
+      return handleResponse(response);
+    },
+    [baseUrl, fetchWithAuth],
+  );
 
-    // Note: Kept '/paginacao' as it likely refers to a specific backend route.
-    // Change to '/pagination' only if your API endpoint supports it.
-    const response = await fetchWithAuth(
-      `${fullUrl}/paginacao?${params.toString()}`,
-    );
+  const findById = useCallback(
+    async (id: number | string) => {
+      const response = await fetchWithAuth(`${baseUrl}/${id}`);
+      return handleResponse(response);
+    },
+    [baseUrl, fetchWithAuth],
+  );
 
-    return handleResponse(response);
-  };
+  const create = useCallback(
+    async (data: any) => {
+      const response = await fetchWithAuth(baseUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      return handleResponse(response);
+    },
+    [baseUrl, fetchWithAuth],
+  );
 
-  // Optional: You might want these methods too for a full API hook
-  const create = async (obj: T) => {
-    const response = await fetchWithAuth(fullUrl, {
-      method: 'POST',
-      headers: { 'Content-type': 'application/json' },
-      body: JSON.stringify(obj),
-    });
-    return handleResponse(response);
-  };
+  const update = useCallback(
+    async (id: number | string, data: any) => {
+      const response = await fetchWithAuth(`${baseUrl}/${id}`, {
+        method: 'PUT', // Defaulting to PUT for updates
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      return handleResponse(response);
+    },
+    [baseUrl, fetchWithAuth],
+  );
 
-  const remove = async (id: number | string) => {
-    const response = await fetchWithAuth(`${fullUrl}/${id}`, {
-      method: 'DELETE',
-    });
-    return handleResponse(response);
-  };
+  const remove = useCallback(
+    async (id: number | string) => {
+      const response = await fetchWithAuth(`${baseUrl}/${id}`, {
+        method: 'DELETE',
+      });
+      return handleResponse(response);
+    },
+    [baseUrl, fetchWithAuth],
+  );
 
   return {
+    findAll,
+    findById,
+    create,
     update,
-    fetchPaginated,
-    create, // Exporting the new optional method
-    remove, // Exporting the new optional method
+    remove,
+    fetchWithAuth, // Expose for custom calls if needed
+    baseUrl,
   };
 };
 

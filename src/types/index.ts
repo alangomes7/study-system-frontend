@@ -29,3 +29,6 @@ export * from './fetchPaginated';
 
 // Export types from tokenResponse.ts
 export * from './tokenResponse';
+
+// Export types from userApp.ts
+export * from './userApp';

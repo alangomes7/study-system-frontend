@@ -13,9 +13,6 @@ const useFetchWithAuth = () => {
   const router = useRouter();
 
   const fetchWithAuth = async (url: string, options?: RequestInit) => {
-    console.log('Entrou em fetchWithAuth - url = ', url);
-    console.log('Entrou em fetchWithAuth - options = ', options);
-
     const token = tokenResponse.token;
 
     let newHeaders: Record<string, string> = {};
@@ -35,9 +32,6 @@ const useFetchWithAuth = () => {
       headers: newHeaders,
     };
 
-    console.log('url da requisição = ', url);
-    console.log('options da requisição = ', finalOptions);
-
     const response = await fetch(url, finalOptions);
 
     if (!response.ok) {
@@ -52,7 +46,7 @@ const useFetchWithAuth = () => {
         );
         setTokenResponse({ token: '', idUsuario: 0, nome: '', role: '' });
 
-        router.push('/login');
+        router.push('/authentication/login');
       } else {
         const errorData = await response.json().catch(() => null);
 

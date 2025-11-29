@@ -15,3 +15,4 @@ export * from './studyClass';
 export * from './professor';
 export * from './student';
 export * from './subscription';
+export * from './userApp';

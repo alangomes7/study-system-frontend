@@ -3,8 +3,9 @@
 import Link from 'next/link';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
-import { MenuIcon, XIcon } from 'lucide-react';
+import { MenuIcon, XIcon, User } from 'lucide-react';
 import { ButtonTheme } from '@/components';
+import useTokenStore from '@/stores/TokenStore';
 
 export default function NavBar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,13 +13,10 @@ export default function NavBar() {
   const [isManageOpen, setIsManageOpen] = useState(false);
   const [isSubscribeOpen, setIsSubscribeOpen] = useState(false);
 
-  // State for closing animation
   const [isClosing, setIsClosing] = useState(false);
   const animationDuration = 500;
 
-  // --- mounted state ---
   const [mounted, setMounted] = useState(false);
-  // Default to false (desktop) to match server render
   const [isMobile, setIsMobile] = useState(false);
 
   const createMenuRef = useRef<HTMLDivElement>(null);
@@ -26,13 +24,15 @@ export default function NavBar() {
   const subscribeMenuRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLDivElement>(null);
 
-  // --- Get current path ---
   const pathname = usePathname();
 
-  // --- Set mounted and THEN check mobile ---
-  useEffect(() => {
-    setMounted(true); // Signal client mount
+  const { tokenResponse } = useTokenStore();
+  const { nome, role, token } = tokenResponse;
+  const isLoggedIn = !!token;
+  const isAdmin = role === 'ADMIN';
 
+  useEffect(() => {
+    setMounted(true);
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     handleResize();
     window.addEventListener('resize', handleResize);
@@ -52,7 +52,6 @@ export default function NavBar() {
     }, animationDuration);
   }, [isClosing]);
 
-  // Handle click outside (for menus)
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -89,19 +88,16 @@ export default function NavBar() {
     }
   }, [mounted, isOpen, handleCloseMenu]);
 
-  // --- Base and Active Link Styles ---
   const navLinkClass =
     'text-sm font-medium text-foreground/80 hover:text-foreground transition-all px-3 py-2 rounded-md hover:bg-foreground/5';
   const menuItemClass =
     'block px-4 py-2 text-sm text-foreground hover:bg-foreground/10 rounded-md';
 
-  // --- Active class styles ---
   const activeNavLinkClass =
     'text-sm font-medium text-primary font-semibold transition-all bg-primary/10 px-3 py-2 rounded-md';
   const activeMenuItemClass =
     'block px-4 py-2 text-sm text-primary bg-primary/10 rounded-md';
 
-  // --- Logic for active dropdowns ---
   const isManageActive = pathname.startsWith('/manage');
   const isCreateActive = pathname.startsWith('/manage/create');
   const isSubscribeActive = pathname.startsWith('/manage/subscribe');
@@ -112,12 +108,10 @@ export default function NavBar() {
       className='relative bg-background border-b border-border z-50'
     >
       <div className='flex items-center justify-between p-4'>
-        {/* Left section */}
         <div className='flex items-center space-x-4'>
           <ButtonTheme />
           <Link
             href='/'
-            // --- Conditional style for Home ---
             className={
               pathname === '/'
                 ? 'text-lg font-bold text-primary transition-colors'
@@ -128,12 +122,9 @@ export default function NavBar() {
           </Link>
         </div>
 
-        {/* Desktop Menu */}
         <div className='hidden md:flex items-center space-x-2'>
-          {' '}
           <Link
             href='/courses'
-            // --- Conditional style ---
             className={
               pathname.startsWith('/courses')
                 ? activeNavLinkClass
@@ -144,7 +135,6 @@ export default function NavBar() {
           </Link>
           <Link
             href='/professors'
-            // --- Conditional style ---
             className={
               pathname.startsWith('/professors')
                 ? activeNavLinkClass
@@ -155,7 +145,6 @@ export default function NavBar() {
           </Link>
           <Link
             href='/students'
-            // --- Conditional style ---
             className={
               pathname.startsWith('/students')
                 ? activeNavLinkClass
@@ -166,7 +155,6 @@ export default function NavBar() {
           </Link>
           <Link
             href='/study-classes'
-            // --- Conditional style ---
             className={
               pathname.startsWith('/study-classes')
                 ? activeNavLinkClass
@@ -175,6 +163,7 @@ export default function NavBar() {
           >
             Study Classes
           </Link>
+
           <div
             ref={manageMenuRef}
             className='relative'
@@ -183,7 +172,6 @@ export default function NavBar() {
           >
             <button
               onClick={() => isMobile && setIsManageOpen(!isManageOpen)}
-              // --- active logic ---
               className={`${
                 isManageActive ? activeNavLinkClass : navLinkClass
               } w-full`}
@@ -191,12 +179,12 @@ export default function NavBar() {
               Manage
             </button>
 
-            {/* Dropdown Content */}
             {isManageOpen && (
               <div className='absolute right-0 w-56 bg-card-background border border-border rounded-md shadow-lg py-1 p-1 z-50 animate-dropdown-in'>
                 <p className='px-4 py-2 text-xs font-semibold text-foreground/60'>
                   Create
                 </p>
+
                 <Link
                   href='/manage/create/student'
                   className={
@@ -247,10 +235,26 @@ export default function NavBar() {
                 >
                   Student Groups
                 </Link>
+
+                {isAdmin && (
+                  <Link
+                    href='/manage/create/user'
+                    className={
+                      pathname === '/manage/create/user'
+                        ? activeMenuItemClass
+                        : menuItemClass
+                    }
+                  >
+                    Register User (Admin)
+                  </Link>
+                )}
+
                 <div className='my-1 border-t border-border' />
+
                 <p className='px-4 py-2 text-xs font-semibold text-foreground/60'>
                   Enroll
                 </p>
+
                 <Link
                   href='/manage/subscribe/students'
                   className={
@@ -274,28 +278,37 @@ export default function NavBar() {
               </div>
             )}
           </div>
+
           <Link
             href='/about'
-            // --- Conditional style ---
-            className={pathname == '/about' ? activeNavLinkClass : navLinkClass}
+            className={
+              pathname === '/about' ? activeNavLinkClass : navLinkClass
+            }
           >
             About
           </Link>
         </div>
 
-        <div className='hidden md:block'>
-          <Link
-            href='/login'
-            // --- Conditional style ---
-            className={`btn btn-primary ${
-              pathname === '/login' ? 'opacity-75' : ''
-            }`}
-          >
-            Login
-          </Link>
+        <div className='hidden md:flex items-center'>
+          {isLoggedIn ? (
+            <div className='flex items-center gap-2 px-4 py-2 text-sm text-foreground bg-card-background border border-border rounded-md shadow-sm'>
+              <User className='w-4 h-4 text-primary' />
+              <span>
+                Hello, <span className='font-semibold'>{nome}</span>
+              </span>
+            </div>
+          ) : (
+            <Link
+              href='/authentication/login'
+              className={`btn btn-primary ${
+                pathname === '/authentication/login' ? 'opacity-75' : ''
+              }`}
+            >
+              Login
+            </Link>
+          )}
         </div>
 
-        {/* ... Mobile menu button ... */}
         <div className='md:hidden'>
           {!mounted ? (
             <div className='h-6 w-6' />
@@ -314,10 +327,9 @@ export default function NavBar() {
         </div>
       </div>
 
-      {/* --- Mobile Menu Drawer --- */}
       {mounted && (isOpen || isClosing) && (
         <div
-          className={`fixed inset-0 z-40 bg-black/30 backdrop-blur-xs flex justify-end ${
+          className={`fixed inset-0 z-40 bg-black/30 backdrop-blur-sm flex justify-end ${
             isClosing ? 'animate-fade-out' : 'animate-fade-in'
           }`}
         >
@@ -339,6 +351,7 @@ export default function NavBar() {
             >
               Courses
             </Link>
+
             <Link
               href='/professors'
               className={
@@ -350,6 +363,7 @@ export default function NavBar() {
             >
               Professors
             </Link>
+
             <Link
               href='/students'
               className={
@@ -361,6 +375,7 @@ export default function NavBar() {
             >
               Students
             </Link>
+
             <Link
               href='/study-classes'
               className={
@@ -385,7 +400,6 @@ export default function NavBar() {
 
               {isManageOpen && (
                 <div className='pl-2 space-y-1 animate-accordion-down animate-fade-in'>
-                  {/* --- Create Sub-menu --- */}
                   <div ref={createMenuRef}>
                     <button
                       onClick={() => setIsCreateOpen(!isCreateOpen)}
@@ -395,6 +409,7 @@ export default function NavBar() {
                     >
                       Create
                     </button>
+
                     {isCreateOpen && (
                       <div className='pl-4 space-y-1 animate-accordion-down animate-fade-in'>
                         <Link
@@ -408,6 +423,7 @@ export default function NavBar() {
                         >
                           Create Student
                         </Link>
+
                         <Link
                           href='/manage/create/professor'
                           className={
@@ -419,6 +435,7 @@ export default function NavBar() {
                         >
                           Create Professor
                         </Link>
+
                         <Link
                           href='/manage/create/course'
                           className={
@@ -430,6 +447,7 @@ export default function NavBar() {
                         >
                           Create Course
                         </Link>
+
                         <Link
                           href='/manage/create/study-class'
                           className={
@@ -441,6 +459,7 @@ export default function NavBar() {
                         >
                           Create Study Class
                         </Link>
+
                         <Link
                           href='/manage/create/study-class/student-group'
                           className={
@@ -453,11 +472,24 @@ export default function NavBar() {
                         >
                           Student Groups
                         </Link>
+
+                        {isAdmin && (
+                          <Link
+                            href='/manage/create/user'
+                            className={
+                              pathname === '/manage/create/user'
+                                ? activeMenuItemClass
+                                : menuItemClass
+                            }
+                            onClick={handleCloseMenu}
+                          >
+                            Register User (Admin)
+                          </Link>
+                        )}
                       </div>
                     )}
                   </div>
 
-                  {/* --- Subscribe Sub-menu --- */}
                   <div ref={subscribeMenuRef}>
                     <button
                       onClick={() => setIsSubscribeOpen(!isSubscribeOpen)}
@@ -469,6 +501,7 @@ export default function NavBar() {
                     >
                       Enroll
                     </button>
+
                     {isSubscribeOpen && (
                       <div className='pl-4 space-y-1 animate-accordion-down animate-fade-in'>
                         <Link
@@ -482,6 +515,7 @@ export default function NavBar() {
                         >
                           Enroll Student
                         </Link>
+
                         <Link
                           href='/manage/subscribe/professor'
                           className={
@@ -502,23 +536,31 @@ export default function NavBar() {
 
             <Link
               href='/about'
-              // --- Conditional style ---
               className={`${
-                pathname == '/about' ? activeMenuItemClass : menuItemClass
+                pathname === '/about' ? activeMenuItemClass : menuItemClass
               } border-t border-border`}
               onClick={handleCloseMenu}
             >
               About
             </Link>
 
-            <div className='border-t border-border pt-2'>
-              <Link
-                href='/login'
-                className='btn btn-primary w-full'
-                onClick={handleCloseMenu}
-              >
-                Login
-              </Link>
+            <div className='border-t border-border pt-4 mt-2'>
+              {isLoggedIn ? (
+                <div className='flex items-center justify-center gap-2 p-3 bg-card-background border border-border rounded-md shadow-sm'>
+                  <User className='w-5 h-5 text-primary' />
+                  <span className='text-foreground'>
+                    Hello, <span className='font-bold'>{nome}</span>
+                  </span>
+                </div>
+              ) : (
+                <Link
+                  href='/authentication/login'
+                  className='btn btn-primary w-full'
+                  onClick={handleCloseMenu}
+                >
+                  Login
+                </Link>
+              )}
             </div>
           </div>
         </div>

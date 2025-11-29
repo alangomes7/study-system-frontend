@@ -22,4 +22,5 @@ export const queryKeys = {
     'bySubscriptions',
     subscriptionIds,
   ],
+  userApps: ['userApps'],
 } as const;

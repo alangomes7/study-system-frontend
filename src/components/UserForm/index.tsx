@@ -18,7 +18,7 @@ type UserFormField = keyof UserFormState;
 interface UserFormProps {
   userType: UserType;
   title: string;
-  user?: Student | Professor | null;
+  user?: Student | Professor | User | null;
   submitLabel?: string;
 }
 

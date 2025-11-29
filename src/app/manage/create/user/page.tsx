@@ -6,5 +6,5 @@ export const metadata: Metadata = {
 };
 
 export default function CreateUserPage() {
-  return <UserForm userType='USER' title='Create New USER Account' />;
+  return <UserForm userType='User' title='Create New USER Account' />;
 }

@@ -2,26 +2,23 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from './queryKeys';
-import * as api from '@/lib/api';
-import {
-  Student,
-  CreateStudentOptions,
-  StudentCreationData,
-  Professor,
-} from '@/types';
+import useApi from './useApi';
+import { Student, CreateStudentOptions, StudentCreationData } from '@/types';
 import { useRouter } from 'next/navigation';
 
 export const useGetAllStudents = () => {
+  const { findAll } = useApi<Student>('/students');
   return useQuery<Student[], Error>({
     queryKey: queryKeys.students,
-    queryFn: api.getAllStudents,
+    queryFn: () => findAll(),
   });
 };
 
 export const useGetStudent = (id: number) => {
+  const { findById } = useApi<Student>('/students');
   return useQuery<Student, Error>({
     queryKey: queryKeys.student(id),
-    queryFn: () => api.getStudent(id),
+    queryFn: () => findById(id),
     enabled: !!id,
   });
 };
@@ -29,48 +26,29 @@ export const useGetStudent = (id: number) => {
 export const useCreateStudent = (options?: CreateStudentOptions) => {
   const queryClient = useQueryClient();
   const router = useRouter();
+  const { create } = useApi<Student>('/students');
 
   return useMutation<Student, Error, StudentCreationData>({
-    mutationFn: api.createStudent,
+    mutationFn: data => create(data),
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.students });
       options?.onSuccess?.(data, variables, context);
-      router.push(`/students/${data.id}`);
+      router.push(`/students/\${data.id}`);
     },
   });
 };
 
-/**
- * Hook for updating an existing student.
- */
 export const useUpdateStudent = (id: number) => {
   const queryClient = useQueryClient();
   const router = useRouter();
+  const { update } = useApi<Student>('/students');
 
   return useMutation<Student, Error, StudentCreationData>({
-    mutationFn: studentData => api.updateStudent(id, studentData),
+    mutationFn: studentData => update(id, studentData),
     onSuccess: data => {
       queryClient.setQueryData(queryKeys.student(id), data);
       queryClient.invalidateQueries({ queryKey: queryKeys.students });
-      router.push(`/students/${id}`);
+      router.push(`/students/\${id}`);
     },
   });
 };
-
-// /**
-//  * Hook for updating an existing professor.
-//  * (This is a logical place to add it for completeness)
-//  */
-// export const useUpdateProfessor = (id: number) => {
-//   const queryClient = useQueryClient();
-//   const router = useRouter();
-
-//   return useMutation<Professor, Error, StudentCreationData>({
-//     mutationFn: professorData => api.updateProfessor(id, professorData),
-//     onSuccess: data => {
-//       queryClient.setQueryData(queryKeys.professor(id), data);
-//       queryClient.invalidateQueries({ queryKey: queryKeys.professors });
-//       router.push(`/professors/${id}`);
-//     },
-//   });
-// };

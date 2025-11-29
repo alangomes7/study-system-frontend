@@ -1,1 +1,1 @@
-export type UserType = 'student' | 'professor' | 'USER' | 'ADMIN';
+export type UserType = 'Student' | 'Professor' | 'User' | 'ADMIN';
