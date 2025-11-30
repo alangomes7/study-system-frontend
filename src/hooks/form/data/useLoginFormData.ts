@@ -22,7 +22,7 @@ export function useLoginFormData() {
       router.push('/');
     },
     onError: (error: Error) => {
-      console.error(error);
+      // Removed console.error to avoid treating handled logic (401) as a crash
       toast.error(error.message || 'Login failed. Please try again.');
     },
   });

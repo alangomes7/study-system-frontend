@@ -23,7 +23,10 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
       <ErrorLayout
         title='Oops!'
         subtitle='Something went wrong while loading this page.'
-        message={'Error: ' + error.message || 'Unknown error occurred.'}
+        // Fix: Correctly check for error.message existence
+        message={
+          error.message ? `Error: ${error.message}` : 'Unknown error occurred.'
+        }
         animation={<ErrorAnimation />}
         animationSize={{ width: 256, height: 256 }}
         tone='destructive'
