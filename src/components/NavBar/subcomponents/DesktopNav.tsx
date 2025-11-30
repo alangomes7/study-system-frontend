@@ -3,22 +3,18 @@ import { usePathname } from 'next/navigation';
 import { NavLinks } from './NavLinks';
 import { AuthButtons } from './AuthButtons';
 import { STYLES, NAV_LINKS } from '../types/constants';
-import { SessionData, NavState, NavActions, NavRefs } from '../types/types';
+import { SessionData, NavRefs } from '../types/types';
+import { useNavUiStore } from '../stores/useNavUiStore';
 
 interface DesktopNavProps {
   session: SessionData;
-  state: NavState;
-  actions: NavActions;
   refs: NavRefs;
+  onLogout: () => void;
 }
 
-export const DesktopNav = ({
-  session,
-  state,
-  actions,
-  refs,
-}: DesktopNavProps) => {
+export const DesktopNav = ({ session, refs, onLogout }: DesktopNavProps) => {
   const pathname = usePathname();
+  const { isManageOpen, setManageOpen, isMobile } = useNavUiStore();
   const isManageActive = pathname.startsWith('/manage');
 
   return (
@@ -29,8 +25,8 @@ export const DesktopNav = ({
         <div
           ref={refs.manageMenuRef}
           className='relative'
-          onMouseEnter={() => actions.setIsManageOpen(true)}
-          onMouseLeave={() => actions.setIsManageOpen(false)}
+          onMouseEnter={() => !isMobile && setManageOpen(true)}
+          onMouseLeave={() => !isMobile && setManageOpen(false)}
         >
           <button
             className={`${
@@ -40,7 +36,7 @@ export const DesktopNav = ({
             Manage
           </button>
 
-          {state.isManageOpen && (
+          {isManageOpen && (
             <div className='absolute right-0 w-56 bg-card-background border border-border rounded-md shadow-lg py-1 p-1 z-50 animate-dropdown-in'>
               <p className='px-4 py-2 text-xs font-semibold text-foreground/60'>
                 Create
@@ -105,7 +101,7 @@ export const DesktopNav = ({
       </Link>
 
       <div className='ml-2'>
-        <AuthButtons session={session} onLogout={actions.handleLogout} />
+        <AuthButtons session={session} onLogout={onLogout} />
       </div>
     </div>
   );

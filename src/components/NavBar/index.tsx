@@ -5,68 +5,24 @@ import { usePathname } from 'next/navigation';
 import { MenuIcon, XIcon } from 'lucide-react';
 import { ButtonTheme } from '@/components';
 
-// Hooks
-import { useNavState } from './hooks/data/useNavState';
+// 1. Hooks
 import { useNavSession } from './hooks/data/useNavSession';
-import { useMenuLogic } from './hooks/handler/useMenuLogic';
+import { useMenuHandler } from './hooks/handler/useMenuHandler';
+import { useNavUiStore } from './stores/useNavUiStore';
 
-// Components
+// 2. Components
 import { DesktopNav } from './subcomponents/DesktopNav';
 import { MobileNav } from './subcomponents/MobileNav';
 
 export default function NavBar() {
-  // 1. Data Hooks
-  const {
-    isOpen,
-    setIsOpen,
-    isCreateOpen,
-    setIsCreateOpen,
-    isManageOpen,
-    setIsManageOpen,
-    isSubscribeOpen,
-    setIsSubscribeOpen,
-    isClosing,
-    setIsClosing,
-    mounted,
-    isMobile,
-  } = useNavState();
-
-  const { name, isLoggedIn, isAdmin, logout } = useNavSession();
   const pathname = usePathname();
 
-  // Aggregate state for passing down
-  const navState = {
-    isOpen,
-    isCreateOpen,
-    isManageOpen,
-    isSubscribeOpen,
-    isClosing,
-    mounted,
-    isMobile,
-  };
-  const session = { name, isLoggedIn, isAdmin };
+  // Zustand Store for UI State
+  const { isOpen, setIsOpen, mounted } = useNavUiStore();
 
-  // 2. Handler Hooks
-  const { handleCloseMenu, handleLogout, refs } = useMenuLogic({
-    state: navState,
-    setters: {
-      setIsOpen,
-      setIsClosing,
-      setIsCreateOpen,
-      setIsManageOpen,
-      setIsSubscribeOpen,
-    },
-    logout,
-  });
-
-  const navActions = {
-    setIsOpen,
-    setIsCreateOpen,
-    setIsManageOpen,
-    setIsSubscribeOpen,
-    handleCloseMenu,
-    handleLogout,
-  };
+  // Custom Hooks
+  const { session, logout } = useNavSession();
+  const { handleCloseMenu, refs } = useMenuHandler();
 
   return (
     <nav
@@ -90,12 +46,7 @@ export default function NavBar() {
         </div>
 
         {/* Desktop Navigation */}
-        <DesktopNav
-          session={session}
-          state={navState}
-          actions={navActions}
-          refs={refs}
-        />
+        <DesktopNav session={session} refs={refs} onLogout={logout} />
 
         {/* Mobile Toggle Button */}
         <div className='md:hidden'>
@@ -119,9 +70,9 @@ export default function NavBar() {
       {/* Mobile Drawer */}
       <MobileNav
         session={session}
-        state={navState}
-        actions={navActions}
         refs={refs}
+        onClose={handleCloseMenu}
+        onLogout={logout}
       />
     </nav>
   );

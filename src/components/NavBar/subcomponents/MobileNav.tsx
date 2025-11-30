@@ -3,45 +3,51 @@ import { usePathname } from 'next/navigation';
 import { NavLinks } from './NavLinks';
 import { AuthButtons } from './AuthButtons';
 import { STYLES, NAV_LINKS } from '../types/constants';
-import { SessionData, NavState, NavActions, NavRefs } from '../types/types';
+import { SessionData, NavRefs } from '../types/types';
+import { useNavUiStore } from '../stores/useNavUiStore';
 
 interface MobileNavProps {
   session: SessionData;
-  state: NavState;
-  actions: NavActions;
   refs: NavRefs;
+  onClose: () => void;
+  onLogout: () => void;
 }
 
 export const MobileNav = ({
   session,
-  state,
-  actions,
   refs,
+  onClose,
+  onLogout,
 }: MobileNavProps) => {
   const pathname = usePathname();
-  const isManageActive = pathname.startsWith('/manage');
+  const store = useNavUiStore();
 
-  if (!state.mounted || (!state.isOpen && !state.isClosing)) return null;
+  const isManageActive = pathname.startsWith('/manage');
+  const isCreateActive = pathname.startsWith('/manage/create');
+  const isSubscribeActive = pathname.startsWith('/manage/subscribe');
+
+  // Should render?
+  if (!store.mounted || (!store.isOpen && !store.isClosing)) return null;
 
   return (
     <div
       className={`fixed inset-0 z-40 bg-black/30 backdrop-blur-sm flex justify-end ${
-        state.isClosing ? 'animate-fade-out' : 'animate-fade-in'
+        store.isClosing ? 'animate-fade-out' : 'animate-fade-in'
       }`}
     >
-      <div className='flex-1' onClick={actions.handleCloseMenu} />
+      <div className='flex-1' onClick={onClose} />
 
       <div
         className={`w-3/4 sm:w-2/5 h-full bg-background border-l border-border shadow-xl p-4 space-y-2 overflow-y-auto ${
-          state.isClosing ? 'animate-slide-out' : 'animate-slide-in'
+          store.isClosing ? 'animate-slide-out' : 'animate-slide-in'
         }`}
       >
-        <NavLinks isMobile onLinkClick={actions.handleCloseMenu} />
+        <NavLinks isMobile onLinkClick={onClose} />
 
         {session.isLoggedIn && (
           <div ref={refs.manageMenuRef} className='border-t border-border pt-2'>
             <button
-              onClick={() => actions.setIsManageOpen(!state.isManageOpen)}
+              onClick={store.toggleManageOpen}
               className={`w-full text-left font-semibold mb-1 px-4 py-2 ${
                 isManageActive ? 'text-primary' : 'text-foreground/70'
               }`}
@@ -49,28 +55,30 @@ export const MobileNav = ({
               Manage
             </button>
 
-            {state.isManageOpen && (
+            {store.isManageOpen && (
               <div className='pl-2 space-y-1 animate-accordion-down animate-fade-in'>
-                {/* Create Accordion */}
+                {/* Create Section */}
                 <div ref={refs.createMenuRef}>
                   <button
-                    onClick={() => actions.setIsCreateOpen(!state.isCreateOpen)}
-                    className='w-full text-left font-semibold mb-1 px-2 py-2 text-foreground/70'
+                    onClick={store.toggleCreateOpen}
+                    className={`w-full text-left font-semibold mb-1 px-2 py-2 ${
+                      isCreateActive ? 'text-primary' : 'text-foreground/70'
+                    }`}
                   >
                     Create
                   </button>
-                  {state.isCreateOpen && (
+                  {store.isCreateOpen && (
                     <div className='pl-4 space-y-1 animate-accordion-down animate-fade-in'>
                       {NAV_LINKS.create.map(link => (
                         <Link
                           key={link.href}
                           href={link.href}
-                          onClick={actions.handleCloseMenu}
                           className={
                             pathname === link.href
                               ? STYLES.activeMenuItem
                               : STYLES.menuItem
                           }
+                          onClick={onClose}
                         >
                           {link.label}
                         </Link>
@@ -78,12 +86,12 @@ export const MobileNav = ({
                       {session.isAdmin && (
                         <Link
                           href='/manage/create/user'
-                          onClick={actions.handleCloseMenu}
                           className={
                             pathname === '/manage/create/user'
                               ? STYLES.activeMenuItem
                               : STYLES.menuItem
                           }
+                          onClick={onClose}
                         >
                           Register User (Admin)
                         </Link>
@@ -92,28 +100,28 @@ export const MobileNav = ({
                   )}
                 </div>
 
-                {/* Enroll Accordion */}
+                {/* Enroll Section */}
                 <div ref={refs.subscribeMenuRef}>
                   <button
-                    onClick={() =>
-                      actions.setIsSubscribeOpen(!state.isSubscribeOpen)
-                    }
-                    className='w-full text-left font-semibold mb-1 px-2 py-2 text-foreground/70'
+                    onClick={store.toggleSubscribeOpen}
+                    className={`w-full text-left font-semibold mb-1 px-2 py-2 ${
+                      isSubscribeActive ? 'text-primary' : 'text-foreground/70'
+                    }`}
                   >
                     Enroll
                   </button>
-                  {state.isSubscribeOpen && (
+                  {store.isSubscribeOpen && (
                     <div className='pl-4 space-y-1 animate-accordion-down animate-fade-in'>
                       {NAV_LINKS.enroll.map(link => (
                         <Link
                           key={link.href}
                           href={link.href}
-                          onClick={actions.handleCloseMenu}
                           className={
                             pathname === link.href
                               ? STYLES.activeMenuItem
                               : STYLES.menuItem
                           }
+                          onClick={onClose}
                         >
                           {link.label}
                         </Link>
@@ -131,17 +139,13 @@ export const MobileNav = ({
           className={`${
             pathname === '/about' ? STYLES.activeMenuItem : STYLES.menuItem
           } border-t border-border`}
-          onClick={actions.handleCloseMenu}
+          onClick={onClose}
         >
           About
         </Link>
 
         <div className='border-t border-border pt-4 mt-2'>
-          <AuthButtons
-            session={session}
-            onLogout={actions.handleLogout}
-            isMobile
-          />
+          <AuthButtons session={session} onLogout={onLogout} isMobile />
         </div>
       </div>
     </div>
