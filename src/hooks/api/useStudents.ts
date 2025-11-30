@@ -1,54 +1,59 @@
 'use client';
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useApi } from './useApi';
 import { queryKeys } from './queryKeys';
-import useApi from '../../lib/api/useApi';
 import { Student, CreateStudentOptions, StudentCreationData } from '@/types';
 import { useRouter } from 'next/navigation';
 
+const STUDENT_ENDPOINT = '/students';
+
 export const useGetAllStudents = () => {
-  const { findAll } = useApi<Student>('/students');
-  return useQuery<Student[], Error>({
+  return useApi<Student>({
+    endpoint: STUDENT_ENDPOINT,
     queryKey: queryKeys.students,
-    queryFn: () => findAll(),
-  });
+  }).useGetAll();
 };
 
 export const useGetStudent = (id: number) => {
-  const { findById } = useApi<Student>('/students');
-  return useQuery<Student, Error>({
-    queryKey: queryKeys.student(id),
-    queryFn: () => findById(id),
-    enabled: !!id,
-  });
+  return useApi<Student>({
+    endpoint: STUDENT_ENDPOINT,
+    queryKey: queryKeys.students,
+  }).useGetOne(id);
 };
 
 export const useCreateStudent = (options?: CreateStudentOptions) => {
-  const queryClient = useQueryClient();
   const router = useRouter();
-  const { create } = useApi<Student>('/students');
 
-  return useMutation<Student, Error, StudentCreationData>({
-    mutationFn: data => create(data),
+  return useApi<Student, StudentCreationData>({
+    endpoint: STUDENT_ENDPOINT,
+    queryKey: queryKeys.students,
+  }).useCreate({
+    ...options,
     onSuccess: (data, variables, context) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.students });
       options?.onSuccess?.(data, variables, context);
-      router.push(`/students/\${data.id}`);
+      router.push(`/students/${data.id}`);
     },
   });
 };
 
 export const useUpdateStudent = (id: number) => {
-  const queryClient = useQueryClient();
   const router = useRouter();
-  const { update } = useApi<Student>('/students');
+  const { useUpdate } = useApi<Student, StudentCreationData>({
+    endpoint: STUDENT_ENDPOINT,
+    queryKey: queryKeys.students,
+  });
 
-  return useMutation<Student, Error, StudentCreationData>({
-    mutationFn: studentData => update(id, studentData),
-    onSuccess: data => {
-      queryClient.setQueryData(queryKeys.student(id), data);
-      queryClient.invalidateQueries({ queryKey: queryKeys.students });
-      router.push(`/students/\${id}`);
+  const mutation = useUpdate({
+    onSuccess: () => {
+      router.push(`/students/${id}`);
     },
   });
+
+  // Wrapper to match previous signature (data only) -> (id + data)
+  return {
+    ...mutation,
+    mutate: (data: StudentCreationData) => mutation.mutate({ id, data }),
+    mutateAsync: (data: StudentCreationData) =>
+      mutation.mutateAsync({ id, data }),
+  };
 };

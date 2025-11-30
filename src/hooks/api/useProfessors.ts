@@ -1,8 +1,7 @@
 'use client';
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useApi } from './useApi';
 import { queryKeys } from './queryKeys';
-import useApi from '../../lib/api/useApi';
 import {
   Professor,
   CreateProfessorOptions,
@@ -10,49 +9,53 @@ import {
 } from '@/types';
 import { useRouter } from 'next/navigation';
 
+const PROFESSOR_ENDPOINT = '/professors';
+
 export const useGetProfessors = () => {
-  const { findAll } = useApi<Professor>('/professors');
-  return useQuery<Professor[], Error>({
+  return useApi<Professor>({
+    endpoint: PROFESSOR_ENDPOINT,
     queryKey: queryKeys.professors,
-    queryFn: () => findAll(),
-  });
+  }).useGetAll();
 };
 
 export const useGetProfessor = (id: number) => {
-  const { findById } = useApi<Professor>('/professors');
-  return useQuery<Professor, Error>({
-    queryKey: queryKeys.professor(id),
-    queryFn: () => findById(id),
-    enabled: !!id,
-  });
+  return useApi<Professor>({
+    endpoint: PROFESSOR_ENDPOINT,
+    queryKey: queryKeys.professors,
+  }).useGetOne(id);
 };
 
 export const useCreateProfessor = (options?: CreateProfessorOptions) => {
-  const queryClient = useQueryClient();
   const router = useRouter();
-  const { create } = useApi<Professor>('/professors');
-
-  return useMutation<Professor, Error, ProfessorCreationData>({
-    mutationFn: data => create(data),
+  return useApi<Professor, ProfessorCreationData>({
+    endpoint: PROFESSOR_ENDPOINT,
+    queryKey: queryKeys.professors,
+  }).useCreate({
+    ...options,
     onSuccess: (data, variables, context) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.professors });
-      router.push('/professors');
       options?.onSuccess?.(data, variables, context);
+      router.push('/professors');
     },
   });
 };
 
 export const useUpdateProfessor = (id: number) => {
-  const queryClient = useQueryClient();
   const router = useRouter();
-  const { update } = useApi<Professor>('/professors');
+  const { useUpdate } = useApi<Professor, ProfessorCreationData>({
+    endpoint: PROFESSOR_ENDPOINT,
+    queryKey: queryKeys.professors,
+  });
 
-  return useMutation<Professor, Error, ProfessorCreationData>({
-    mutationFn: professorData => update(id, professorData),
-    onSuccess: data => {
-      queryClient.setQueryData(queryKeys.professor(id), data);
-      queryClient.invalidateQueries({ queryKey: queryKeys.professors });
-      router.push(`/professors/\${id}`);
+  const mutation = useUpdate({
+    onSuccess: () => {
+      router.push(`/professors/${id}`);
     },
   });
+
+  return {
+    ...mutation,
+    mutate: (data: ProfessorCreationData) => mutation.mutate({ id, data }),
+    mutateAsync: (data: ProfessorCreationData) =>
+      mutation.mutateAsync({ id, data }),
+  };
 };

@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
-import useFetchWithAuth from './useFetchWithAuth';
+import fetchWithAuth from './fetchWithAuth';
 import { API_BASE_URL } from '@/lib/api/client';
 
 /**
@@ -10,8 +10,8 @@ import { API_BASE_URL } from '@/lib/api/client';
  * @template T The entity type returned by the API (e.g., Student, Course).
  * @template TInput The type used for create/update payloads (defaults to Partial<T>).
  */
-const useApi = <T, TInput = Partial<T>>(endpoint: string) => {
-  const { fetchWithAuth } = useFetchWithAuth();
+const fecthApi = <T, TInput = Partial<T>>(endpoint: string) => {
+  const { fetchWithAuth } = fetchWithAuth();
   const baseUrl = `${API_BASE_URL}${endpoint}`;
 
   // 1. Wrap handleResponse in useCallback so it has a stable reference
@@ -107,4 +107,4 @@ const useApi = <T, TInput = Partial<T>>(endpoint: string) => {
   };
 };
 
-export default useApi;
+export default fecthApi;

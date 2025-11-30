@@ -17,3 +17,4 @@ export * from './student';
 export * from './subscription';
 export * from './userApp';
 export * from './auth';
+export * from './fecthApi';

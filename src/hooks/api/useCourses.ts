@@ -1,37 +1,28 @@
 'use client';
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from './queryKeys';
-import useApi from '../../lib/api/useApi';
 import { Course, CourseCreationData, CreateCourseOptions } from '@/types';
+import { useApi } from './useApi';
+
+const COURSE_ENDPOINT = '/courses';
 
 export const useGetCourses = () => {
-  const { findAll } = useApi<Course>('/courses');
-  return useQuery<Course[], Error>({
+  return useApi<Course, CourseCreationData>({
+    endpoint: COURSE_ENDPOINT,
     queryKey: queryKeys.courses,
-    queryFn: () => findAll(),
-  });
+  }).useGetAll();
 };
 
 export const useGetCourse = (id: number) => {
-  const { findById } = useApi<Course>('/courses');
-  return useQuery<Course, Error>({
-    queryKey: queryKeys.course(id),
-    queryFn: () => findById(id),
-    enabled: !!id,
-  });
+  return useApi<Course>({
+    endpoint: COURSE_ENDPOINT,
+    queryKey: queryKeys.courses, // Using base key, useApi appends ID automatically
+  }).useGetOne(id);
 };
 
 export const useCreateCourse = (options?: CreateCourseOptions) => {
-  const queryClient = useQueryClient();
-  const { create } = useApi<Course>('/courses');
-
-  return useMutation<Course, Error, CourseCreationData>({
-    mutationFn: data => create(data),
-    onSuccess: (data, variables, context) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.courses });
-      options?.onSuccess?.(data, variables, context);
-    },
-    onError: options?.onError,
-  });
+  return useApi<Course, CourseCreationData>({
+    endpoint: COURSE_ENDPOINT,
+    queryKey: queryKeys.courses,
+  }).useCreate(options);
 };

@@ -4,7 +4,7 @@ import useLoginStore from '@/stores/loginStore';
 import useTokenStore from '@/stores/TokenStore';
 import { useRouter } from 'next/navigation';
 
-const useFetchWithAuth = () => {
+const fetchWithAuth = () => {
   const setLoginInvalido = useLoginStore(s => s.setInvalidLogin);
   const setMsg = useLoginStore(s => s.setMsg);
   const tokenResponse = useTokenStore(s => s.tokenResponse);
@@ -66,4 +66,4 @@ const useFetchWithAuth = () => {
   return { fetchWithAuth };
 };
 
-export default useFetchWithAuth;
+export default fetchWithAuth;

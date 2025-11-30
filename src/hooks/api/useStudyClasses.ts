@@ -1,39 +1,43 @@
 'use client';
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useApi } from './useApi';
 import { queryKeys } from './queryKeys';
-import useApi from '../../lib/api/useApi';
 import {
   StudyClass,
   CreateStudyClassOptions,
   StudyClassCreationData,
 } from '@/types';
 
+const ENDPOINT = '/study-classes';
+
 export const useGetAllStudyClasses = () => {
-  const { findAll } = useApi<StudyClass>('/study-classes');
-  return useQuery<StudyClass[], Error>({
+  return useApi<StudyClass>({
+    endpoint: ENDPOINT,
     queryKey: queryKeys.studyClasses,
-    queryFn: () => findAll(),
-  });
+  }).useGetAll();
 };
 
 export const useGetStudyClass = (id: number) => {
-  const { findById } = useApi<StudyClass>('/study-classes');
-  return useQuery<StudyClass, Error>({
-    queryKey: queryKeys.studyClass(id),
-    queryFn: () => findById(id),
-    enabled: !!id,
-  });
+  return useApi<StudyClass>({
+    endpoint: ENDPOINT,
+    queryKey: queryKeys.studyClasses,
+  }).useGetOne(id);
 };
 
 export const useGetStudyClassesByCourse = (courseId: number) => {
-  // Accessing a sub-resource manually
-  const { fetchWithAuth, baseUrl } = useApi<StudyClass>('/study-classes');
+  const { raw } = useApi<StudyClass>({
+    endpoint: ENDPOINT,
+    queryKey: queryKeys.studyClasses,
+  });
 
   return useQuery<StudyClass[], Error>({
     queryKey: queryKeys.studyClassesByCourse(courseId),
     queryFn: async () => {
-      const response = await fetchWithAuth(`${baseUrl}/course/${courseId}`);
+      // Accessing a custom sub-resource
+      const response = await raw.fetchWithAuth(
+        `${raw.baseUrl}/course/${courseId}`,
+      );
       if (!response.ok) throw new Error('Failed to fetch study classes');
       return response.json();
     },
@@ -43,45 +47,42 @@ export const useGetStudyClassesByCourse = (courseId: number) => {
 
 export const useCreateStudyClass = (options?: CreateStudyClassOptions) => {
   const queryClient = useQueryClient();
-  const { create } = useApi<StudyClass>('/study-classes');
+  const { useCreate } = useApi<StudyClass, StudyClassCreationData>({
+    endpoint: ENDPOINT,
+    queryKey: queryKeys.studyClasses,
+  });
 
-  return useMutation<StudyClass, Error, StudyClassCreationData>({
+  return useCreate({
     ...options,
-    mutationFn: data => create(data),
     onSuccess: (data, variables, context) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.studyClasses });
+      // Invalidate specific cache keys
       queryClient.invalidateQueries({
         queryKey: queryKeys.studyClassesByCourse(data.courseId),
       });
-
       options?.onSuccess?.(data, variables, context);
-    },
-    onError: (error, variables, context) => {
-      options?.onError?.(error, variables, context);
     },
   });
 };
 
 export const useEnrollProfessor = () => {
   const queryClient = useQueryClient();
-  const { fetchWithAuth, baseUrl } = useApi<StudyClass>('/study-classes');
+  const { raw } = useApi<StudyClass>({
+    endpoint: ENDPOINT,
+    queryKey: queryKeys.studyClasses,
+  });
 
   return useMutation<
     StudyClass,
     Error,
     { studyClassId: number; professorId: number }
   >({
-    mutationFn: async variables => {
-      const response = await fetchWithAuth(
-        `${baseUrl}/\${variables.studyClassId}/professor`,
+    mutationFn: async ({ studyClassId, professorId }) => {
+      const response = await raw.fetchWithAuth(
+        `${raw.baseUrl}/${studyClassId}/professor`,
         {
           method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            professorId: variables.professorId,
-          }),
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ professorId }),
         },
       );
 
