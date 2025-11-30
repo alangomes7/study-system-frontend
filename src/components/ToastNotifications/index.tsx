@@ -1,12 +1,19 @@
+'use client';
+
+import { useEffect } from 'react';
 import { Bounce, toast, ToastContainer } from 'react-toastify';
 
 type ToastNotificationsProps = {
   children: React.ReactNode;
 };
+
 export default function ToastNotifications({
   children,
 }: ToastNotificationsProps) {
-  toast.dismiss();
+  useEffect(() => {
+    toast.dismiss();
+  }, []);
+
   return (
     <>
       {children}
