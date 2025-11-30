@@ -14,23 +14,25 @@ const useApi = <T, TInput = Partial<T>>(endpoint: string) => {
   const { fetchWithAuth } = useFetchWithAuth();
   const baseUrl = `${API_BASE_URL}${endpoint}`;
 
-  // Helper to handle responses and cast them to the expected type R
-  const handleResponse = async <R = T>(response: Response): Promise<R> => {
-    if (!response.ok) {
-      // 401/403 are handled by fetchWithAuth usually, but we check here too
-      const errorData = await response.json().catch(() => null);
-      if (errorData && errorData.message) {
-        throw new Error(errorData.message);
-      } else {
-        throw new Error(
-          `Request failed: ${response.statusText} (${response.status})`,
-        );
+  // 1. Wrap handleResponse in useCallback so it has a stable reference
+  const handleResponse = useCallback(
+    async <R = T>(response: Response): Promise<R> => {
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        if (errorData && errorData.message) {
+          throw new Error(errorData.message);
+        } else {
+          throw new Error(
+            `Request failed: ${response.statusText} (${response.status})`,
+          );
+        }
       }
-    }
-    // Handle 204 No Content
-    if (response.status === 204) return null as R;
-    return response.json();
-  };
+      // Handle 204 No Content
+      if (response.status === 204) return null as R;
+      return response.json();
+    },
+    [],
+  );
 
   const findAll = useCallback(
     async (params?: Record<string, string | number | boolean>) => {
@@ -46,24 +48,22 @@ const useApi = <T, TInput = Partial<T>>(endpoint: string) => {
       }
       const response = await fetchWithAuth(url);
       console.log(url);
-      // Explicitly return an array of T
       return handleResponse<T[]>(response);
     },
-    [baseUrl, fetchWithAuth],
+    // 2. Add handleResponse to dependency array
+    [baseUrl, fetchWithAuth, handleResponse],
   );
 
   const findById = useCallback(
     async (id: number | string) => {
       const response = await fetchWithAuth(`${baseUrl}/${id}`);
-      // Explicitly return a single T
       return handleResponse<T>(response);
     },
-    [baseUrl, fetchWithAuth],
+    [baseUrl, fetchWithAuth, handleResponse],
   );
 
   const create = useCallback(
     async (data: TInput) => {
-      // Typed input data instead of 'any'
       const response = await fetchWithAuth(baseUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -71,12 +71,11 @@ const useApi = <T, TInput = Partial<T>>(endpoint: string) => {
       });
       return handleResponse<T>(response);
     },
-    [baseUrl, fetchWithAuth],
+    [baseUrl, fetchWithAuth, handleResponse],
   );
 
   const update = useCallback(
     async (id: number | string, data: TInput) => {
-      // Typed input data instead of 'any'
       const response = await fetchWithAuth(`${baseUrl}/${id}`, {
         method: 'PUT', // Defaulting to PUT for updates
         headers: { 'Content-Type': 'application/json' },
@@ -84,7 +83,7 @@ const useApi = <T, TInput = Partial<T>>(endpoint: string) => {
       });
       return handleResponse<T>(response);
     },
-    [baseUrl, fetchWithAuth],
+    [baseUrl, fetchWithAuth, handleResponse],
   );
 
   const remove = useCallback(
@@ -94,7 +93,7 @@ const useApi = <T, TInput = Partial<T>>(endpoint: string) => {
       });
       return handleResponse<void>(response);
     },
-    [baseUrl, fetchWithAuth],
+    [baseUrl, fetchWithAuth, handleResponse],
   );
 
   return {
@@ -103,7 +102,7 @@ const useApi = <T, TInput = Partial<T>>(endpoint: string) => {
     create,
     update,
     remove,
-    fetchWithAuth, // Expose for custom calls if needed
+    fetchWithAuth,
     baseUrl,
   };
 };

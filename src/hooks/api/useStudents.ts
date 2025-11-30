@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from './queryKeys';
-import useApi from './useApi';
+import useApi from '../../lib/api/useApi';
 import { Student, CreateStudentOptions, StudentCreationData } from '@/types';
 import { useRouter } from 'next/navigation';
 
