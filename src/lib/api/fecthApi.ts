@@ -1,4 +1,4 @@
-import { fetchWithAuth } from './fetchWithAuth'; // Import your new server-side fetcher
+import { fetchWithAuth } from './fetchWithAuth';
 import { API_BASE_URL } from '@/lib/api/client';
 
 /**
