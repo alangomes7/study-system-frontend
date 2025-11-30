@@ -8,17 +8,27 @@ import {
 } from '@/lib/schemas';
 import { z } from 'zod';
 import { type UseMutationResult } from '@tanstack/react-query';
-import { UserType } from '@/types';
+import {
+  UserType,
+  StudentCreationData,
+  ProfessorCreationData,
+  UserApp,
+} from '@/types';
 
 const unmask = (value: string) => value.replace(/\D/g, '');
-type ValidatedUserData = z.infer<typeof userSchema>;
+
+// Define a union type for all possible mutation variables
+type UserMutationVariables =
+  | StudentCreationData
+  | ProfessorCreationData
+  | Omit<UserApp, 'id'>;
 
 type UseUserFormHandlersProps = {
   formData: userFormData;
   setFormData: React.Dispatch<React.SetStateAction<userFormData>>;
   setErrors: React.Dispatch<React.SetStateAction<userFormErrors>>;
-  mutation: UseMutationResult<unknown, Error, any, unknown>; // Relaxed type to any to support different payloads
-  userType: UserType; // Added userType
+  mutation: UseMutationResult<unknown, Error, UserMutationVariables, unknown>;
+  userType: UserType;
 };
 
 export function useUserFormHandlers({
@@ -76,7 +86,7 @@ export function useUserFormHandlers({
       }
 
       // Prepare payload based on type
-      let payload: any = validationResult.data;
+      let payload: UserMutationVariables;
 
       if (userType === 'User' || userType === 'ADMIN') {
         payload = {
@@ -85,6 +95,8 @@ export function useUserFormHandlers({
           role: userType, // Pass the role
           // Password is optional in UserApp type, backend might handle default
         };
+      } else {
+        payload = validationResult.data;
       }
 
       mutation.mutate(payload);

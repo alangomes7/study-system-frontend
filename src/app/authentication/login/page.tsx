@@ -21,7 +21,7 @@ export default function LoginPage() {
       {/* New Sign Up Section */}
       <div className={clsx('text-center text-sm text-gray-600')}>
         <p>
-          Don't have an account?{' '}
+          Don&apos;t have an account?{' '}
           <Link
             href='/authentication/create-new-account'
             className={clsx(

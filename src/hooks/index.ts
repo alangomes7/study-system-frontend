@@ -38,9 +38,11 @@ export * from './api/useProfessors';
 export * from './api/useStudents';
 export * from './api/useSubscriptions';
 export * from './api/useUserApps';
+export * from './api/useAuth';
 
 // Form Hooks
 export { default as useCourseForm } from './form/useCourseForm';
 export { default as useStudentGroup } from './form/useStudentGroup';
 export { default as useStudyClassForm } from './form/useStudyClassForm';
 export { default as useUserForm } from './form/useUserForm';
+export { default as useLoginForm } from './form/useLoginForm';
