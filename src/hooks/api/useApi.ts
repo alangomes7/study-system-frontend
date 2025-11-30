@@ -7,7 +7,7 @@ import {
   UseQueryOptions,
   UseMutationOptions,
 } from '@tanstack/react-query';
-import fecthApi from '@/lib/api';
+import { useFetchApi } from './useFetchApi';
 
 interface UseApiOptions {
   endpoint: string;
@@ -26,7 +26,7 @@ export function useApi<T, TInput = Partial<T>>({
   queryKey,
 }: UseApiOptions) {
   const { findAll, findById, create, update, remove, fetchWithAuth, baseUrl } =
-    fecthApi<T, TInput>(endpoint);
+    useFetchApi<T, TInput>(endpoint);
   const queryClient = useQueryClient();
   const baseKey = Array.isArray(queryKey) ? queryKey : [queryKey];
 

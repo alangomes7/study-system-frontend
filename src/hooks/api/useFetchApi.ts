@@ -2,6 +2,7 @@
 
 import { useFetchWithAuth } from './useFetchWithAuth';
 import { useCallback } from 'react';
+import { API_BASE_URL } from '@/lib/api/client';
 
 // Defined OUTSIDE the hook to avoid dependency array issues
 const handleResponse = async <R>(response: Response): Promise<R> => {
@@ -22,6 +23,7 @@ const handleResponse = async <R>(response: Response): Promise<R> => {
  */
 export function useFetchApi<T, TInput = Partial<T>>(endpoint: string) {
   const fetchWithAuth = useFetchWithAuth();
+  const baseUrl = `${API_BASE_URL}${endpoint}`;
 
   const findAll = useCallback(
     async (params?: Record<string, string | number | boolean>) => {
@@ -88,5 +90,6 @@ export function useFetchApi<T, TInput = Partial<T>>(endpoint: string) {
     update,
     remove,
     fetchWithAuth,
+    baseUrl,
   };
 }
