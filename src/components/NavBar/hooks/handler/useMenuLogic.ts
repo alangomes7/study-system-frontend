@@ -1,5 +1,5 @@
 import { useCallback, useRef, useEffect } from 'react';
-import { NavState, NavRefs } from '../../types/types';
+import { NavState, NavRefs } from '../../types/types'; // Ensure path is correct
 
 interface UseMenuLogicProps {
   state: NavState;
@@ -14,6 +14,7 @@ interface UseMenuLogicProps {
 }
 
 export const useMenuLogic = ({ state, setters, logout }: UseMenuLogicProps) => {
+  // These create RefObject<HTMLDivElement | null>
   const navRef = useRef<HTMLDivElement>(null);
   const createMenuRef = useRef<HTMLDivElement>(null);
   const manageMenuRef = useRef<HTMLDivElement>(null);
@@ -29,7 +30,7 @@ export const useMenuLogic = ({ state, setters, logout }: UseMenuLogicProps) => {
       setters.setIsCreateOpen(false);
       setters.setIsManageOpen(false);
       setters.setIsSubscribeOpen(false);
-    }, 500); // Animation duration
+    }, 500);
   }, [state.isClosing, setters]);
 
   const handleLogout = () => {
@@ -42,6 +43,7 @@ export const useMenuLogic = ({ state, setters, logout }: UseMenuLogicProps) => {
     function handleClickOutside(event: MouseEvent) {
       const target = event.target as Node;
 
+      // Type guards ensure .current exists before checking .contains
       if (createMenuRef.current && !createMenuRef.current.contains(target)) {
         setters.setIsCreateOpen(false);
       }
@@ -66,6 +68,7 @@ export const useMenuLogic = ({ state, setters, logout }: UseMenuLogicProps) => {
     }
   }, [state.mounted, state.isOpen, handleCloseMenu, setters]);
 
+  // Now compatible with the updated NavRefs interface
   const refs: NavRefs = {
     navRef,
     createMenuRef,
