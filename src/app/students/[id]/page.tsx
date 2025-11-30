@@ -9,17 +9,17 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
 
-  const student = await getStudent(Number(id));
+  try {
+    const student = await getStudent(Number(id));
 
-  if (!student) {
     return {
-      title: 'Students',
+      title: `Student | ${student.name}`,
+    };
+  } catch {
+    return {
+      title: 'Student Details',
     };
   }
-
-  return {
-    title: `Student | ${student.name}`,
-  };
 }
 
 export default async function StudentDetailsPage({ params }: Props) {
