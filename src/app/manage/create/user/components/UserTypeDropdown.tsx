@@ -20,7 +20,7 @@ export function UserTypeDropdown({
   onToggle,
 }: UserTypeDropdownProps) {
   return (
-    <div className='card p-6 mb-6 bg-card-background border border-border shadow-sm rounded-lg'>
+    <div className='card p-6 bg-card-background border border-border shadow-sm rounded-lg'>
       <label className='block text-sm font-medium text-foreground/80 mb-2'>
         Select Account Type
       </label>

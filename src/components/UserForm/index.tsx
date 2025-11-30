@@ -88,7 +88,7 @@ export default function UserForm({
   });
 
   return (
-    <div className='container mx-auto px-4 py-8 max-w-2xl'>
+    <div className='container mx-auto py-2 max-w-2xl'>
       {/* Conditionally render title */}
       {title && (
         <h1 className='text-3xl font-bold mb-6 text-foreground'>{title}</h1>
@@ -98,7 +98,7 @@ export default function UserForm({
 
       <form
         onSubmit={handleSubmit}
-        className='card p-6 bg-card-background border border-border shadow-sm rounded-lg'
+        className='card bg-card-background border border-border shadow-sm rounded-lg'
       >
         {fields.map(field => (
           <div key={field.name} className='mb-4'>
