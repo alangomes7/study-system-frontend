@@ -23,7 +23,7 @@ export default function LoginPage() {
         <p>
           Don't have an account?{' '}
           <Link
-            href='/manage/create/user'
+            href='/authentication/create-new-account'
             className={clsx(
               'font-medium text-blue-600 hover:text-blue-500 hover:underline transition-colors',
             )}

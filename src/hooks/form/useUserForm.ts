@@ -1,17 +1,14 @@
 'use client';
 
-import { Student, Professor, UserType } from '@/types';
+import { Student, Professor, UserType, UserApp } from '@/types';
 import { useUserFormData } from './data/useUserFormData';
 import { useUserFormHandlers } from './handler/useUserFormHandlers';
 
 type UseUserFormProps = {
   userType: UserType;
-  user?: Student | Professor | null;
+  user?: Student | Professor | UserApp | null;
 };
 
-/**
- * Manages state and logic for the user create/edit form.
- */
 export default function useUserForm({ user, userType }: UseUserFormProps) {
   const {
     formData,
@@ -29,6 +26,7 @@ export default function useUserForm({ user, userType }: UseUserFormProps) {
       setFormData,
       setErrors,
       mutation,
+      userType, // Pass userType here
     });
 
   return {

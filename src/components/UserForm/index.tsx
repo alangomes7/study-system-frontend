@@ -2,7 +2,7 @@
 
 import { IMaskInput } from 'react-imask';
 import { useUserForm } from '@/hooks/index';
-import { Student, Professor, UserType } from '@/types';
+import { Student, Professor, UserType, UserApp } from '@/types';
 import { DotsAnimation } from '@/components';
 import { useRouter } from 'next/navigation';
 
@@ -17,9 +17,10 @@ type UserFormField = keyof UserFormState;
 
 interface UserFormProps {
   userType: UserType;
-  title: string;
-  user?: Student | Professor | User | null;
+  title?: string; // Made optional
+  user?: Student | Professor | UserApp | null;
   submitLabel?: string;
+  disableSubmit?: boolean;
 }
 
 export default function UserForm({
@@ -27,6 +28,7 @@ export default function UserForm({
   title,
   user = null,
   submitLabel,
+  disableSubmit = false,
 }: UserFormProps) {
   const router = useRouter();
   const {
@@ -39,7 +41,6 @@ export default function UserForm({
     handleSubmit,
   } = useUserForm({ userType, user });
 
-  // Determine label based on edit mode
   const isEditMode = !!user;
   const inProgressLabel = isEditMode ? 'Updating' : 'Creating';
   const buttonLabel = submitLabel
@@ -57,7 +58,7 @@ export default function UserForm({
     autocomplete?: string;
   };
 
-  const fields: FieldConfig[] = [
+  const allFields: FieldConfig[] = [
     { label: 'Name', name: 'name', type: 'text', autocomplete: 'name' },
     {
       label: 'Phone',
@@ -78,12 +79,27 @@ export default function UserForm({
     },
   ];
 
+  // Filter fields based on userType
+  const fields = allFields.filter(field => {
+    if (userType === 'User' || userType === 'ADMIN') {
+      return field.name !== 'phone' && field.name !== 'register';
+    }
+    return true;
+  });
+
   return (
     <div className='container mx-auto px-4 py-8 max-w-2xl'>
-      <h1 className='text-3xl font-bold mb-6 text-foreground'>{title}</h1>
+      {/* Conditionally render title */}
+      {title && (
+        <h1 className='text-3xl font-bold mb-6 text-foreground'>{title}</h1>
+      )}
+
       {apiError && <p className='text-red-500 mb-4'>{apiError.message}</p>}
 
-      <form onSubmit={handleSubmit} className='card p-6'>
+      <form
+        onSubmit={handleSubmit}
+        className='card p-6 bg-card-background border border-border shadow-sm rounded-lg'
+      >
         {fields.map(field => (
           <div key={field.name} className='mb-4'>
             <label htmlFor={field.name} className='labelForm'>
@@ -133,13 +149,13 @@ export default function UserForm({
             )}
           </div>
         ))}
+
         {/* Buttons */}
         <div className='flex items-center gap-4 pt-2'>
-          {/* --- SUBMIT BUTTON --- */}
           <button
             type='submit'
             className='btn btn-primary'
-            disabled={isSubmitting}
+            disabled={isSubmitting || disableSubmit}
           >
             {isSubmitting ? (
               <span className='flex items-center gap-2'>
@@ -151,7 +167,6 @@ export default function UserForm({
             )}
           </button>
 
-          {/* --- CANCEL BUTTON --- */}
           <button
             type='button'
             onClick={() => router.back()}
