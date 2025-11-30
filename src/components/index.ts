@@ -14,6 +14,7 @@
  *  -  Message
  *  - AnimatedJson
  *  - Animations
+ *  - ToastNotifications
  */
 
 export { default as Logo } from './Logo';
@@ -26,3 +27,4 @@ export { default as ErrorLayout } from './ErrorLayout';
 export { default as AnimatedJson } from './AnimatedJson';
 export * from './Animations';
 export * from './ButtonTheme';
+export { default as ToastNotifications } from './ToastNotifications';
