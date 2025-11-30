@@ -44,7 +44,8 @@ const useFetchWithAuth = () => {
             ? 'É preciso efetuar login para acessar este recurso.'
             : 'Você não tem permissão para acessar este recurso.',
         );
-        setTokenResponse({ token: '', idUsuario: 0, nome: '', role: '' });
+        // UPDATE THIS LINE: Use correct keys for reset
+        setTokenResponse({ token: '', userId: 0, name: '', role: '' });
 
         router.push('/authentication/login');
       } else {

@@ -27,7 +27,7 @@ export default function NavBar() {
   const pathname = usePathname();
 
   const { tokenResponse } = useTokenStore();
-  const { nome, role, token } = tokenResponse;
+  const { name, role, token } = tokenResponse;
   const isLoggedIn = !!token;
   const isAdmin = role === 'ADMIN';
 
@@ -164,120 +164,122 @@ export default function NavBar() {
             Study Classes
           </Link>
 
-          <div
-            ref={manageMenuRef}
-            className='relative'
-            onMouseEnter={() => !isMobile && setIsManageOpen(true)}
-            onMouseLeave={() => !isMobile && setIsManageOpen(false)}
-          >
-            <button
-              onClick={() => isMobile && setIsManageOpen(!isManageOpen)}
-              className={`${
-                isManageActive ? activeNavLinkClass : navLinkClass
-              } w-full`}
+          {isLoggedIn && (
+            <div
+              ref={manageMenuRef}
+              className='relative'
+              onMouseEnter={() => !isMobile && setIsManageOpen(true)}
+              onMouseLeave={() => !isMobile && setIsManageOpen(false)}
             >
-              Manage
-            </button>
+              <button
+                onClick={() => isMobile && setIsManageOpen(!isManageOpen)}
+                className={`${
+                  isManageActive ? activeNavLinkClass : navLinkClass
+                } w-full`}
+              >
+                Manage
+              </button>
 
-            {isManageOpen && (
-              <div className='absolute right-0 w-56 bg-card-background border border-border rounded-md shadow-lg py-1 p-1 z-50 animate-dropdown-in'>
-                <p className='px-4 py-2 text-xs font-semibold text-foreground/60'>
-                  Create
-                </p>
+              {isManageOpen && (
+                <div className='absolute right-0 w-56 bg-card-background border border-border rounded-md shadow-lg py-1 p-1 z-50 animate-dropdown-in'>
+                  <p className='px-4 py-2 text-xs font-semibold text-foreground/60'>
+                    Create
+                  </p>
 
-                <Link
-                  href='/manage/create/student'
-                  className={
-                    pathname === '/manage/create/student'
-                      ? activeMenuItemClass
-                      : menuItemClass
-                  }
-                >
-                  Create Student
-                </Link>
-                <Link
-                  href='/manage/create/professor'
-                  className={
-                    pathname === '/manage/create/professor'
-                      ? activeMenuItemClass
-                      : menuItemClass
-                  }
-                >
-                  Create Professor
-                </Link>
-                <Link
-                  href='/manage/create/course'
-                  className={
-                    pathname === '/manage/create/course'
-                      ? activeMenuItemClass
-                      : menuItemClass
-                  }
-                >
-                  Create Course
-                </Link>
-                <Link
-                  href='/manage/create/study-class'
-                  className={
-                    pathname === '/manage/create/study-class'
-                      ? activeMenuItemClass
-                      : menuItemClass
-                  }
-                >
-                  Create Study Class
-                </Link>
-                <Link
-                  href='/manage/create/study-class/student-group'
-                  className={
-                    pathname === '/manage/create/study-class/student-group'
-                      ? activeMenuItemClass
-                      : menuItemClass
-                  }
-                >
-                  Student Groups
-                </Link>
-
-                {isAdmin && (
                   <Link
-                    href='/manage/create/user'
+                    href='/manage/create/student'
                     className={
-                      pathname === '/manage/create/user'
+                      pathname === '/manage/create/student'
                         ? activeMenuItemClass
                         : menuItemClass
                     }
                   >
-                    Register User (Admin)
+                    Create Student
                   </Link>
-                )}
+                  <Link
+                    href='/manage/create/professor'
+                    className={
+                      pathname === '/manage/create/professor'
+                        ? activeMenuItemClass
+                        : menuItemClass
+                    }
+                  >
+                    Create Professor
+                  </Link>
+                  <Link
+                    href='/manage/create/course'
+                    className={
+                      pathname === '/manage/create/course'
+                        ? activeMenuItemClass
+                        : menuItemClass
+                    }
+                  >
+                    Create Course
+                  </Link>
+                  <Link
+                    href='/manage/create/study-class'
+                    className={
+                      pathname === '/manage/create/study-class'
+                        ? activeMenuItemClass
+                        : menuItemClass
+                    }
+                  >
+                    Create Study Class
+                  </Link>
+                  <Link
+                    href='/manage/create/study-class/student-group'
+                    className={
+                      pathname === '/manage/create/study-class/student-group'
+                        ? activeMenuItemClass
+                        : menuItemClass
+                    }
+                  >
+                    Student Groups
+                  </Link>
 
-                <div className='my-1 border-t border-border' />
+                  {isAdmin && (
+                    <Link
+                      href='/manage/create/user'
+                      className={
+                        pathname === '/manage/create/user'
+                          ? activeMenuItemClass
+                          : menuItemClass
+                      }
+                    >
+                      Register User (Admin)
+                    </Link>
+                  )}
 
-                <p className='px-4 py-2 text-xs font-semibold text-foreground/60'>
-                  Enroll
-                </p>
+                  <div className='my-1 border-t border-border' />
 
-                <Link
-                  href='/manage/subscribe/students'
-                  className={
-                    pathname === '/manage/subscribe/students'
-                      ? activeMenuItemClass
-                      : menuItemClass
-                  }
-                >
-                  Enroll Student
-                </Link>
-                <Link
-                  href='/manage/subscribe/professor'
-                  className={
-                    pathname === '/manage/subscribe/professor'
-                      ? activeMenuItemClass
-                      : menuItemClass
-                  }
-                >
-                  Enroll Professor
-                </Link>
-              </div>
-            )}
-          </div>
+                  <p className='px-4 py-2 text-xs font-semibold text-foreground/60'>
+                    Enroll
+                  </p>
+
+                  <Link
+                    href='/manage/subscribe/students'
+                    className={
+                      pathname === '/manage/subscribe/students'
+                        ? activeMenuItemClass
+                        : menuItemClass
+                    }
+                  >
+                    Enroll Student
+                  </Link>
+                  <Link
+                    href='/manage/subscribe/professor'
+                    className={
+                      pathname === '/manage/subscribe/professor'
+                        ? activeMenuItemClass
+                        : menuItemClass
+                    }
+                  >
+                    Enroll Professor
+                  </Link>
+                </div>
+              )}
+            </div>
+          )}
 
           <Link
             href='/about'
@@ -294,7 +296,7 @@ export default function NavBar() {
             <div className='flex items-center gap-2 px-4 py-2 text-sm text-foreground bg-card-background border border-border rounded-md shadow-sm'>
               <User className='w-4 h-4 text-primary' />
               <span>
-                Hello, <span className='font-semibold'>{nome}</span>
+                Hello, <span className='font-semibold'>{name}</span>
               </span>
             </div>
           ) : (
@@ -388,151 +390,153 @@ export default function NavBar() {
               Study Classes
             </Link>
 
-            <div ref={manageMenuRef} className='border-t border-border pt-2'>
-              <button
-                onClick={() => setIsManageOpen(!isManageOpen)}
-                className={`w-full text-left font-semibold mb-1 px-4 py-2 ${
-                  isManageActive ? 'text-primary' : 'text-foreground/70'
-                }`}
-              >
-                Manage
-              </button>
+            {isLoggedIn && (
+              <div ref={manageMenuRef} className='border-t border-border pt-2'>
+                <button
+                  onClick={() => setIsManageOpen(!isManageOpen)}
+                  className={`w-full text-left font-semibold mb-1 px-4 py-2 ${
+                    isManageActive ? 'text-primary' : 'text-foreground/70'
+                  }`}
+                >
+                  Manage
+                </button>
 
-              {isManageOpen && (
-                <div className='pl-2 space-y-1 animate-accordion-down animate-fade-in'>
-                  <div ref={createMenuRef}>
-                    <button
-                      onClick={() => setIsCreateOpen(!isCreateOpen)}
-                      className={`w-full text-left font-semibold mb-1 px-2 py-2 ${
-                        isCreateActive ? 'text-primary' : 'text-foreground/70'
-                      }`}
-                    >
-                      Create
-                    </button>
+                {isManageOpen && (
+                  <div className='pl-2 space-y-1 animate-accordion-down animate-fade-in'>
+                    <div ref={createMenuRef}>
+                      <button
+                        onClick={() => setIsCreateOpen(!isCreateOpen)}
+                        className={`w-full text-left font-semibold mb-1 px-2 py-2 ${
+                          isCreateActive ? 'text-primary' : 'text-foreground/70'
+                        }`}
+                      >
+                        Create
+                      </button>
 
-                    {isCreateOpen && (
-                      <div className='pl-4 space-y-1 animate-accordion-down animate-fade-in'>
-                        <Link
-                          href='/manage/create/student'
-                          className={
-                            pathname === '/manage/create/student'
-                              ? activeMenuItemClass
-                              : menuItemClass
-                          }
-                          onClick={handleCloseMenu}
-                        >
-                          Create Student
-                        </Link>
-
-                        <Link
-                          href='/manage/create/professor'
-                          className={
-                            pathname === '/manage/create/professor'
-                              ? activeMenuItemClass
-                              : menuItemClass
-                          }
-                          onClick={handleCloseMenu}
-                        >
-                          Create Professor
-                        </Link>
-
-                        <Link
-                          href='/manage/create/course'
-                          className={
-                            pathname === '/manage/create/course'
-                              ? activeMenuItemClass
-                              : menuItemClass
-                          }
-                          onClick={handleCloseMenu}
-                        >
-                          Create Course
-                        </Link>
-
-                        <Link
-                          href='/manage/create/study-class'
-                          className={
-                            pathname === '/manage/create/study-class'
-                              ? activeMenuItemClass
-                              : menuItemClass
-                          }
-                          onClick={handleCloseMenu}
-                        >
-                          Create Study Class
-                        </Link>
-
-                        <Link
-                          href='/manage/create/study-class/student-group'
-                          className={
-                            pathname ===
-                            '/manage/create/study-class/student-group'
-                              ? activeMenuItemClass
-                              : menuItemClass
-                          }
-                          onClick={handleCloseMenu}
-                        >
-                          Student Groups
-                        </Link>
-
-                        {isAdmin && (
+                      {isCreateOpen && (
+                        <div className='pl-4 space-y-1 animate-accordion-down animate-fade-in'>
                           <Link
-                            href='/manage/create/user'
+                            href='/manage/create/student'
                             className={
-                              pathname === '/manage/create/user'
+                              pathname === '/manage/create/student'
                                 ? activeMenuItemClass
                                 : menuItemClass
                             }
                             onClick={handleCloseMenu}
                           >
-                            Register User (Admin)
+                            Create Student
                           </Link>
-                        )}
-                      </div>
-                    )}
+
+                          <Link
+                            href='/manage/create/professor'
+                            className={
+                              pathname === '/manage/create/professor'
+                                ? activeMenuItemClass
+                                : menuItemClass
+                            }
+                            onClick={handleCloseMenu}
+                          >
+                            Create Professor
+                          </Link>
+
+                          <Link
+                            href='/manage/create/course'
+                            className={
+                              pathname === '/manage/create/course'
+                                ? activeMenuItemClass
+                                : menuItemClass
+                            }
+                            onClick={handleCloseMenu}
+                          >
+                            Create Course
+                          </Link>
+
+                          <Link
+                            href='/manage/create/study-class'
+                            className={
+                              pathname === '/manage/create/study-class'
+                                ? activeMenuItemClass
+                                : menuItemClass
+                            }
+                            onClick={handleCloseMenu}
+                          >
+                            Create Study Class
+                          </Link>
+
+                          <Link
+                            href='/manage/create/study-class/student-group'
+                            className={
+                              pathname ===
+                              '/manage/create/study-class/student-group'
+                                ? activeMenuItemClass
+                                : menuItemClass
+                            }
+                            onClick={handleCloseMenu}
+                          >
+                            Student Groups
+                          </Link>
+
+                          {isAdmin && (
+                            <Link
+                              href='/manage/create/user'
+                              className={
+                                pathname === '/manage/create/user'
+                                  ? activeMenuItemClass
+                                  : menuItemClass
+                              }
+                              onClick={handleCloseMenu}
+                            >
+                              Register User (Admin)
+                            </Link>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    <div ref={subscribeMenuRef}>
+                      <button
+                        onClick={() => setIsSubscribeOpen(!isSubscribeOpen)}
+                        className={`w-full text-left font-semibold mb-1 px-2 py-2 ${
+                          isSubscribeActive
+                            ? 'text-primary'
+                            : 'text-foreground/70'
+                        }`}
+                      >
+                        Enroll
+                      </button>
+
+                      {isSubscribeOpen && (
+                        <div className='pl-4 space-y-1 animate-accordion-down animate-fade-in'>
+                          <Link
+                            href='/manage/subscribe/students'
+                            className={
+                              pathname === '/manage/subscribe/students'
+                                ? activeMenuItemClass
+                                : menuItemClass
+                            }
+                            onClick={handleCloseMenu}
+                          >
+                            Enroll Student
+                          </Link>
+
+                          <Link
+                            href='/manage/subscribe/professor'
+                            className={
+                              pathname === '/manage/subscribe/professor'
+                                ? activeMenuItemClass
+                                : menuItemClass
+                            }
+                            onClick={handleCloseMenu}
+                          >
+                            Enroll Professor
+                          </Link>
+                        </div>
+                      )}
+                    </div>
                   </div>
-
-                  <div ref={subscribeMenuRef}>
-                    <button
-                      onClick={() => setIsSubscribeOpen(!isSubscribeOpen)}
-                      className={`w-full text-left font-semibold mb-1 px-2 py-2 ${
-                        isSubscribeActive
-                          ? 'text-primary'
-                          : 'text-foreground/70'
-                      }`}
-                    >
-                      Enroll
-                    </button>
-
-                    {isSubscribeOpen && (
-                      <div className='pl-4 space-y-1 animate-accordion-down animate-fade-in'>
-                        <Link
-                          href='/manage/subscribe/students'
-                          className={
-                            pathname === '/manage/subscribe/students'
-                              ? activeMenuItemClass
-                              : menuItemClass
-                          }
-                          onClick={handleCloseMenu}
-                        >
-                          Enroll Student
-                        </Link>
-
-                        <Link
-                          href='/manage/subscribe/professor'
-                          className={
-                            pathname === '/manage/subscribe/professor'
-                              ? activeMenuItemClass
-                              : menuItemClass
-                          }
-                          onClick={handleCloseMenu}
-                        >
-                          Enroll Professor
-                        </Link>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            )}
 
             <Link
               href='/about'
@@ -549,7 +553,7 @@ export default function NavBar() {
                 <div className='flex items-center justify-center gap-2 p-3 bg-card-background border border-border rounded-md shadow-sm'>
                   <User className='w-5 h-5 text-primary' />
                   <span className='text-foreground'>
-                    Hello, <span className='font-bold'>{nome}</span>
+                    Hello, <span className='font-bold'>{name}</span>
                   </span>
                 </div>
               ) : (

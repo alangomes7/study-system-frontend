@@ -7,7 +7,7 @@ interface TokenStore {
 }
 
 const useTokenStore = create<TokenStore>(set => ({
-  tokenResponse: { token: '', idUsuario: 0, nome: '', role: '' },
+  tokenResponse: { token: '', userId: 0, name: '', role: '' },
   setTokenResponse: (newTokenResponse: TokenResponse) =>
     set(() => ({ tokenResponse: newTokenResponse })),
 }));

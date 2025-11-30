@@ -2,11 +2,14 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { toast } from 'react-toastify';
+import useTokenStore from '@/stores/TokenStore';
+import { API_BASE_URL } from '@/lib/api/client';
 
 export default function LoginForm() {
   const router = useRouter();
+  const setTokenResponse = useTokenStore(s => s.setTokenResponse);
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -23,15 +26,34 @@ export default function LoginForm() {
     setIsSubmitting(true);
 
     try {
-      console.log('Login attempt:', formData);
+      const response = await fetch(`${API_BASE_URL}/authentication/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
 
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const data = await response.json();
 
-      toast.success('Logged in successfully!');
+      if (!response.ok) {
+        // Handle specific backend error messages if available
+        throw new Error(data.message || 'Invalid credentials');
+      }
+
+      // Store the token and user info in Zustand
+      setTokenResponse(data);
+
+      toast.success(`Welcome, ${data.name}!`);
       router.push('/');
-    } catch (error) {
+    } catch (error: unknown) {
+      // Changed 'any' to 'unknown' and added a type check
       console.error(error);
-      toast.error('Invalid email or password.');
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Login failed. Please try again.';
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -82,12 +104,6 @@ export default function LoginForm() {
               onChange={handleChange}
               disabled={isSubmitting}
             />
-            <Link
-              href='/forgot-password'
-              className='text-sm text-primary hover:underline'
-            >
-              Forgot password?
-            </Link>
           </div>
 
           <button
@@ -95,7 +111,7 @@ export default function LoginForm() {
             className='btn btn-primary w-full'
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Loging in...' : 'Login'}
+            {isSubmitting ? 'Logging in...' : 'Login'}
           </button>
         </form>
       </div>
