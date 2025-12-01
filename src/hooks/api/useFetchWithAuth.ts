@@ -38,23 +38,20 @@ export function useFetchWithAuth() {
         let errorMessage = 'Unauthorized access';
 
         try {
-          // Attempt to parse the server error message
-          // Use clone() to prevent consuming the body so the caller can still read it
           const errorData = await response.clone().json();
+          console.log('Server Error Response:', errorData);
+
           if (errorData.message) {
             errorMessage = errorData.message;
           }
-        } catch {
-          // Keep default message if parsing fails
+        } catch (e) {
+          console.error('Failed to parse error JSON:', e);
         }
 
-        // Display the error using Dialog Popup
-        DialogPopup.error(errorMessage);
-
-        // 1. Clear the global store so NavBar updates immediately
         setTokenResponse({ token: '', userId: 0, name: '', role: '' });
 
-        // 2. Redirect to login
+        DialogPopup.error(errorMessage);
+
         router.push('/authentication/login');
       }
 
