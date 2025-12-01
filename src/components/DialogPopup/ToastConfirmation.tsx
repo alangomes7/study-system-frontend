@@ -10,7 +10,6 @@ export default function ToastConfirmation({
 }: ToastContentProps<string>) {
   return (
     <div className='flex flex-col gap-3'>
-      {/* Message Content */}
       <p className='text-sm font-medium text-foreground leading-snug'>{data}</p>
 
       {/* Actions Container */}

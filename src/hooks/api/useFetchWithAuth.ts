@@ -39,7 +39,8 @@ export function useFetchWithAuth() {
 
         try {
           // Attempt to parse the server error message
-          const errorData = await response.json();
+          // Use clone() to prevent consuming the body so the caller can still read it
+          const errorData = await response.clone().json();
           if (errorData.message) {
             errorMessage = errorData.message;
           }
@@ -55,10 +56,6 @@ export function useFetchWithAuth() {
 
         // 2. Redirect to login
         router.push('/authentication/login');
-
-        // 3. Return a never-resolving promise to prevent the error page from showing
-        //    This effectively halts the request flow while the redirect happens.
-        return new Promise<Response>(() => {});
       }
 
       return response;

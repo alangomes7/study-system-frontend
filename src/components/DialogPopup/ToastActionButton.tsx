@@ -15,8 +15,10 @@ export default function ToastActionButton({
   ...props
 }: ToastActionButtonProps) {
   const variants = {
-    confirm: 'bg-success text-white hover:bg-success/90 focus:ring-success',
-    cancel: 'bg-error text-white hover:bg-error/90 focus:ring-error',
+    confirm:
+      'bg-success text-primary-foreground hover:bg-success/90 focus:ring-success shadow-sm',
+    cancel:
+      'bg-error text-primary-foreground hover:bg-error/90 focus:ring-error shadow-sm',
   };
 
   return (
