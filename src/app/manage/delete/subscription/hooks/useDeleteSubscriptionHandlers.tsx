@@ -43,12 +43,12 @@ export function useDeleteSubscriptionHandlers() {
       const message = response?.message;
 
       if (status === 200) {
+        DialogPopup.success('200');
         DialogPopup.success(message || 'Subscription removed successfully');
         setSelectedSubscriptionId(null);
         setOpenDropdown(null);
         return;
       }
-
       throw new Error(
         message ||
           `Failed to remove subscription (status: ${status ?? 'unknown'})`,
