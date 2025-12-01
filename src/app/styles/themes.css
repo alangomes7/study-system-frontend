@@ -1,42 +1,28 @@
 /* GLOBAL & SHARED VARIABLES
   All variables that are *defined identically* for both themes are placed here.
-  This makes your themes "DRY" (Don't Repeat Yourself).
 */
 :root {
-  /* ---- Transition ---- */
-  /* Note: For this transition to affect all elements, you might
-    want to apply it to 'body, body *' or a similar selector,
-    not just :root (which is the <html> tag).
-  */
-  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease,
-    fill 0.3s ease, stroke 0.3s ease;
-
   /* ---- Shared Derived Variables ---- */
   --brand-secondary-lightest: color-mix(in srgb, var(--brand-main) 80%, white);
 
-  /* These "semantic" variables are also defined identically
-    across themes, so they live in the base :root.
-  */
+  /* Semantic Variables */
   --primary: var(--brand-main);
   --primary-light: var(--brand-secondary-lightest);
   --primary-dark: var(--brand-secondary-dark);
   --text-over-primary: #ffffff;
 }
 
-/* LIGHT THEME
-  This block now *only* contains the variables that are
-  unique to the light theme.
-*/
+/* LIGHT THEME */
 :root[data-theme='light'] {
   /* ---- Base Colors ---- */
   --brand-main: #f25749;
   --base-dark: #0d0d0d;
 
-  /* ---- Derived Colors (Unique to Light) ---- */
+  /* ---- Derived Colors ---- */
   --brand-secondary-light: color-mix(in srgb, var(--brand-main) 60%, white);
   --brand-secondary-dark: color-mix(in srgb, var(--brand-main) 40%, black);
 
-  /* ---- Semantic Colors (Unique to Light) ---- */
+  /* ---- Semantic Colors ---- */
   --background: #ffffff;
   --foreground: var(--base-dark);
   --border: #e5e7eb;
@@ -54,20 +40,17 @@
   --link-hover: var(--primary-dark);
 }
 
-/* DARK THEME
-  This block now *only* contains the variables that are
-  unique to the dark theme.
-*/
+/* DARK THEME */
 :root[data-theme='dark'] {
   /* ---- Base Colors ---- */
-  --brand-main: #0f758c;
+  --brand-main: #3190a5;
 
-  /* ---- Derived Colors (Unique to Dark) ---- */
+  /* ---- Derived Colors ---- */
   --brand-secondary-light: color-mix(in srgb, var(--brand-main) 65%, white);
   --brand-secondary-dark: color-mix(in srgb, var(--brand-main) 45%, black);
   --brand-accent: color-mix(in srgb, var(--brand-main) 55%, #05a678);
 
-  /* ---- Semantic Colors (Unique to Dark) ---- */
+  /* ---- Semantic Colors ---- */
   --background: #111827;
   --foreground: #f9fafb;
   --border: #374151;

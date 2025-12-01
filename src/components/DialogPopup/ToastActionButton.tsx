@@ -16,9 +16,9 @@ export default function ToastActionButton({
 }: ToastActionButtonProps) {
   const variants = {
     confirm:
-      'bg-success text-primary-foreground hover:bg-success/90 focus:ring-success shadow-sm',
+      'bg-success text-primary-foreground hover:bg-success/90 focus:ring-success shadow-sm mb-2',
     cancel:
-      'bg-error text-primary-foreground hover:bg-error/90 focus:ring-error shadow-sm',
+      'bg-error text-primary-foreground hover:bg-error/90 focus:ring-error shadow-sm mb-2',
   };
 
   return (

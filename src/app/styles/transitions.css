@@ -1,0 +1,127 @@
+/* -------------------------------------------------------------------------- */
+/* 🏃 TRANSITIONS & ANIMATIONS                                                */
+/* -------------------------------------------------------------------------- */
+
+/* Global Transition Settings */
+:root {
+  --transition-speed: 0.3s;
+  --transition-ease: ease;
+  --transition-base: background-color var(--transition-speed)
+      var(--transition-ease),
+    color var(--transition-speed) var(--transition-ease),
+    border-color var(--transition-speed) var(--transition-ease),
+    fill var(--transition-speed) var(--transition-ease),
+    stroke var(--transition-speed) var(--transition-ease);
+}
+
+/* 1. Keyframes */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-out {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes dropdown-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes dropdown-out {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.96);
+  }
+}
+
+@keyframes accordion-down {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 20rem;
+  }
+}
+
+/* 2. Utility Classes */
+.animate-fade-in {
+  animation: fade-in 0.3s ease forwards;
+}
+
+.animate-fade-out {
+  animation: fade-out 0.3s ease forwards;
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease forwards;
+}
+
+.animate-slide-out {
+  animation: slide-out 0.3s ease forwards;
+}
+
+.animate-dropdown-in {
+  animation: dropdown-in 0.25s ease-out forwards;
+}
+
+.animate-dropdown-out {
+  animation: dropdown-out 0.2s ease-in forwards;
+}
+
+.animate-accordion-down {
+  overflow: hidden;
+  animation: accordion-down 0.5s ease-out forwards;
+}
+
+/* 3. Accessibility: Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
-import './globals.css';
+import './styles/globals.css';
 import { NavBar } from '@/components';
 import { QueryProvider } from '@/providers';
-import { ToastContainer } from 'react-toastify';
+import ToastProvider from './ToastProvider';
 
 export const metadata: Metadata = {
   title: {
@@ -62,7 +62,7 @@ export default function RootLayout({
         <QueryProvider>
           <NavBar />
           {children}
-          <ToastContainer position='top-center' />
+          <ToastProvider />
         </QueryProvider>
       </body>
     </html>

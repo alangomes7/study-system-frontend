@@ -9,11 +9,10 @@ export default function ToastConfirmation({
   data,
 }: ToastContentProps<string>) {
   return (
-    <div className='flex flex-col gap-3'>
+    <div className='flex flex-col gap-3 p-4'>
       <p className='text-sm font-medium text-foreground leading-snug'>{data}</p>
 
-      {/* Actions Container */}
-      <div className='flex items-center justify-end gap-2'>
+      <div className='flex items-center justify-center gap-2'>
         <ToastActionButton
           onClick={() => closeToast && closeToast(true)}
           icon={<Check size={18} />}
