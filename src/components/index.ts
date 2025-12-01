@@ -11,10 +11,8 @@
  *  - CourseForm
  *  - NavBar
  *  - UserForm
- *  -  Message
  *  - AnimatedJson
  *  - Animations
- *  - ToastNotifications
  *  - DialogPopup
  */
 
@@ -23,11 +21,8 @@ export { default as ButtonTheme } from './ButtonTheme';
 export { default as CreateCourseForm } from './CourseForm';
 export { default as NavBar } from './NavBar';
 export { default as UserForm } from './UserForm';
-export { default as Message } from './Message';
 export { default as ErrorLayout } from './ErrorLayout';
 export { default as AnimatedJson } from './AnimatedJson';
 export * from './Animations';
 export * from './ButtonTheme';
-export { default as ToastNotifications } from './ToastNotifications';
-export { default as DialogButton } from './DialogPopup/DialogPopupButton';
-export { default as DialogPopup } from './DialogPopup';
+export * from './DialogPopup';

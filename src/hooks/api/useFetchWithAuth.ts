@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
 import useTokenStore from '@/stores/TokenStore';
 import { API_BASE_URL } from '@/lib/api/client';
-import { toast } from 'react-toastify';
+import { DialogPopup } from '@/components';
 
 export function useFetchWithAuth() {
   const { tokenResponse, setTokenResponse } = useTokenStore();
@@ -47,8 +47,8 @@ export function useFetchWithAuth() {
           // Keep default message if parsing fails
         }
 
-        // Display the error using ToastNotifications (via react-toastify)
-        toast.error(errorMessage);
+        // Display the error using Dialog Popup
+        DialogPopup.error(errorMessage);
 
         // 1. Clear the global store so NavBar updates immediately
         setTokenResponse({ token: '', userId: 0, name: '', role: '' });

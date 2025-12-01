@@ -6,7 +6,7 @@ import { CourseDropdown } from './CourseDropdown';
 import { StudyClassDropdown } from './StudyClassDropdown';
 import { ProfessorDropdown } from './ProfessorDropdown';
 import { useSubscribeProfessorStore } from '@/stores';
-import { toast } from 'react-toastify';
+import { DialogPopup } from '@/components';
 
 export function ProfessorEnrollmentForm() {
   // Get state and actions from the form store
@@ -38,13 +38,13 @@ export function ProfessorEnrollmentForm() {
         },
         {
           onSuccess: data => {
-            toast.success(
+            DialogPopup.success(
               `Professor ${data.professorName} enrolled in ${data.classCode}!`,
             );
             resetProfessorSelection();
           },
           onError: error => {
-            toast.error(`Error: ${error.message}`);
+            DialogPopup.error(`Error: ${error.message}`);
           },
         },
       );

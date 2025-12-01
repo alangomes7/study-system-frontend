@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { NavBar, ToastNotifications } from '@/components';
+import { NavBar } from '@/components';
 import { QueryProvider } from '@/providers';
 
 export const metadata: Metadata = {
@@ -59,10 +59,8 @@ export default function RootLayout({
       <body>
         <ThemeScript />
         <QueryProvider>
-          <ToastNotifications>
-            <NavBar />
-            {children}
-          </ToastNotifications>
+          <NavBar />
+          {children}
         </QueryProvider>
       </body>
     </html>
