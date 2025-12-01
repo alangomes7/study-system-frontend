@@ -38,3 +38,15 @@ export async function createSubscription(
   if (!response.ok) throw new Error('Failed to enroll student');
   return response.json();
 }
+
+/**
+ * Deletes a subscription by ID.
+ * @param id The ID of the subscription to delete.
+ */
+export async function deleteSubscription(id: number): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/subscriptions/${id}`, {
+    method: 'DELETE',
+  });
+
+  if (!response.ok) throw new Error('Failed to delete subscription');
+}

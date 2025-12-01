@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { STYLES, NAV_LINKS } from '../types/constants';
+import { STYLES, NAV_LINKS } from '../data/constants';
 
 interface NavLinksProps {
   isMobile?: boolean;

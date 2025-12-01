@@ -1,10 +1,11 @@
 'use client';
 
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useApi } from './useApi';
 import { queryKeys } from './queryKeys';
 import { Subscription, Student, SubscriptionCreationData } from '@/types';
 import { useMemo } from 'react';
+import { deleteSubscription } from '@/lib/api';
 
 const SUB_ENDPOINT = '/subscriptions';
 
@@ -92,6 +93,18 @@ export const useCreateSubscription = (options?: { onSuccess?: () => void }) => {
         queryKey: queryKeys.subscriptionsByClass(data.studyClassId),
       });
       options?.onSuccess?.();
+    },
+  });
+};
+
+export const useDeleteSubscription = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: deleteSubscription,
+    onSuccess: () => {
+      // Invalidate all subscriptions related queries
+      queryClient.invalidateQueries({ queryKey: ['subscriptions'] });
     },
   });
 };

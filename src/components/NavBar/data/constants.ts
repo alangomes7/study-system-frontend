@@ -19,6 +19,10 @@ export const NAV_LINKS = {
     { href: '/manage/subscribe/students', label: 'Enroll Student' },
     { href: '/manage/subscribe/professor', label: 'Enroll Professor' },
   ],
+  delete: [
+    { href: '/manage/delete/student', label: 'Delete Student' },
+    { href: '/manage/delete/subscription', label: 'Delete Subscription' },
+  ],
 };
 
 export const STYLES = {

@@ -13,6 +13,7 @@ import { useNavUiStore } from './stores/useNavUiStore';
 // 2. Components
 import { DesktopNav } from './subcomponents/DesktopNav';
 import { MobileNav } from './subcomponents/MobileNav';
+import { AuthButtons } from './subcomponents/AuthButtons';
 
 export default function NavBar() {
   const pathname = usePathname();
@@ -29,9 +30,9 @@ export default function NavBar() {
       ref={refs.navRef}
       className='relative bg-background border-b border-border z-50'
     >
-      <div className='flex items-center justify-between p-4'>
-        {/* Brand & Theme */}
-        <div className='flex items-center space-x-4'>
+      <div className='flex items-center justify-between p-4 min-h-[72px]'>
+        {/* Left Side: Brand & Theme */}
+        <div className='flex items-center space-x-4 z-10'>
           <ButtonTheme />
           <Link
             href='/'
@@ -45,25 +46,35 @@ export default function NavBar() {
           </Link>
         </div>
 
-        {/* Desktop Navigation */}
-        <DesktopNav session={session} refs={refs} onLogout={logout} />
+        {/* Center: Desktop Navigation */}
+        <div className='hidden md:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2'>
+          <DesktopNav session={session} refs={refs} />
+        </div>
 
-        {/* Mobile Toggle Button */}
-        <div className='md:hidden'>
-          {!mounted ? (
-            <div className='h-6 w-6' />
-          ) : (
-            <button
-              onClick={() => (isOpen ? handleCloseMenu() : setIsOpen(true))}
-              className='text-foreground focus:outline-none'
-            >
-              {isOpen ? (
-                <XIcon className='h-6 w-6' />
-              ) : (
-                <MenuIcon className='h-6 w-6' />
-              )}
-            </button>
-          )}
+        {/* Right Side: Auth & Mobile Toggle */}
+        <div className='flex items-center gap-4 z-10'>
+          {/* Desktop Auth Buttons */}
+          <div className='hidden md:block'>
+            <AuthButtons session={session} onLogout={logout} />
+          </div>
+
+          {/* Mobile Toggle Button */}
+          <div className='md:hidden'>
+            {!mounted ? (
+              <div className='h-6 w-6' />
+            ) : (
+              <button
+                onClick={() => (isOpen ? handleCloseMenu() : setIsOpen(true))}
+                className='text-foreground focus:outline-none'
+              >
+                {isOpen ? (
+                  <XIcon className='h-6 w-6' />
+                ) : (
+                  <MenuIcon className='h-6 w-6' />
+                )}
+              </button>
+            )}
+          </div>
         </div>
       </div>
 

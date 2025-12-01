@@ -57,3 +57,10 @@ export const useUpdateStudent = (id: number) => {
       mutation.mutateAsync({ id, data }),
   };
 };
+
+export const useDeleteStudent = () => {
+  return useApi<Student>({
+    endpoint: STUDENT_ENDPOINT,
+    queryKey: queryKeys.students,
+  }).useDelete();
+};

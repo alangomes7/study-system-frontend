@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { User, LogOut } from 'lucide-react';
-import { SessionData } from '../types/types';
+import { SessionData } from '../data/types';
 
 interface AuthButtonsProps {
   session: SessionData;

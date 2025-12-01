@@ -1,18 +1,16 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { NavLinks } from './NavLinks';
-import { AuthButtons } from './AuthButtons';
-import { STYLES, NAV_LINKS } from '../types/constants';
-import { SessionData, NavRefs } from '../types/types';
+import { STYLES, NAV_LINKS } from '../data/constants';
+import { SessionData, NavRefs } from '../data/types';
 import { useNavUiStore } from '../stores/useNavUiStore';
 
 interface DesktopNavProps {
   session: SessionData;
   refs: NavRefs;
-  onLogout: () => void;
 }
 
-export const DesktopNav = ({ session, refs, onLogout }: DesktopNavProps) => {
+export const DesktopNav = ({ session, refs }: DesktopNavProps) => {
   const pathname = usePathname();
   const { isManageOpen, setManageOpen, isMobile } = useNavUiStore();
   const isManageActive = pathname.startsWith('/manage');
@@ -38,6 +36,7 @@ export const DesktopNav = ({ session, refs, onLogout }: DesktopNavProps) => {
 
           {isManageOpen && (
             <div className='absolute right-0 w-56 bg-card-background border border-border rounded-md shadow-lg py-1 p-1 z-50 animate-dropdown-in'>
+              {/* Create Section */}
               <p className='px-4 py-2 text-xs font-semibold text-foreground/60'>
                 Create
               </p>
@@ -70,6 +69,7 @@ export const DesktopNav = ({ session, refs, onLogout }: DesktopNavProps) => {
 
               <div className='my-1 border-t border-border' />
 
+              {/* Enroll Section */}
               <p className='px-4 py-2 text-xs font-semibold text-foreground/60'>
                 Enroll
               </p>
@@ -86,11 +86,31 @@ export const DesktopNav = ({ session, refs, onLogout }: DesktopNavProps) => {
                   {link.label}
                 </Link>
               ))}
+
+              <div className='my-1 border-t border-border' />
+
+              {/* Delete Section */}
+              <p className='px-4 py-2 text-xs font-semibold text-foreground/60'>
+                Delete
+              </p>
+              {NAV_LINKS.delete.map(link => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={
+                    pathname === link.href
+                      ? STYLES.activeMenuItem
+                      : STYLES.menuItem
+                  }
+                >
+                  {link.label}
+                </Link>
+              ))}
             </div>
           )}
         </div>
       )}
-
+      {/* ... About and AuthButtons */}
       <Link
         href='/about'
         className={
@@ -99,10 +119,6 @@ export const DesktopNav = ({ session, refs, onLogout }: DesktopNavProps) => {
       >
         About
       </Link>
-
-      <div className='ml-2'>
-        <AuthButtons session={session} onLogout={onLogout} />
-      </div>
     </div>
   );
 };

@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { NavLinks } from './NavLinks';
 import { AuthButtons } from './AuthButtons';
-import { STYLES, NAV_LINKS } from '../types/constants';
-import { SessionData, NavRefs } from '../types/types';
+import { STYLES, NAV_LINKS } from '../data/constants';
+import { SessionData, NavRefs } from '../data/types';
 import { useNavUiStore } from '../stores/useNavUiStore';
 
 interface MobileNavProps {
@@ -26,7 +26,6 @@ export const MobileNav = ({
   const isCreateActive = pathname.startsWith('/manage/create');
   const isSubscribeActive = pathname.startsWith('/manage/subscribe');
 
-  // Should render?
   if (!store.mounted || (!store.isOpen && !store.isClosing)) return null;
 
   return (
@@ -56,7 +55,7 @@ export const MobileNav = ({
             </button>
 
             {store.isManageOpen && (
-              <div className='pl-2 space-y-1 animate-accordion-down animate-fade-in'>
+              <div className='pl-2 space-y-3 animate-accordion-down animate-fade-in'>
                 {/* Create Section */}
                 <div ref={refs.createMenuRef}>
                   <button
@@ -67,6 +66,7 @@ export const MobileNav = ({
                   >
                     Create
                   </button>
+
                   {store.isCreateOpen && (
                     <div className='pl-4 space-y-1 animate-accordion-down animate-fade-in'>
                       {NAV_LINKS.create.map(link => (
@@ -83,6 +83,7 @@ export const MobileNav = ({
                           {link.label}
                         </Link>
                       ))}
+
                       {session.isAdmin && (
                         <Link
                           href='/manage/create/user'
@@ -110,6 +111,7 @@ export const MobileNav = ({
                   >
                     Enroll
                   </button>
+
                   {store.isSubscribeOpen && (
                     <div className='pl-4 space-y-1 animate-accordion-down animate-fade-in'>
                       {NAV_LINKS.enroll.map(link => (
@@ -128,6 +130,27 @@ export const MobileNav = ({
                       ))}
                     </div>
                   )}
+                </div>
+
+                {/* Delete Section (FIXED) */}
+                <div>
+                  <p className='font-semibold px-2 py-1'>Delete</p>
+                  <div className='pl-4 space-y-1 animate-accordion-down animate-fade-in'>
+                    {NAV_LINKS.delete.map(link => (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        className={
+                          pathname === link.href
+                            ? STYLES.activeMenuItem
+                            : STYLES.menuItem
+                        }
+                        onClick={onClose}
+                      >
+                        {link.label}
+                      </Link>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
