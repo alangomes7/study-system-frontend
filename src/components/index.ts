@@ -15,6 +15,7 @@
  *  - AnimatedJson
  *  - Animations
  *  - ToastNotifications
+ *  - DialogPopup
  */
 
 export { default as Logo } from './Logo';
@@ -28,3 +29,5 @@ export { default as AnimatedJson } from './AnimatedJson';
 export * from './Animations';
 export * from './ButtonTheme';
 export { default as ToastNotifications } from './ToastNotifications';
+export { default as DialogButton } from './DialogPopup/DialogPopupButton';
+export { default as DialogPopup } from './DialogPopup';
