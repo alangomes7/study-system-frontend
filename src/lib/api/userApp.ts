@@ -1,5 +1,4 @@
 import { API_BASE_URL } from './client';
-// You will need to define the UserApp type in your @/types folder
 import { UserApp } from '@/types';
 
 /**

@@ -84,7 +84,7 @@ export const useCreateSubscription = (options?: { onSuccess?: () => void }) => {
   const queryClient = useQueryClient();
   const { useCreate } = useApi<Subscription, SubscriptionCreationData>({
     endpoint: SUB_ENDPOINT,
-    queryKey: 'subscriptions', // Base key
+    queryKey: 'subscriptions',
   });
 
   return useCreate({

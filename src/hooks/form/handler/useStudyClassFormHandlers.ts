@@ -7,8 +7,8 @@ import {
   type StudyClassFormErrors,
   type StudyClassFormData,
 } from '@/lib/schemas';
-// Import 'UseMutateFunction' instead of 'UseMutationResult'
 import { type UseMutateFunction } from '@tanstack/react-query';
+import { StudyClassCreationData } from '@/types';
 
 type UseStudyClassFormHandlersProps = {
   formData: StudyClassFormData;
@@ -18,10 +18,9 @@ type UseStudyClassFormHandlersProps = {
   createStudyClass: UseMutateFunction<
     unknown,
     Error,
-    StudyClassFormData,
+    StudyClassCreationData,
     unknown
   >;
-  // ------------------------------
 };
 
 /**
@@ -62,8 +61,7 @@ export function useStudyClassFormHandlers({
         return;
       }
 
-      createStudyClass(validationResult.data);
-      // ------------------------------------------
+      createStudyClass(validationResult.data as StudyClassCreationData);
     },
     [formData, setErrors, createStudyClass],
   );

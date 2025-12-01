@@ -47,7 +47,7 @@ export const useSubscribeProfessorStore = create<SubscribeProfessorState>(
     selectCourse: courseId => {
       set({
         selectedCourseId: courseId,
-        selectedStudyClassId: null, // Reset dependent state
+        selectedStudyClassId: null,
         selectedProfessorId: null,
         openDropdown: null,
       });

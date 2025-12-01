@@ -34,7 +34,6 @@ export const useGetStudyClassesByCourse = (courseId: number) => {
   return useQuery<StudyClass[], Error>({
     queryKey: queryKeys.studyClassesByCourse(courseId),
     queryFn: async () => {
-      // Accessing a custom sub-resource
       const response = await raw.fetchWithAuth(
         `${raw.baseUrl}/course/${courseId}`,
       );

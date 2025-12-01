@@ -2,7 +2,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 // Define the name of the cookie where your auth token is stored
-const TOKEN_COOKIE_NAME = 'token'; // Update this to match your actual cookie name
+const TOKEN_COOKIE_NAME = 'token';
 
 export async function fetchWithAuth(url: string, options: RequestInit = {}) {
   // 1. Retrieve the token from cookies (Server-side approach)
@@ -35,7 +35,7 @@ export async function fetchWithAuth(url: string, options: RequestInit = {}) {
       // On the server, we cannot set global state (Zustand).
       // Instead, we redirect the user immediately.
 
-      // Optional: Add a query param to the login URL so the client knows why they were redirected
+      // Add a query param to the login URL so the client knows why they were redirected
       const reason = response.status === 401 ? 'unauthorized' : 'forbidden';
 
       redirect(`/authentication/login?error=${reason}`);

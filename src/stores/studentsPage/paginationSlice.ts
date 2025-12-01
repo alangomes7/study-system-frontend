@@ -6,7 +6,7 @@ export const createPaginationSlice: StateCreator<
   [],
   [],
   PaginationSlice
-> = (set, get) => ({
+> = set => ({
   currentPage: 1,
   paginationLength: 10,
   openDropdown: null,
@@ -14,7 +14,7 @@ export const createPaginationSlice: StateCreator<
     set(state => ({
       currentPage,
       paginationLength: paginationLength ?? state.paginationLength,
-      openDropdown: null, // Close dropdown on pagination change
+      openDropdown: null,
     })),
   setOpenDropdown: openDropdown => set({ openDropdown }),
 });

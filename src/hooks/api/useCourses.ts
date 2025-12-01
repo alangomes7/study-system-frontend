@@ -16,7 +16,7 @@ export const useGetCourses = () => {
 export const useGetCourse = (id: number) => {
   return useApi<Course>({
     endpoint: COURSE_ENDPOINT,
-    queryKey: queryKeys.courses, // Using base key, useApi appends ID automatically
+    queryKey: queryKeys.courses,
   }).useGetOne(id);
 };
 

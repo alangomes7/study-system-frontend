@@ -46,7 +46,7 @@ export const useSubscribeFormStore = create<SubscribeFormState>(set => ({
   selectCourse: courseId => {
     set({
       selectedCourseId: courseId,
-      selectedStudyClassId: null, // Reset dependent state
+      selectedStudyClassId: null,
       selectedStudentId: null,
       openDropdown: null,
     });
@@ -60,7 +60,7 @@ export const useSubscribeFormStore = create<SubscribeFormState>(set => ({
   selectStudyClass: studyClassId => {
     set({
       selectedStudyClassId: studyClassId,
-      selectedStudentId: null, // Reset dependent state
+      selectedStudentId: null,
       openDropdown: null,
     });
   },

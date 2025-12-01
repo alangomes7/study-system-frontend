@@ -1,10 +1,6 @@
 import { Subscription, SubscriptionCreationData } from '@/types';
 import { API_BASE_URL } from './client';
 
-/* -------------------------------------------------------------------------- */
-/* SUBSCRIPTIONS                                                              */
-/* -------------------------------------------------------------------------- */
-
 /**
  * Fetches all subscriptions for a specific study class.
  * @param studyClassId The ID of the study class.

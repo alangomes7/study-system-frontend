@@ -10,8 +10,6 @@ export const createFilterSlice: StateCreator<
   searchTerm: '',
   setSearchTerm: term => {
     set({ searchTerm: term });
-    // This is where we handle the coupled logic:
-    // Calling setSearchTerm also resets pagination.
     get().setPagination(1);
   },
 });

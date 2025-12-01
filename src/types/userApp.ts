@@ -5,3 +5,5 @@ export interface UserApp {
   password?: string;
   role?: string;
 }
+
+export type UserAppCreationData = Omit<UserApp, 'id'>;

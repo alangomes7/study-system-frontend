@@ -1,8 +1,10 @@
 'use client';
 
+import { UseMutationResult } from '@tanstack/react-query';
 import { Student, Professor, UserType, UserApp } from '@/types';
 import { useUserFormData } from './data/useUserFormData';
 import { useUserFormHandlers } from './handler/useUserFormHandlers';
+import { UserMutationVariables } from './types';
 
 type UseUserFormProps = {
   userType: UserType;
@@ -25,8 +27,12 @@ export default function useUserForm({ user, userType }: UseUserFormProps) {
       formData,
       setFormData,
       setErrors,
-      mutation,
-      userType, // Pass userType here
+      mutation: mutation as unknown as UseMutationResult<
+        unknown,
+        Error,
+        UserMutationVariables
+      >,
+      userType,
     });
 
   return {

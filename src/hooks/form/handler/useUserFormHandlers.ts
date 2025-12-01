@@ -8,20 +8,8 @@ import {
 } from '@/lib/schemas';
 import { z } from 'zod';
 import { type UseMutationResult } from '@tanstack/react-query';
-import {
-  UserType,
-  StudentCreationData,
-  ProfessorCreationData,
-  UserApp,
-} from '@/types';
-
-const unmask = (value: string) => value.replace(/\D/g, '');
-
-// Define a union type for all possible mutation variables
-type UserMutationVariables =
-  | StudentCreationData
-  | ProfessorCreationData
-  | Omit<UserApp, 'id'>;
+import { UserType } from '@/types';
+import { AnyUserCreationData, UserMutationVariables } from '../types';
 
 type UseUserFormHandlersProps = {
   formData: userFormData;
@@ -62,17 +50,14 @@ export function useUserFormHandlers({
         ...formData,
         phone: unmask(formData.phone),
         register: unmask(formData.register),
+        password: formData.password,
       };
 
-      // Conditional Validation: Skip phone/register for User/ADMIN
       const schemaToUse = userSchema;
+
       if (userType === 'User' || userType === 'ADMIN') {
-        // Create a partial schema or relax requirements for UserApp
-        // Since we are reusing the schema, we can just validate the fields we care about
-        // or use .partial() then .required(...) but userSchema is simple.
-        // A simple way is to mock phone/register if they are missing for User/ADMIN to pass Zod
-        if (!unmaskedData.phone) unmaskedData.phone = '00000000000'; // Dummy valid
-        if (!unmaskedData.register) unmaskedData.register = '00000000000'; // Dummy valid
+        if (!unmaskedData.phone) unmaskedData.phone = '00000000000';
+        if (!unmaskedData.register) unmaskedData.register = '00000000000';
       }
 
       const validationResult = schemaToUse.safeParse(unmaskedData);
@@ -86,20 +71,22 @@ export function useUserFormHandlers({
       }
 
       // Prepare payload based on type
-      let payload: UserMutationVariables;
+      let dataPayload: AnyUserCreationData;
 
       if (userType === 'User' || userType === 'ADMIN') {
-        payload = {
+        dataPayload = {
           name: validationResult.data.name,
           email: validationResult.data.email,
-          role: userType, // Pass the role
-          // Password is optional in UserApp type, backend might handle default
+          role: userType,
+          password: validationResult.data.password,
         };
       } else {
-        payload = validationResult.data;
+        dataPayload = validationResult.data;
       }
 
-      mutation.mutate(payload);
+      mutation.mutate({
+        data: dataPayload,
+      });
     },
     [formData, setErrors, mutation, userType],
   );
@@ -110,3 +97,5 @@ export function useUserFormHandlers({
     handleSubmit,
   };
 }
+
+const unmask = (value: string) => value.replace(/\D/g, '');

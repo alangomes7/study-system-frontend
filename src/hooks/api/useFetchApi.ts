@@ -4,7 +4,6 @@ import { useFetchWithAuth } from './useFetchWithAuth';
 import { useCallback } from 'react';
 import { API_BASE_URL } from '@/lib/api/client';
 
-// Defined OUTSIDE the hook to avoid dependency array issues
 const handleResponse = async <R>(response: Response): Promise<R> => {
   // Handle 204 No Content
   if (response.status === 204) return null as R;

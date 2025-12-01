@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { NavLinks } from './NavLinks';
 import { STYLES, NAV_LINKS } from '../data/constants';
-import { SessionData, NavRefs } from '../data/types';
 import { useNavUiStore } from '../stores/useNavUiStore';
+import { NavRefs, SessionData } from '../data/types';
 
 interface DesktopNavProps {
   session: SessionData;

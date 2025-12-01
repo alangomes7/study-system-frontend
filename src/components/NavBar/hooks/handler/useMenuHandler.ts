@@ -28,7 +28,7 @@ export const useMenuHandler = () => {
     store.setIsClosing(true);
     setTimeout(() => {
       store.closeAllMenus();
-    }, 500); // Animation duration
+    }, 300);
   }, [store]);
 
   // 3. Handle Click Outside

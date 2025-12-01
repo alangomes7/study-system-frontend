@@ -7,7 +7,7 @@ import {
   useCreateProfessor,
   useUpdateStudent,
   useUpdateProfessor,
-  useCreateUserApp, // Import this
+  useCreateUserApp,
 } from '@/hooks';
 import { Student, Professor, UserType, UserApp } from '@/types';
 
@@ -16,11 +16,13 @@ type UseUserFormProps = {
   user?: Student | Professor | UserApp | null;
 };
 
+// Add password to initial state
 const INITIAL_STATE: userFormData = {
   name: '',
   email: '',
   phone: '',
   register: '',
+  password: '',
 };
 
 export function useUserFormData({ user, userType }: UseUserFormProps) {
@@ -68,9 +70,9 @@ export function useUserFormData({ user, userType }: UseUserFormProps) {
       setFormData({
         name: user.name,
         email: user.email,
-        // Only set phone/register if they exist on the user object
         phone: 'phone' in user ? user.phone : '',
         register: 'register' in user ? user.register : '',
+        password: '',
       });
     } else if (!isEditMode) {
       resetForm();

@@ -8,6 +8,9 @@ export const userSchema = z.object({
     .min(10, { message: 'Invalid phone number' })
     .max(11, { message: 'Invalid phone number' }),
   register: z.string().length(11, { message: 'Invalid CPF' }),
+  password: z
+    .string()
+    .min(3, { message: 'Password must be at least 8 characters' }),
 });
 
 export type userFormData = z.infer<typeof userSchema>;

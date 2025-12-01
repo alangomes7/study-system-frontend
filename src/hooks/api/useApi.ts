@@ -102,7 +102,6 @@ export function useApi<T, TInput = Partial<T>>({
           queryKey: [...baseKey, variables.id],
         });
 
-        // Cast to specific function type to avoid 'any'
         const onSuccess = options?.onSuccess as
           | ((
               data: T,
@@ -128,7 +127,6 @@ export function useApi<T, TInput = Partial<T>>({
       onSuccess: (data, id, context) => {
         queryClient.invalidateQueries({ queryKey: baseKey });
 
-        // Cast to specific function type to avoid 'any'
         const onSuccess = options?.onSuccess as
           | ((
               data: void,

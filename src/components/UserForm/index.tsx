@@ -1,27 +1,78 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { IMaskInput } from 'react-imask';
 import { useUserForm } from '@/hooks/index';
 import { Student, Professor, UserType, UserApp } from '@/types';
 import { DotsAnimation } from '@/components';
-import { useRouter } from 'next/navigation';
+
+// --- Types ---
 
 type UserFormState = {
   name: string;
   email: string;
   phone: string;
   register: string;
+  password: string;
 };
 
 type UserFormField = keyof UserFormState;
 
 interface UserFormProps {
   userType: UserType;
-  title?: string; // Made optional
+  title?: string;
   user?: Student | Professor | UserApp | null;
   submitLabel?: string;
   disableSubmit?: boolean;
 }
+
+type FieldConfig = {
+  label: string;
+  name: UserFormField;
+  type: 'text' | 'email' | 'password' | 'mask';
+  mask?: string;
+  inputType?: string;
+  autoComplete?: string;
+};
+
+// --- Configuration (Moved outside component for performance) ---
+
+const allFields: FieldConfig[] = [
+  {
+    label: 'Name',
+    name: 'name',
+    type: 'text',
+    autoComplete: 'name',
+  },
+  {
+    label: 'Phone',
+    name: 'phone',
+    type: 'mask',
+    mask: '(00) 0 0000-0000',
+    inputType: 'tel',
+    autoComplete: 'tel',
+  },
+  {
+    label: 'Email',
+    name: 'email',
+    type: 'email',
+    autoComplete: 'email',
+  },
+  {
+    label: 'Password',
+    name: 'password',
+    type: 'password',
+    autoComplete: 'new-password',
+  },
+  {
+    label: 'Register (CPF)',
+    name: 'register',
+    type: 'mask',
+    mask: '000.000.000-00',
+    inputType: 'tel',
+    autoComplete: 'off',
+  },
+];
 
 export default function UserForm({
   userType,
@@ -31,6 +82,7 @@ export default function UserForm({
   disableSubmit = false,
 }: UserFormProps) {
   const router = useRouter();
+
   const {
     formData,
     errors,
@@ -43,53 +95,28 @@ export default function UserForm({
 
   const isEditMode = !!user;
   const inProgressLabel = isEditMode ? 'Updating' : 'Creating';
-  const buttonLabel = submitLabel
-    ? submitLabel
-    : isEditMode
-    ? 'Update'
-    : 'Create';
-
-  type FieldConfig = {
-    label: string;
-    name: UserFormField;
-    type: string;
-    mask?: string;
-    inputType?: string;
-    autocomplete?: string;
-  };
-
-  const allFields: FieldConfig[] = [
-    { label: 'Name', name: 'name', type: 'text', autocomplete: 'name' },
-    {
-      label: 'Phone',
-      name: 'phone',
-      type: 'mask',
-      mask: '(00) 0 0000-0000',
-      inputType: 'tel',
-      autocomplete: 'tel',
-    },
-    { label: 'Email', name: 'email', type: 'email', autocomplete: 'email' },
-    {
-      label: 'Register (CPF)',
-      name: 'register',
-      type: 'mask',
-      mask: '000.000.000-00',
-      inputType: 'tel',
-      autocomplete: 'off',
-    },
-  ];
+  const buttonLabel = submitLabel ?? (isEditMode ? 'Update' : 'Create');
 
   // Filter fields based on userType
   const fields = allFields.filter(field => {
-    if (userType === 'User' || userType === 'ADMIN') {
-      return field.name !== 'phone' && field.name !== 'register';
+    switch (userType) {
+      case 'ADMIN':
+      case 'User':
+        // Users and ADMIN do NOT see phone/register, but DO see password
+        return field.name !== 'phone' && field.name !== 'register';
+
+      case 'Student':
+      case 'Professor':
+        // Students and Professors do NOT see password
+        return field.name !== 'password';
+
+      default:
+        return true;
     }
-    return true;
   });
 
   return (
     <div className='container mx-auto py-2 max-w-2xl'>
-      {/* Conditionally render title */}
       {title && (
         <h1 className='text-3xl font-bold mb-6 text-foreground'>{title}</h1>
       )}
@@ -108,34 +135,38 @@ export default function UserForm({
 
             {field.type === 'mask' ? (
               <IMaskInput
-                type={field.inputType}
-                mask={field.mask!}
                 id={field.name}
                 name={field.name}
-                value={formData[field.name]}
-                onAccept={value => handleMaskedChange(field.name, value)}
+                mask={field.mask!}
+                type={field.inputType}
+                // Handle null/undefined values to prevent "uncontrolled" warnings
+                value={formData[field.name] ?? ''}
+                onAccept={(value: string) =>
+                  handleMaskedChange(field.name, value)
+                }
                 className='input-form'
                 disabled={isSubmitting}
+                autoComplete={field.autoComplete}
                 aria-invalid={!!errors[field.name]}
                 aria-describedby={
                   errors[field.name] ? `${field.name}-error` : undefined
                 }
-                autoComplete={field.autocomplete}
               />
             ) : (
               <input
-                type={field.type}
                 id={field.name}
                 name={field.name}
-                value={formData[field.name]}
+                type={field.type}
+                // Handle null/undefined values to prevent "uncontrolled" warnings
+                value={formData[field.name] ?? ''}
                 onChange={handleChange}
                 className='input-form'
                 disabled={isSubmitting}
+                autoComplete={field.autoComplete}
                 aria-invalid={!!errors[field.name]}
                 aria-describedby={
                   errors[field.name] ? `${field.name}-error` : undefined
                 }
-                autoComplete={field.autocomplete}
               />
             )}
 
@@ -163,7 +194,7 @@ export default function UserForm({
                 {`${inProgressLabel}...`}
               </span>
             ) : (
-              `${buttonLabel}`
+              buttonLabel
             )}
           </button>
 
@@ -171,6 +202,7 @@ export default function UserForm({
             type='button'
             onClick={() => router.back()}
             className='btn border border-border hover:bg-foreground/5'
+            disabled={isSubmitting}
           >
             Cancel
           </button>
