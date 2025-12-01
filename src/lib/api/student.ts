@@ -1,5 +1,6 @@
 import { Student, StudentCreationData, Subscription } from '@/types';
 import { API_BASE_URL } from './client';
+import { ErrorResponseApp } from '@/types/ErrorResonse';
 
 /**
  * Fetches a list of all students.
@@ -88,4 +89,17 @@ export async function getStudentsInBatches(
   }
 
   return allStudents;
+}
+
+/**
+ * Deletes a student by ID.
+ * @param id The ID of the student to delete.
+ * @returns A promise that resolves when the deletion is successful.
+ */
+export async function deleteStudent(id: number): Promise<ErrorResponseApp> {
+  const response = await fetch(`${API_BASE_URL}/students/${id}`, {
+    method: 'DELETE',
+  });
+
+  return response.json();
 }

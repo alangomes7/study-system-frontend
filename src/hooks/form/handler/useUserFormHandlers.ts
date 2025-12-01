@@ -9,13 +9,13 @@ import {
 import { z } from 'zod';
 import { type UseMutationResult } from '@tanstack/react-query';
 import { UserType } from '@/types';
-import { AnyUserCreationData, UserMutationVariables } from '../types';
+import { AnyUserCreationData } from '../types';
 
 type UseUserFormHandlersProps = {
   formData: userFormData;
   setFormData: React.Dispatch<React.SetStateAction<userFormData>>;
   setErrors: React.Dispatch<React.SetStateAction<userFormErrors>>;
-  mutation: UseMutationResult<unknown, Error, UserMutationVariables, unknown>;
+  mutation: UseMutationResult<unknown, Error, any, unknown>;
   userType: UserType;
 };
 
@@ -77,16 +77,14 @@ export function useUserFormHandlers({
         dataPayload = {
           name: validationResult.data.name,
           email: validationResult.data.email,
-          role: userType,
+          role: userType === 'User' ? 'USER' : userType,
           password: validationResult.data.password,
         };
       } else {
         dataPayload = validationResult.data;
       }
 
-      mutation.mutate({
-        data: dataPayload,
-      });
+      mutation.mutate(dataPayload);
     },
     [formData, setErrors, mutation, userType],
   );

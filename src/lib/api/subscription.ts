@@ -1,5 +1,6 @@
 import { Subscription, SubscriptionCreationData } from '@/types';
 import { API_BASE_URL } from './client';
+import { ErrorResponseApp } from '@/types/ErrorResonse';
 
 /**
  * Fetches all subscriptions for a specific study class.
@@ -39,10 +40,13 @@ export async function createSubscription(
  * Deletes a subscription by ID.
  * @param id The ID of the subscription to delete.
  */
-export async function deleteSubscription(id: number): Promise<void> {
+export async function deleteSubscription(
+  id: number,
+): Promise<ErrorResponseApp | null> {
   const response = await fetch(`${API_BASE_URL}/subscriptions/${id}`, {
     method: 'DELETE',
   });
 
-  if (!response.ok) throw new Error('Failed to delete subscription');
+  // Return the parsed JSON (Error or specific message)
+  return response.json();
 }

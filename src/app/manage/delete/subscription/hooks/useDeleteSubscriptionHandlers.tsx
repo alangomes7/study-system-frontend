@@ -37,17 +37,28 @@ export function useDeleteSubscriptionHandlers() {
     if (!selectedSubscriptionId) return;
 
     try {
-      await deleteSub(selectedSubscriptionId);
+      const response = await deleteSub(selectedSubscriptionId);
 
-      DialogPopup.success('Subscription removed successfully');
+      const status = response?.status;
+      const message = response?.message;
 
-      setSelectedSubscriptionId(null);
-      setOpenDropdown(null);
+      if (status === 200) {
+        DialogPopup.success(message || 'Subscription removed successfully');
+        setSelectedSubscriptionId(null);
+        setOpenDropdown(null);
+        return;
+      }
+
+      throw new Error(
+        message ||
+          `Failed to remove subscription (status: ${status ?? 'unknown'})`,
+      );
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error
           ? error.message
           : 'Failed to remove subscription';
+
       DialogPopup.error(errorMessage);
     }
   };
