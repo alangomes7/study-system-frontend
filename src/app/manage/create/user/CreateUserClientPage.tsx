@@ -29,7 +29,7 @@ export default function CreateUserClientPage() {
       {/* User Form Component */}
       <UserForm
         userType={formUserType}
-        title='' // Title is handled by the H1 above
+        title=''
         submitLabel={`Create ${selectedUserType || 'User'}`}
         disableSubmit={!selectedUserType}
       />

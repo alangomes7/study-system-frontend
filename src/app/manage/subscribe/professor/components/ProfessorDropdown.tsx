@@ -33,7 +33,7 @@ export function ProfessorDropdown() {
           .includes(professorSearchTerm.toLowerCase()),
       ),
     [allProfessors, professorSearchTerm],
-  ); //
+  );
 
   const selectedProfessorName =
     allProfessors.find(prof => prof.id === selectedProfessorId)?.name ||

@@ -48,7 +48,7 @@ export default function EditStudentPage({
 
   return (
     <UserForm
-      userType='student'
+      userType='Student'
       title='Edit Student'
       user={student}
       submitLabel={`Update Student ${student.name}`}

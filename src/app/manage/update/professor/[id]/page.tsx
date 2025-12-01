@@ -54,7 +54,7 @@ export default function UpdateProfessorClientPage({
 
   return (
     <UserForm
-      userType='professor'
+      userType='Professor'
       title='Edit Professor'
       user={professor}
       submitLabel={`Update Professor ${professor.name}`}

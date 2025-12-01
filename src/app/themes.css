@@ -12,16 +12,13 @@
     fill 0.3s ease, stroke 0.3s ease;
 
   /* ---- Shared Derived Variables ---- */
-  /* Renamed from --brand-secondary-1 */
   --brand-secondary-lightest: color-mix(in srgb, var(--brand-main) 80%, white);
 
   /* These "semantic" variables are also defined identically
     across themes, so they live in the base :root.
   */
   --primary: var(--brand-main);
-  /* Updated to use the new semantic name */
   --primary-light: var(--brand-secondary-lightest);
-  /* Updated to use the new semantic name */
   --primary-dark: var(--brand-secondary-dark);
   --text-over-primary: #ffffff;
 }
@@ -36,9 +33,7 @@
   --base-dark: #0d0d0d;
 
   /* ---- Derived Colors (Unique to Light) ---- */
-  /* Renamed from --brand-secondary-2 */
   --brand-secondary-light: color-mix(in srgb, var(--brand-main) 60%, white);
-  /* Renamed from --brand-secondary-3 */
   --brand-secondary-dark: color-mix(in srgb, var(--brand-main) 40%, black);
 
   /* ---- Semantic Colors (Unique to Light) ---- */
@@ -68,9 +63,7 @@
   --brand-main: #0f758c;
 
   /* ---- Derived Colors (Unique to Dark) ---- */
-  /* Renamed from --brand-secondary-2 */
   --brand-secondary-light: color-mix(in srgb, var(--brand-main) 65%, white);
-  /* Renamed from --brand-secondary-3 */
   --brand-secondary-dark: color-mix(in srgb, var(--brand-main) 45%, black);
   --brand-accent: color-mix(in srgb, var(--brand-main) 55%, #05a678);
 
@@ -84,11 +77,10 @@
   --success: var(--brand-accent);
   --warning: #fbbf24;
   --error: #f87171;
-  --info: var(--brand-secondary-dark); /* Updated this from ...-3 */
+  --info: var(--brand-secondary-dark);
 
   --disabled: #374151;
   --text-disabled: #6b7280;
   --link-color: var(--primary-light);
-  /* Updated to use the new semantic name */
   --link-hover: var(--brand-secondary-light);
 }

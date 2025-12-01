@@ -3,8 +3,18 @@ import { useNavUiStore } from '../../stores/useNavUiStore';
 import { NavRefs } from '../../types/types';
 
 export const useMenuHandler = () => {
-  // Use the Zustand store
-  const store = useNavUiStore();
+  const {
+    isClosing,
+    isOpen,
+    mounted,
+    setMounted,
+    setIsMobile,
+    setIsClosing,
+    setCreateOpen,
+    setManageOpen,
+    setSubscribeOpen,
+    closeAllMenus,
+  } = useNavUiStore();
 
   // Refs
   const navRef = useRef<HTMLDivElement>(null);
@@ -14,22 +24,23 @@ export const useMenuHandler = () => {
 
   // 1. Handle Resize (Mobile/Desktop detection)
   useEffect(() => {
-    store.setMounted(true);
-    const handleResize = () => store.setIsMobile(window.innerWidth < 768);
+    setMounted(true);
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
     handleResize();
+
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [setMounted, setIsMobile]);
 
   // 2. Handle Closing Animation
   const handleCloseMenu = useCallback(() => {
-    if (store.isClosing) return;
+    if (isClosing) return;
 
-    store.setIsClosing(true);
+    setIsClosing(true);
     setTimeout(() => {
-      store.closeAllMenus();
+      closeAllMenus();
     }, 300);
-  }, [store]);
+  }, [isClosing, setIsClosing, closeAllMenus]);
 
   // 3. Handle Click Outside
   useEffect(() => {
@@ -37,28 +48,35 @@ export const useMenuHandler = () => {
       const target = event.target as Node;
 
       if (createMenuRef.current && !createMenuRef.current.contains(target)) {
-        store.setCreateOpen(false);
+        setCreateOpen(false);
       }
       if (
         subscribeMenuRef.current &&
         !subscribeMenuRef.current.contains(target)
       ) {
-        store.setSubscribeOpen(false);
+        setSubscribeOpen(false);
       }
       if (manageMenuRef.current && !manageMenuRef.current.contains(target)) {
-        store.setManageOpen(false);
+        setManageOpen(false);
       }
-      if (navRef.current && !navRef.current.contains(target) && store.isOpen) {
+      if (navRef.current && !navRef.current.contains(target) && isOpen) {
         handleCloseMenu();
       }
     }
 
-    if (store.mounted) {
+    if (mounted) {
       document.addEventListener('mousedown', handleClickOutside);
       return () =>
         document.removeEventListener('mousedown', handleClickOutside);
     }
-  }, [store.mounted, store.isOpen, handleCloseMenu]);
+  }, [
+    mounted,
+    isOpen,
+    handleCloseMenu,
+    setCreateOpen,
+    setSubscribeOpen,
+    setManageOpen,
+  ]);
 
   const refs: NavRefs = {
     navRef,

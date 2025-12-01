@@ -1,5 +1,5 @@
 import { useCallback, useRef, useEffect } from 'react';
-import { NavRefs } from '../../data/types';
+import { NavRefs, NavState } from '../../data/types';
 
 interface UseMenuLogicProps {
   state: NavState;

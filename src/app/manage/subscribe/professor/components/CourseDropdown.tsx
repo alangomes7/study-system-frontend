@@ -15,7 +15,7 @@ export function CourseDropdown() {
     isSubmitting,
     selectCourse,
     setDropdown,
-  } = useSubscribeProfessorStore(); //
+  } = useSubscribeProfessorStore();
 
   const selectedCourseName =
     courses.find(course => course.id === selectedCourseId)?.name ||

@@ -15,7 +15,7 @@ export function StudyClassDropdown() {
     isSubmitting,
     selectStudyClass,
     setDropdown,
-  } = useSubscribeProfessorStore(); //
+  } = useSubscribeProfessorStore();
 
   const {
     data: studyClasses = [],

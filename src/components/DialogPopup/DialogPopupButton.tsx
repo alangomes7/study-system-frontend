@@ -18,14 +18,7 @@ export default function DialogPopupButton({
   };
 
   return (
-    <button
-      className={clsx(
-        'btn', // Uses the base button styles from globals.css
-        colorVariants[color], // Applies the specific theme color
-        className, // Allows for additional custom classes if passed
-      )}
-      {...props}
-    >
+    <button className={clsx('btn', colorVariants[color], className)} {...props}>
       {icon}
     </button>
   );

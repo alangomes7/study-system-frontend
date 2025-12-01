@@ -368,7 +368,6 @@ export default function CreateStudyClassClientPage() {
           >
             {isSubmitting ? (
               <>
-                {/* 2. LAYOUT SUGGESTION */}
                 <DotsAnimation className='w-4 h-4 mr-2' />
                 Creating...
               </>

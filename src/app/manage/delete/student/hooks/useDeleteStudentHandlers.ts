@@ -36,8 +36,10 @@ export function useDeleteStudentHandlers() {
         await deleteStudent(id);
         toast.success('Student deleted successfully');
         reset();
-      } catch (error: any) {
-        toast.error(error.message || 'Failed to delete student');
+      } catch (error: unknown) {
+        const errorMessage =
+          error instanceof Error ? error.message : 'Failed to delete student';
+        toast.error(errorMessage);
       }
     }
   };

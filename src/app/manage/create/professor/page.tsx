@@ -6,5 +6,5 @@ export const metadata: Metadata = {
 };
 
 export default function CreateProfessorPage() {
-  return <UserForm userType='professor' title='Create Professor' />;
+  return <UserForm userType='Professor' title='Create Professor' />;
 }

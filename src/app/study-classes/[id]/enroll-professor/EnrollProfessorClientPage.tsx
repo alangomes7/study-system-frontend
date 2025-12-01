@@ -3,10 +3,10 @@
 import { useGetProfessors, useEnrollProfessor } from '@/hooks';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { use, useState } from 'react';
+import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { StudyClass } from '@/types';
-import { SpinLoader } from '@/components';
+import { SpinLoaderAnimation } from '@/components';
 
 export default function EnrollProfessorClientPage({
   studyClass,
@@ -16,7 +16,6 @@ export default function EnrollProfessorClientPage({
   const { id } = studyClass;
   const router = useRouter();
 
-  // State for the form - changed to number | null
   const [selectedProfessor, setSelectedProfessor] = useState<number | null>(
     null,
   );
@@ -72,7 +71,7 @@ export default function EnrollProfessorClientPage({
   if (isLoading) {
     return (
       <div className='text-center mt-8 text-foreground'>
-        <SpinLoaderAnimationq>
+        <SpinLoaderAnimation />
       </div>
     );
   }
@@ -134,7 +133,6 @@ export default function EnrollProfessorClientPage({
                 {professors.map(professor => (
                   <li
                     key={professor.id}
-                    // Pass professor.id (number) directly
                     onClick={() => handleProfessorSelect(professor.id)}
                     className={`px-3 py-2 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors ${
                       // Compare numbers

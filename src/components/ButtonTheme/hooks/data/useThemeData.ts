@@ -51,7 +51,7 @@ export function useThemeData(): UseThemeReturn {
     const root = window.document.documentElement;
     root.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
-  }, [theme, mounted]); // Re-runs when theme or mounted status changes
+  }, [theme, mounted]);
 
   return { theme, setTheme, mounted };
 }

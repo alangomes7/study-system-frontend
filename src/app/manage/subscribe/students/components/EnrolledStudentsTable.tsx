@@ -138,13 +138,11 @@ export function EnrolledStudentsTable({
                   ].map(header => (
                     <th
                       key={header.key}
-                      // Changed text-left to text-center
                       className='py-3 px-4 text-center text-foreground/80 cursor-pointer hover:text-foreground'
                       onClick={() =>
                         requestSort(header.key as keyof Student, sortConfig)
                       }
                     >
-                      {/* Added justify-center to center the label and icon */}
                       <span className='flex items-center justify-center gap-2'>
                         {header.label}
                         {getSortIcon(header.key as keyof Student)}
@@ -160,7 +158,6 @@ export function EnrolledStudentsTable({
                     className='hover:bg-foreground/5 border-b border-border cursor-pointer'
                     onClick={() => handleRowClick(student.id)}
                   >
-                    {/* Changed text-left to text-center for all cells */}
                     <td className='py-3 px-4 text-foreground text-center'>
                       {student.id}
                     </td>

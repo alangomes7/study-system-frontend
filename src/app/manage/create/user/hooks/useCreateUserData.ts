@@ -9,7 +9,6 @@ export function useCreateUserData() {
 
   const options: UserType[] = ['User', 'ADMIN'];
 
-  // Default to 'User' so the form renders (but submit is disabled until selection)
   const formUserType: UserType = selectedUserType || 'User';
 
   return {

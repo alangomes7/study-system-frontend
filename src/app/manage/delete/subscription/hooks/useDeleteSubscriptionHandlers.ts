@@ -27,9 +27,13 @@ export function useDeleteSubscriptionHandlers() {
       try {
         await deleteSub(store.selectedSubscriptionId);
         toast.success('Subscription removed successfully');
-        store.setSelectedSubscriptionId(null); // Just reset subscription, keep class selected
-      } catch (error: any) {
-        toast.error(error.message || 'Failed to remove subscription');
+        store.setSelectedSubscriptionId(null);
+      } catch (error: unknown) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : 'Failed to remove subscription';
+        toast.error(message);
       }
     }
   };

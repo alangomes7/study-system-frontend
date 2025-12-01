@@ -23,7 +23,6 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
       <ErrorLayout
         title='Oops!'
         subtitle='Something went wrong while loading this page.'
-        // Fix: Correctly check for error.message existence
         message={
           error.message ? `Error: ${error.message}` : 'Unknown error occurred.'
         }

@@ -18,7 +18,6 @@ export function useDeleteSubscriptionData() {
     useGetStudyClassesByCourse(store.selectedCourseId || 0);
 
   // 3. Get Subscriptions (Dependent)
-  // Note: Ensure useGetSubscriptionsByStudyClass can handle null ID safely or returns []
   const { data: subscriptions = [], isLoading: loadingSubs } =
     useGetSubscriptionsByStudyClass(store.selectedStudyClassId || 0);
 

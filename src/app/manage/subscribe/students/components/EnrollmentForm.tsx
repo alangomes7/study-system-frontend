@@ -8,7 +8,6 @@ import { StudentDropdown } from './StudentDropdown';
 import { useSubscribeFormStore, useEnrolledTableStore } from '@/stores';
 
 export function EnrollmentForm() {
-  // Get state and actions from the form store
   const {
     selectedStudentId,
     selectedStudyClassId,
@@ -17,7 +16,6 @@ export function EnrollmentForm() {
     isSubmitting,
   } = useSubscribeFormStore();
 
-  // Get state and actions from the table store
   const { setSortConfig } = useEnrolledTableStore();
 
   const {

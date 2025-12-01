@@ -14,3 +14,9 @@ export interface NavRefs {
   manageMenuRef: RefObject<HTMLDivElement | null>;
   subscribeMenuRef: RefObject<HTMLDivElement | null>;
 }
+
+export interface NavState {
+  isOpen: boolean;
+  isClosing: boolean;
+  mounted: boolean;
+}
