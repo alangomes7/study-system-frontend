@@ -2,14 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { type userFormData, type userFormErrors } from '@/lib/schemas';
-import {
-  useCreateStudent,
-  useCreateProfessor,
-  useUpdateStudent,
-  useUpdateProfessor,
-  useCreateUserApp,
-} from '@/hooks';
 import { Student, Professor, UserType, UserApp } from '@/types';
+import { useCreateStudent, useUpdateStudent } from '@/hooks/api/useStudents';
+import {
+  useCreateProfessor,
+  useUpdateProfessor,
+} from '@/hooks/api/useProfessors';
+import { useCreateUserApp } from '@/hooks/api/useUserApps';
 
 type UseUserFormProps = {
   userType: UserType;
@@ -37,23 +36,33 @@ export function useUserFormData({ user, userType }: UseUserFormProps) {
   };
 
   // --- Mutations ---
+  // We use the existing API hooks.
+  // Note: These hooks might handle redirection internally (check useStudents.ts).
+
   const studentCreateMutation = useCreateStudent({
     onSuccess: () => resetForm(),
   });
+
   const professorCreateMutation = useCreateProfessor({
     onSuccess: () => resetForm(),
   });
+
   const userAppCreateMutation = useCreateUserApp({
     onSuccess: () => resetForm(),
   });
 
-  const studentUpdateMutation = useUpdateStudent(user?.id || 0);
-  const professorUpdateMutation = useUpdateProfessor(user?.id || 0);
+  // Safe ID access: If user is null, we pass 0, but the mutation won't be called in that case anyway.
+  // We cast the ID to number because the hooks expect numbers, though your types might be flexible.
+  const studentUpdateMutation = useUpdateStudent(
+    user?.id ? Number(user.id) : 0,
+  );
+  const professorUpdateMutation = useUpdateProfessor(
+    user?.id ? Number(user.id) : 0,
+  );
 
   // --- Select Mutation ---
   const mutation = (() => {
     if (isEditMode) {
-      // Assuming only Student and Professor updates are handled here for now
       return userType === 'Student'
         ? studentUpdateMutation
         : professorUpdateMutation;

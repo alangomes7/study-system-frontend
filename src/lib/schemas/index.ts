@@ -18,5 +18,5 @@ export * from './course-schema';
 // Export schema from study-class-schema.ts
 export * from './study-class-schema';
 
-// Export schema from user-schema.ts
-export * from './user-schema';
+// Export schema from user folder
+export * from './user';
