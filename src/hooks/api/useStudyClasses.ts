@@ -1,13 +1,15 @@
 'use client';
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  UseMutationOptions,
+} from '@tanstack/react-query';
 import { useApi } from './useApi';
 import { queryKeys } from './queryKeys';
-import {
-  StudyClass,
-  CreateStudyClassOptions,
-  StudyClassCreationData,
-} from '@/types';
+import { StudyClass, StudyClassCreationData } from '@/types';
+import { ApiError } from '@/lib/api';
 
 const ENDPOINT = '/study-classes';
 
@@ -31,20 +33,31 @@ export const useGetStudyClassesByCourse = (courseId: number) => {
     queryKey: queryKeys.studyClasses,
   });
 
-  return useQuery<StudyClass[], Error>({
+  return useQuery<StudyClass[], ApiError>({
     queryKey: queryKeys.studyClassesByCourse(courseId),
     queryFn: async () => {
       const response = await raw.fetchWithAuth(
         `${raw.baseUrl}/course/${courseId}`,
       );
-      if (!response.ok) throw new Error('Failed to fetch study classes');
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new ApiError(errorData);
+      }
       return response.json();
     },
     enabled: !!courseId,
   });
 };
 
-export const useCreateStudyClass = (options?: CreateStudyClassOptions) => {
+export const useCreateStudyClass = (
+  options?: UseMutationOptions<
+    StudyClass,
+    ApiError,
+    StudyClassCreationData,
+    unknown
+  >,
+) => {
   const queryClient = useQueryClient();
   const { useCreate } = useApi<StudyClass, StudyClassCreationData>({
     endpoint: ENDPOINT,
@@ -53,12 +66,12 @@ export const useCreateStudyClass = (options?: CreateStudyClassOptions) => {
 
   return useCreate({
     ...options,
-    onSuccess: (data, variables, context) => {
-      // Invalidate specific cache keys
+    // Callback Corrected (removed 'unknown' arg)
+    onSuccess: (data, variables, onMutateResult, context) => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.studyClassesByCourse(data.courseId),
       });
-      options?.onSuccess?.(data, variables, context);
+      options?.onSuccess?.(data, variables, onMutateResult, context);
     },
   });
 };
@@ -72,7 +85,7 @@ export const useEnrollProfessor = () => {
 
   return useMutation<
     StudyClass,
-    Error,
+    ApiError,
     { studyClassId: number; professorId: number }
   >({
     mutationFn: async ({ studyClassId, professorId }) => {
@@ -87,7 +100,7 @@ export const useEnrollProfessor = () => {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Failed to assign professor');
+        throw new ApiError(errorData);
       }
       return response.json();
     },

@@ -1,11 +1,15 @@
 'use client';
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  useQuery,
+  useQueryClient,
+  UseMutationOptions,
+} from '@tanstack/react-query';
 import { useApi } from './useApi';
 import { queryKeys } from './queryKeys';
 import { Subscription, Student, SubscriptionCreationData } from '@/types';
 import { useMemo } from 'react';
-import { deleteSubscription } from '@/lib/api';
+import { ApiError } from '@/lib/api';
 
 const SUB_ENDPOINT = '/subscriptions';
 
@@ -17,7 +21,7 @@ export const useGetSubscriptionsByStudyClass = (
     queryKey: queryKeys.subscriptionsByClass(studyClassId),
   });
 
-  return useQuery<Subscription[], Error>({
+  return useQuery<Subscription[], ApiError>({
     queryKey: queryKeys.subscriptionsByClass(studyClassId),
     queryFn: () => raw.findAll(studyClassId ? { studyClassId } : undefined),
     enabled: !!studyClassId,
@@ -25,14 +29,12 @@ export const useGetSubscriptionsByStudyClass = (
 };
 
 export const useGetStudentsByStudyClass = (studyClassId: number | null) => {
-  // 1. Fetch subscriptions
   const {
     data: subscriptions,
     isLoading: isLoadingSubscriptions,
     error: subscriptionsError,
   } = useGetSubscriptionsByStudyClass(studyClassId);
 
-  // 2. Fetch students using the raw API from the generic hook
   const { raw: studentApi } = useApi<Student>({
     endpoint: '/students',
     queryKey: queryKeys.students,
@@ -42,7 +44,7 @@ export const useGetStudentsByStudyClass = (studyClassId: number | null) => {
     data: students,
     isLoading: isLoadingStudents,
     error: studentsError,
-  } = useQuery<Student[], Error>({
+  } = useQuery<Student[], ApiError>({
     queryKey: queryKeys.studentsBySubscriptions(subscriptions?.map(s => s.id)),
     queryFn: async () => {
       const studentIds = [
@@ -52,13 +54,11 @@ export const useGetStudentsByStudyClass = (studyClassId: number | null) => {
             .map(sub => sub.studentId),
         ),
       ];
-      // Parallel fetch using the authenticated findById from the generic hook
       return Promise.all(studentIds.map(id => studentApi.findById(id)));
     },
     enabled: !!subscriptions && subscriptions.length > 0,
   });
 
-  // 3. Merge Data
   const studentsWithSubscription = useMemo(() => {
     if (!students || !subscriptions) return [];
     return students.map(student => {
@@ -80,7 +80,14 @@ export const useGetStudentsByStudyClass = (studyClassId: number | null) => {
   };
 };
 
-export const useCreateSubscription = (options?: { onSuccess?: () => void }) => {
+export const useCreateSubscription = (
+  options?: UseMutationOptions<
+    Subscription,
+    ApiError,
+    SubscriptionCreationData,
+    unknown
+  >,
+) => {
   const queryClient = useQueryClient();
   const { useCreate } = useApi<Subscription, SubscriptionCreationData>({
     endpoint: SUB_ENDPOINT,
@@ -88,23 +95,29 @@ export const useCreateSubscription = (options?: { onSuccess?: () => void }) => {
   });
 
   return useCreate({
-    onSuccess: data => {
+    ...options,
+    // Callback Corrected
+    onSuccess: (data, variables, onMutateResult, context) => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.subscriptionsByClass(data.studyClassId),
       });
-      options?.onSuccess?.();
+      options?.onSuccess?.(data, variables, onMutateResult, context);
     },
   });
 };
 
-export const useDeleteSubscription = () => {
-  const queryClient = useQueryClient();
+export const useDeleteSubscription = (
+  options?: UseMutationOptions<void, ApiError, number | string, unknown>,
+) => {
+  const { useDelete } = useApi<Subscription>({
+    endpoint: SUB_ENDPOINT,
+    queryKey: queryKeys.subscriptions,
+  });
 
-  return useMutation({
-    mutationFn: deleteSubscription,
-    onSuccess: () => {
-      // Invalidate all subscriptions related queries
-      queryClient.invalidateQueries({ queryKey: ['subscriptions'] });
+  return useDelete({
+    ...options,
+    onSuccess: (data, variables, onMutateResult, context) => {
+      options?.onSuccess?.(data, variables, onMutateResult, context);
     },
   });
 };

@@ -1,6 +1,6 @@
 import { Subscription, SubscriptionCreationData } from '@/types';
 import { API_BASE_URL } from './client';
-import { ErrorResponseApp } from '@/types/ErrorResonse';
+import { throwApiError } from './throwApiError'; //
 
 /**
  * Fetches all subscriptions for a specific study class.
@@ -14,7 +14,9 @@ export async function getSubscriptionsByStudyClass(
     `${API_BASE_URL}/subscriptions?studyClassId=${studyClassId}`,
   );
 
-  if (!response.ok) throw new Error('Failed to fetch subscriptions');
+  if (!response.ok) {
+    await throwApiError(response);
+  }
   return response.json();
 }
 
@@ -32,7 +34,9 @@ export async function createSubscription(
     body: JSON.stringify(subscriptionData),
   });
 
-  if (!response.ok) throw new Error('Failed to enroll student');
+  if (!response.ok) {
+    await throwApiError(response);
+  }
   return response.json();
 }
 
@@ -40,13 +44,16 @@ export async function createSubscription(
  * Deletes a subscription by ID.
  * @param id The ID of the subscription to delete.
  */
-export async function deleteSubscription(
-  id: number,
-): Promise<ErrorResponseApp | null> {
+export async function deleteSubscription(id: number): Promise<void> {
   const response = await fetch(`${API_BASE_URL}/subscriptions/${id}`, {
     method: 'DELETE',
   });
 
-  // Return the parsed JSON (Error or specific message)
+  if (!response.ok) {
+    await throwApiError(response);
+  }
+
+  if (response.status === 204) return;
+
   return response.json();
 }

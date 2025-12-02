@@ -1,8 +1,10 @@
 'use client';
 
+import { UseMutationOptions } from '@tanstack/react-query';
 import { queryKeys } from './queryKeys';
-import { Course, CourseCreationData, CreateCourseOptions } from '@/types';
+import { Course, CourseCreationData } from '@/types';
 import { useApi } from './useApi';
+import { ApiError } from '@/lib/api';
 
 const COURSE_ENDPOINT = '/courses';
 
@@ -20,7 +22,14 @@ export const useGetCourse = (id: number) => {
   }).useGetOne(id);
 };
 
-export const useCreateCourse = (options?: CreateCourseOptions) => {
+/**
+ * Hook to create a course.
+ * We explicitly use UseMutationOptions<Course, ApiError, CourseCreationData>
+ * to ensure consumers know the error type is ApiError.
+ */
+export const useCreateCourse = (
+  options?: UseMutationOptions<Course, ApiError, CourseCreationData>,
+) => {
   return useApi<Course, CourseCreationData>({
     endpoint: COURSE_ENDPOINT,
     queryKey: queryKeys.courses,

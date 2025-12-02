@@ -8,34 +8,29 @@ import {
   UseMutationOptions,
 } from '@tanstack/react-query';
 import { useFetchApi } from './useFetchApi';
+import { ApiError } from '@/lib/api/ApiError';
 
 interface UseApiOptions {
   endpoint: string;
   queryKey: string | readonly unknown[];
 }
 
-/**
- * A generic hook that combines the fetch wrapper with React Query.
- * Provides standardized hooks for CRUD operations.
- *
- * @param endpoint - The API endpoint (e.g., '/students')
- * @param queryKey - The base query key for caching (e.g., 'students' or ['students'])
- */
 export function useApi<T, TInput = Partial<T>>({
   endpoint,
   queryKey,
 }: UseApiOptions) {
   const { findAll, findById, create, update, remove, fetchWithAuth, baseUrl } =
     useFetchApi<T, TInput>(endpoint);
+
   const queryClient = useQueryClient();
   const baseKey = Array.isArray(queryKey) ? queryKey : [queryKey];
 
-  /**
-   * Hook to fetch all items.
-   */
+  // -------------------------------------------------
+  // GET ALL
+  // -------------------------------------------------
   const useGetAll = (
     params?: Record<string, string | number | boolean>,
-    options?: Omit<UseQueryOptions<T[], Error>, 'queryKey' | 'queryFn'>,
+    options?: Omit<UseQueryOptions<T[], ApiError>, 'queryKey' | 'queryFn'>,
   ) => {
     return useQuery({
       queryKey: params ? [...baseKey, params] : baseKey,
@@ -44,12 +39,12 @@ export function useApi<T, TInput = Partial<T>>({
     });
   };
 
-  /**
-   * Hook to fetch a single item by ID.
-   */
+  // -------------------------------------------------
+  // GET ONE
+  // -------------------------------------------------
   const useGetOne = (
     id: number | string | null,
-    options?: Omit<UseQueryOptions<T, Error>, 'queryKey' | 'queryFn'>,
+    options?: Omit<UseQueryOptions<T, ApiError>, 'queryKey' | 'queryFn'>,
   ) => {
     return useQuery({
       queryKey: [...baseKey, id],
@@ -59,36 +54,39 @@ export function useApi<T, TInput = Partial<T>>({
     });
   };
 
-  /**
-   * Hook to create a new item.
-   */
+  // -------------------------------------------------
+  // CREATE
+  // -------------------------------------------------
   const useCreate = (
-    options?: UseMutationOptions<T, Error, TInput, unknown>,
+    options?: UseMutationOptions<T, ApiError, TInput, unknown>,
   ) => {
     return useMutation({
       mutationFn: create,
       ...options,
-      onSuccess: (data, variables, context) => {
+      onSuccess: (data, variables, context, mutationContext) => {
         queryClient.invalidateQueries({ queryKey: baseKey });
 
-        // Cast to specific function type to avoid 'any'
         const onSuccess = options?.onSuccess as
-          | ((data: T, variables: TInput, context: unknown) => unknown)
+          | ((
+              data: T,
+              variables: TInput,
+              context: unknown,
+              mutationContext: unknown,
+            ) => unknown)
           | undefined;
 
-        onSuccess?.(data, variables, context);
+        onSuccess?.(data, variables, context, mutationContext);
       },
     });
   };
 
-  /**
-   * Hook to update an item.
-   * Expects variables to be an object containing `id` and `data`.
-   */
+  // -------------------------------------------------
+  // UPDATE
+  // -------------------------------------------------
   const useUpdate = (
     options?: UseMutationOptions<
       T,
-      Error,
+      ApiError,
       { id: number | string; data: TInput },
       unknown
     >,
@@ -96,7 +94,7 @@ export function useApi<T, TInput = Partial<T>>({
     return useMutation({
       mutationFn: ({ id, data }) => update(id, data),
       ...options,
-      onSuccess: (data, variables, context) => {
+      onSuccess: (data, variables, context, mutationContext) => {
         queryClient.invalidateQueries({ queryKey: baseKey });
         queryClient.invalidateQueries({
           queryKey: [...baseKey, variables.id],
@@ -107,24 +105,25 @@ export function useApi<T, TInput = Partial<T>>({
               data: T,
               variables: { id: number | string; data: TInput },
               context: unknown,
+              mutationContext: unknown,
             ) => unknown)
           | undefined;
 
-        onSuccess?.(data, variables, context);
+        onSuccess?.(data, variables, context, mutationContext);
       },
     });
   };
 
-  /**
-   * Hook to delete an item.
-   */
+  // -------------------------------------------------
+  // DELETE
+  // -------------------------------------------------
   const useDelete = (
-    options?: UseMutationOptions<void, Error, number | string, unknown>,
+    options?: UseMutationOptions<void, ApiError, number | string, unknown>,
   ) => {
     return useMutation({
       mutationFn: remove,
       ...options,
-      onSuccess: (data, id, context) => {
+      onSuccess: (data, id, context, mutationContext) => {
         queryClient.invalidateQueries({ queryKey: baseKey });
 
         const onSuccess = options?.onSuccess as
@@ -132,10 +131,11 @@ export function useApi<T, TInput = Partial<T>>({
               data: void,
               variables: number | string,
               context: unknown,
+              mutationContext: unknown,
             ) => unknown)
           | undefined;
 
-        onSuccess?.(data, id, context);
+        onSuccess?.(data, id, context, mutationContext);
       },
     });
   };

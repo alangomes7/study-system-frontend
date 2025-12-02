@@ -1,14 +1,18 @@
 import { Course, CourseCreationData } from '@/types';
 import { API_BASE_URL } from './client';
+import { throwApiError } from './throwApiError';
 
 /**
  * Fetches a list of all courses.
  * @returns A promise that resolves to an array of Course objects.
  */
 export async function getCourses(): Promise<Course[]> {
-  // We remove 'cache: no-store' as React Query will handle caching.
   const response = await fetch(`${API_BASE_URL}/courses`);
-  if (!response.ok) throw new Error('Failed to fetch courses');
+
+  if (!response.ok) {
+    await throwApiError(response);
+  }
+
   return response.json();
 }
 
@@ -16,14 +20,12 @@ export async function getCourses(): Promise<Course[]> {
  * Fetches details for a single course by its ID.
  * @param id The ID of the course to fetch.
  * @returns A promise that resolves to the Course object.
- * @throws Throws an error if the course is not found (404) or on API failure.
  */
 export async function getCourse(id: number): Promise<Course> {
   const response = await fetch(`${API_BASE_URL}/courses/${id}`);
 
   if (!response.ok) {
-    if (response.status === 404) throw new Error('Course not found');
-    throw new Error('Failed to fetch course details');
+    await throwApiError(response);
   }
 
   return response.json();
@@ -44,7 +46,8 @@ export async function createCourse(
   });
 
   if (!response.ok) {
-    throw new Error('Failed to create course');
+    await throwApiError(response);
   }
+
   return response.json();
 }

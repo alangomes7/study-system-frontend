@@ -5,6 +5,7 @@ import { useCallback } from 'react';
 import useTokenStore from '@/stores/TokenStore';
 import { API_BASE_URL } from '@/lib/api/client';
 import { DialogPopup } from '@/components';
+import { ApiError } from '@/lib/api';
 
 export function useFetchWithAuth() {
   const { tokenResponse, setTokenResponse } = useTokenStore();
@@ -33,26 +34,36 @@ export function useFetchWithAuth() {
         headers,
       });
 
-      // Handle Token Expiration / Unauthorized Access
+      // Handle Token Expiration / Unauthorized Access (Global Handler)
       if (response.status === 401 || response.status === 403) {
-        let errorMessage = 'Unauthorized access';
+        const errorData = await response
+          .clone()
+          .json()
+          .catch(() => ({}));
 
-        try {
-          const errorData = await response.clone().json();
-          console.log('Server Error Response:', errorData);
-
-          if (errorData.message) {
-            errorMessage = errorData.message;
-          }
-        } catch (e) {
-          console.error('Failed to parse error JSON:', e);
+        if (response.status === 401) {
+          setTokenResponse({ token: '', userId: 0, name: '', role: '' });
+          DialogPopup.error('Session expired. Please login again.');
+          router.push('/authentication/login');
         }
 
-        setTokenResponse({ token: '', userId: 0, name: '', role: '' });
+        if (response.status === 403) {
+          DialogPopup.error(errorData.message || 'Unauthorized Access');
+        }
 
-        DialogPopup.error(errorMessage);
-
-        router.push('/authentication/login');
+        throw new ApiError(
+          errorData && errorData.status
+            ? errorData
+            : {
+                status: response.status,
+                message: errorData.message || 'Unauthorized',
+                error: response.statusText || 'Unauthorized',
+                timestamp: new Date().toISOString(),
+                path: url,
+                method: options.method || 'GET',
+                fieldErrors: {},
+              },
+        );
       }
 
       return response;

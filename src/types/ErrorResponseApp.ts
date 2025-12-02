@@ -4,6 +4,6 @@ export interface ErrorResponseApp {
   error: string;
   method: string;
   path: string;
-  fieldErrors?: Record<string, string>;
+  fieldErrors: Record<string, string>;
   message: string;
 }

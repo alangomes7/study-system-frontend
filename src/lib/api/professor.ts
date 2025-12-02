@@ -1,5 +1,6 @@
 import { Professor, ProfessorCreationData } from '@/types';
 import { API_BASE_URL } from './client';
+import { throwApiError } from './throwApiError';
 
 /**
  * Fetches a list of all professors.
@@ -7,7 +8,11 @@ import { API_BASE_URL } from './client';
  */
 export async function getProfessors(): Promise<Professor[]> {
   const response = await fetch(`${API_BASE_URL}/professors`);
-  if (!response.ok) throw new Error('Failed to fetch professors');
+
+  if (!response.ok) {
+    await throwApiError(response);
+  }
+
   return response.json();
 }
 
@@ -22,10 +27,13 @@ export async function createProfessor(
   const response = await fetch(`${API_BASE_URL}/professors`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(professorData), // Send the full object
+    body: JSON.stringify(professorData),
   });
 
-  if (!response.ok) throw new Error('Failed to create professor');
+  if (!response.ok) {
+    await throwApiError(response);
+  }
+
   return response.json();
 }
 
@@ -36,7 +44,11 @@ export async function createProfessor(
  */
 export async function getProfessor(id: number): Promise<Professor> {
   const response = await fetch(`${API_BASE_URL}/professors/${id}`);
-  if (!response.ok) throw new Error(`Failed to fetch professor with id ${id}`);
+
+  if (!response.ok) {
+    await throwApiError(response);
+  }
+
   return response.json();
 }
 
@@ -51,13 +63,14 @@ export async function updateProfessor(
   professorData: ProfessorCreationData,
 ): Promise<Professor> {
   const response = await fetch(`${API_BASE_URL}/professors/${id}`, {
-    method: 'PUT', // or 'PATCH' depending on your API's preference
+    method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(professorData),
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to update professor with id ${id}`);
+    await throwApiError(response);
   }
+
   return response.json();
 }

@@ -3,6 +3,8 @@
 import { useApi } from './useApi';
 import { queryKeys } from './queryKeys';
 import { UserApp } from '@/types';
+import { ApiError } from '@/lib/api';
+import { UseMutationOptions } from '@tanstack/react-query';
 
 const ENDPOINT = '/userApp';
 
@@ -13,10 +15,9 @@ export const useGetAllUserApps = () => {
   }).useGetAll();
 };
 
-export const useCreateUserApp = (options?: {
-  onSuccess?: (data: UserApp) => void;
-  onError?: (error: Error) => void;
-}) => {
+export const useCreateUserApp = (
+  options?: UseMutationOptions<UserApp, ApiError, Omit<UserApp, 'id'>>,
+) => {
   return useApi<UserApp, Omit<UserApp, 'id'>>({
     endpoint: ENDPOINT,
     queryKey: queryKeys.userApps,

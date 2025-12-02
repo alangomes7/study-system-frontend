@@ -3,17 +3,42 @@
 import { useFetchWithAuth } from './useFetchWithAuth';
 import { useCallback } from 'react';
 import { API_BASE_URL } from '@/lib/api/client';
+import { ErrorResponseApp } from '@/types/ErrorResponseApp';
+import { ApiError } from '@/lib/api/ApiError';
 
+// Helper to handle the response and throw structured errors
 const handleResponse = async <R>(response: Response): Promise<R> => {
-  // Handle 204 No Content
-  if (response.status === 204) return null as R;
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || `Request failed: ${response.status}`);
+  if (response.status === 204) {
+    return {} as R;
   }
 
-  return response.json();
+  // Attempt to parse JSON regardless of status
+  // We use .catch() to return null if the body is empty or invalid JSON
+  const data = await response.json().catch(() => null);
+
+  // Handle Errors (4xx, 5xx)
+  if (!response.ok) {
+    let errorData: ErrorResponseApp;
+
+    if (data && typeof data === 'object' && 'status' in data) {
+      errorData = data as ErrorResponseApp;
+    } else {
+      errorData = {
+        status: response.status,
+        error: response.statusText,
+        message: data?.message || `Request failed: ${response.statusText}`,
+        method: 'UNKNOWN', // We don't have access to method in handleResponse easily without passing it
+        path: response.url,
+        timestamp: new Date().toISOString(),
+        fieldErrors: {},
+      };
+    }
+
+    // Throw the custom ApiError containing the structured data
+    throw new ApiError(errorData);
+  }
+
+  return data as R;
 };
 
 /**
@@ -22,6 +47,7 @@ const handleResponse = async <R>(response: Response): Promise<R> => {
  */
 export function useFetchApi<T, TInput = Partial<T>>(endpoint: string) {
   const fetchWithAuth = useFetchWithAuth();
+
   const baseUrl = `${API_BASE_URL}${endpoint}`;
 
   const findAll = useCallback(

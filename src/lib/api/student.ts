@@ -1,6 +1,6 @@
 import { Student, StudentCreationData, Subscription } from '@/types';
 import { API_BASE_URL } from './client';
-import { ErrorResponseApp } from '@/types/ErrorResonse';
+import { throwApiError } from './throwApiError';
 
 /**
  * Fetches a list of all students.
@@ -8,7 +8,9 @@ import { ErrorResponseApp } from '@/types/ErrorResonse';
  */
 export async function getAllStudents(): Promise<Student[]> {
   const response = await fetch(`${API_BASE_URL}/students`);
-  if (!response.ok) throw new Error('Failed to fetch students');
+  if (!response.ok) {
+    await throwApiError(response);
+  }
   return response.json();
 }
 
@@ -19,7 +21,9 @@ export async function getAllStudents(): Promise<Student[]> {
  */
 export async function getStudent(id: number): Promise<Student> {
   const response = await fetch(`${API_BASE_URL}/students/${id}`);
-  if (!response.ok) throw new Error(`Failed to fetch student with id ${id}`);
+  if (!response.ok) {
+    await throwApiError(response);
+  }
   return response.json();
 }
 
@@ -37,7 +41,9 @@ export async function createStudent(
     body: JSON.stringify(studentData),
   });
 
-  if (!response.ok) throw new Error('Failed to create student');
+  if (!response.ok) {
+    await throwApiError(response);
+  }
   return response.json();
 }
 
@@ -57,7 +63,9 @@ export async function updateStudent(
     body: JSON.stringify(studentData),
   });
 
-  if (!response.ok) throw new Error('Failed to update student');
+  if (!response.ok) {
+    await throwApiError(response);
+  }
   return response.json();
 }
 
@@ -71,7 +79,6 @@ export async function getStudentsInBatches(
   subscriptions: Subscription[],
   batchSize = 20,
 ): Promise<Student[]> {
-  // Get unique student IDs from the subscriptions
   const studentIds = [
     ...new Set(
       subscriptions.filter(sub => sub?.studentId).map(sub => sub.studentId),
@@ -80,10 +87,9 @@ export async function getStudentsInBatches(
 
   const allStudents: Student[] = [];
 
-  // Process requests in batches
   for (let i = 0; i < studentIds.length; i += batchSize) {
     const batchIds = studentIds.slice(i, i + batchSize);
-    const batchPromises = batchIds.map(id => getStudent(id)); // Use renamed getStudent
+    const batchPromises = batchIds.map(id => getStudent(id));
     const students = await Promise.all(batchPromises);
     allStudents.push(...students);
   }
@@ -94,12 +100,17 @@ export async function getStudentsInBatches(
 /**
  * Deletes a student by ID.
  * @param id The ID of the student to delete.
- * @returns A promise that resolves when the deletion is successful.
  */
-export async function deleteStudent(id: number): Promise<ErrorResponseApp> {
+export async function deleteStudent(id: number): Promise<void> {
   const response = await fetch(`${API_BASE_URL}/students/${id}`, {
     method: 'DELETE',
   });
+
+  if (!response.ok) {
+    await throwApiError(response);
+  }
+
+  if (response.status === 204) return;
 
   return response.json();
 }

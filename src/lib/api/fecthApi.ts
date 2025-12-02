@@ -1,34 +1,44 @@
 import { fetchWithAuth } from './fetchWithAuth';
 import { API_BASE_URL } from '@/lib/api/client';
+import { ApiError } from '@/lib/api/ApiError'; // Ensure path matches your project structure
+import { ErrorResponseApp } from '@/types/ErrorResponseApp'; //
 
 /**
  * Server-side generic service for interacting with RESTful API endpoints.
- * @param endpoint The base endpoint (e.g., '/students', '/courses').
- * @template T The entity type returned by the API (e.g., Student, Course).
- * @template TInput The type used for create/update payloads (defaults to Partial<T>).
  */
 export const createApiService = <T, TInput = Partial<T>>(endpoint: string) => {
   const baseUrl = `${API_BASE_URL}${endpoint}`;
 
   // Helper to handle response parsing and error throwing
   const handleResponse = async <R = T>(response: Response): Promise<R> => {
-    // Handle 204 No Content immediately
-    if (response.status === 204) return null as R;
-
-    // Handle Errors
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      if (errorData && errorData.message) {
-        throw new Error(errorData.message);
-      } else {
-        throw new Error(
-          `Request failed: ${response.statusText} (${response.status})`,
-        );
-      }
+    if (response.status === 204) {
+      return {} as R;
     }
 
-    // Handle JSON success
-    return response.json();
+    const data = await response.json().catch(() => null);
+
+    // Handle Errors (4xx, 5xx)
+    if (!response.ok) {
+      let errorData: ErrorResponseApp;
+
+      if (data && typeof data === 'object' && 'status' in data) {
+        errorData = data as ErrorResponseApp;
+      } else {
+        errorData = {
+          status: response.status,
+          error: response.statusText,
+          message: data?.message || 'An unexpected error occurred',
+          timestamp: new Date().toISOString(),
+          method: 'UNKNOWN',
+          path: endpoint,
+          fieldErrors: {},
+        };
+      }
+
+      throw new ApiError(errorData);
+    }
+
+    return data as R;
   };
 
   const findAll = async (
@@ -45,7 +55,6 @@ export const createApiService = <T, TInput = Partial<T>>(endpoint: string) => {
       url += `?${searchParams.toString()}`;
     }
 
-    // Pass 'fetchWithAuth' logic implicitly by calling the utility
     const response = await fetchWithAuth(url);
     return handleResponse<T[]>(response);
   };

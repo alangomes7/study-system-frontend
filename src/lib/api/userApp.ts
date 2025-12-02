@@ -1,5 +1,6 @@
 import { API_BASE_URL } from './client';
 import { UserApp } from '@/types';
+import { throwApiError } from './throwApiError'; //
 
 /**
  * Retrieves a list of all users.
@@ -7,7 +8,9 @@ import { UserApp } from '@/types';
  */
 export async function getAllUserApps(): Promise<UserApp[]> {
   const response = await fetch(`${API_BASE_URL}/userApp`);
-  if (!response.ok) throw new Error('Failed to fetch users');
+  if (!response.ok) {
+    await throwApiError(response);
+  }
   return response.json();
 }
 
@@ -25,6 +28,8 @@ export async function createUserApp(
     body: JSON.stringify(userAppData),
   });
 
-  if (!response.ok) throw new Error('Failed to create user');
+  if (!response.ok) {
+    await throwApiError(response);
+  }
   return response.json();
 }

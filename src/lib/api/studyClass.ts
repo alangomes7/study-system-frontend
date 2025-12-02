@@ -1,5 +1,6 @@
 import { StudyClass, StudyClassCreationData } from '@/types';
 import { API_BASE_URL } from './client';
+import { throwApiError } from './throwApiError'; //
 
 /**
  * Fetches a list of all study classes.
@@ -7,7 +8,9 @@ import { API_BASE_URL } from './client';
  */
 export async function getAllStudyClasses(): Promise<StudyClass[]> {
   const response = await fetch(`${API_BASE_URL}/study-classes`);
-  if (!response.ok) throw new Error('Failed to fetch study classes');
+  if (!response.ok) {
+    await throwApiError(response);
+  }
   return response.json();
 }
 
@@ -15,12 +18,12 @@ export async function getAllStudyClasses(): Promise<StudyClass[]> {
  * Fetches a single study class by its unique identifier.
  * @param id - The numerical ID of the study class to retrieve.
  * @returns A Promise that resolves to the {@link StudyClass} object.
- * @throws Will throw an Error if the fetch response is not 'ok' (e.g., 404, 500).
  */
 export async function getStudyClass(id: number): Promise<StudyClass> {
   const response = await fetch(`${API_BASE_URL}/study-classes/${id}`);
-  if (!response.ok)
-    throw new Error(`Failed to fetch study class with id ${id}`);
+  if (!response.ok) {
+    await throwApiError(response);
+  }
   return response.json();
 }
 
@@ -35,7 +38,9 @@ export async function getStudyClassesByCourse(
   const response = await fetch(
     `${API_BASE_URL}/study-classes/course/${courseId}`,
   );
-  if (!response.ok) throw new Error('Failed to fetch study classes');
+  if (!response.ok) {
+    await throwApiError(response);
+  }
   return response.json();
 }
 
@@ -53,7 +58,9 @@ export async function createStudyClass(
     body: JSON.stringify(studyClassData),
   });
 
-  if (!response.ok) throw new Error('Failed to create study class');
+  if (!response.ok) {
+    await throwApiError(response);
+  }
   return response.json();
 }
 
@@ -63,7 +70,6 @@ export async function createStudyClass(
  * @param studyClassId - The ID of the study class.
  * @param professorId - The ID of the professor to assign.
  * @returns A Promise that resolves to the updated StudyClass DTO on success.
- * @throws Will throw an Error if the fetch response is not 'ok'.
  */
 export async function enrollProfessorInStudyClass(
   studyClassId: string | number,
@@ -83,8 +89,7 @@ export async function enrollProfessorInStudyClass(
   );
 
   if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Failed to assign professor');
+    await throwApiError(response);
   }
   return response.json();
 }

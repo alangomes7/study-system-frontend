@@ -3,6 +3,7 @@
 import { useDeleteSubscriptionStore } from '@/stores/deleteSubscription';
 import { useDeleteSubscription } from '@/hooks';
 import { DialogPopup } from '@/components';
+import { ApiError } from '@/lib/api';
 
 export function useDeleteSubscriptionHandlers() {
   const selectedSubscriptionId = useDeleteSubscriptionStore(
@@ -37,27 +38,20 @@ export function useDeleteSubscriptionHandlers() {
     if (!selectedSubscriptionId) return;
 
     try {
-      const response = await deleteSub(selectedSubscriptionId);
+      await deleteSub(selectedSubscriptionId);
 
-      const status = response?.status;
-      const message = response?.message;
+      DialogPopup.success('Subscription removed successfully');
 
-      if (status === 200) {
-        DialogPopup.success('200');
-        DialogPopup.success(message || 'Subscription removed successfully');
-        setSelectedSubscriptionId(null);
-        setOpenDropdown(null);
-        return;
-      }
-      throw new Error(
-        message ||
-          `Failed to remove subscription (status: ${status ?? 'unknown'})`,
-      );
+      setSelectedSubscriptionId(null);
+      setOpenDropdown(null);
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : 'Failed to remove subscription';
+      let errorMessage = 'Failed to remove subscription';
+
+      if (error instanceof ApiError) {
+        errorMessage = error.response?.message || error.message;
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
 
       DialogPopup.error(errorMessage);
     }
