@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { type userFormData, type userFormErrors } from '@/lib/schemas';
+import { type UserFormData, type UserFormErrors } from '@/lib/schemas';
 import { Student, Professor, UserType, UserApp } from '@/types';
 import { useCreateStudent, useUpdateStudent } from '@/hooks/api/useStudents';
 import {
@@ -13,10 +13,11 @@ import { useCreateUserApp } from '@/hooks/api/useUserApps';
 type UseUserFormProps = {
   userType: UserType;
   user?: Student | Professor | UserApp | null;
+  onSuccess?: () => void;
 };
 
 // Add password to initial state
-const INITIAL_STATE: userFormData = {
+const INITIAL_STATE: UserFormData = {
   name: '',
   email: '',
   phone: '',
@@ -24,9 +25,13 @@ const INITIAL_STATE: userFormData = {
   password: '',
 };
 
-export function useUserFormData({ user, userType }: UseUserFormProps) {
-  const [formData, setFormData] = useState<userFormData>(INITIAL_STATE);
-  const [errors, setErrors] = useState<userFormErrors>({});
+export function useUserFormData({
+  user,
+  userType,
+  onSuccess,
+}: UseUserFormProps) {
+  const [formData, setFormData] = useState<UserFormData>(INITIAL_STATE);
+  const [errors, setErrors] = useState<UserFormErrors>({});
 
   const isEditMode = !!user;
 
@@ -36,26 +41,32 @@ export function useUserFormData({ user, userType }: UseUserFormProps) {
   };
 
   // --- Mutations ---
-  // We use the existing API hooks.
-  // Note: These hooks might handle redirection internally (check useStudents.ts).
-
   const studentCreateMutation = useCreateStudent({
-    onSuccess: () => resetForm(),
+    onSuccess: () => {
+      resetForm();
+      onSuccess?.();
+    },
   });
 
   const professorCreateMutation = useCreateProfessor({
-    onSuccess: () => resetForm(),
+    onSuccess: () => {
+      resetForm();
+      onSuccess?.();
+    },
   });
 
   const userAppCreateMutation = useCreateUserApp({
-    onSuccess: () => resetForm(),
+    onSuccess: () => {
+      resetForm();
+      onSuccess?.();
+    },
   });
 
-  // Safe ID access: If user is null, we pass 0, but the mutation won't be called in that case anyway.
-  // We cast the ID to number because the hooks expect numbers, though your types might be flexible.
+  // Safe ID access
   const studentUpdateMutation = useUpdateStudent(
     user?.id ? Number(user.id) : 0,
   );
+
   const professorUpdateMutation = useUpdateProfessor(
     user?.id ? Number(user.id) : 0,
   );
