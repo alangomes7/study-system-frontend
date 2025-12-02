@@ -1,69 +1,45 @@
+'use client';
+
+import {
+  useCreateProfessor,
+  useCreateStudent,
+  useCreateUserApp,
+} from './mutations';
 import { AnyUserCreationData } from './types';
 
-// Helper to handle API responses
-const handleResponse = async (response: Response) => {
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(
-      errorData.message || 'An error occurred during the request.',
-    );
-  }
-  return response.json();
-};
+/**
+ * A hook that aggregates user creation logic by calling the specific entity hooks.
+ * * Note: Update operations (e.g., updateStudent) are not included here because
+ * the provided hooks (useUpdateStudent, useUpdateProfessor) require an `id`
+ * at initialization.
+ * Updates should be performed by calling those hooks directly in the specific
+ * components where the entity ID is known.
+ */
+export const useUserService = () => {
+  // Initialize the specific entity mutations
+  const studentMutation = useCreateStudent();
+  const professorMutation = useCreateProfessor();
+  const userAppMutation = useCreateUserApp();
 
-// --- Student API ---
+  return {
+    // --- Student API ---
+    createStudent: (data: AnyUserCreationData) =>
+      studentMutation.mutateAsync(data as any),
+    isCreatingStudent: studentMutation.isPending,
+    studentError: studentMutation.error,
 
-export const createStudent = async (data: AnyUserCreationData) => {
-  const response = await fetch('/api/students', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
-  return handleResponse(response);
-};
+    // --- Professor API ---
+    createProfessor: (data: AnyUserCreationData) =>
+      professorMutation.mutateAsync(data as any),
 
-export const updateStudent = async (
-  id: number | string,
-  data: AnyUserCreationData,
-) => {
-  const response = await fetch(`/api/students/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
-  return handleResponse(response);
-};
+    isCreatingProfessor: professorMutation.isPending,
+    professorError: professorMutation.error,
 
-// --- Professor API ---
+    // --- User App (Admin/User) API ---
+    createUserApp: (data: AnyUserCreationData) =>
+      userAppMutation.mutateAsync(data as any),
 
-export const createProfessor = async (data: AnyUserCreationData) => {
-  const response = await fetch('/api/professors', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
-  return handleResponse(response);
-};
-
-export const updateProfessor = async (
-  id: number | string,
-  data: AnyUserCreationData,
-) => {
-  const response = await fetch(`/api/professors/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
-  return handleResponse(response);
-};
-
-// --- User App (Admin/User) API ---
-
-export const createUserApp = async (data: AnyUserCreationData) => {
-  const response = await fetch('/api/users', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
-  return handleResponse(response);
+    isCreatingUserApp: userAppMutation.isPending,
+    userAppError: userAppMutation.error,
+  };
 };

@@ -1,16 +1,17 @@
 'use client';
 
-import { useMutation } from '@tanstack/react-query';
-import { loginUser } from '@/lib/api';
+import { UseMutationOptions } from '@tanstack/react-query';
+import { useApi } from './useApi';
 import { TokenResponse } from '@/types';
+import { ApiError, LoginCredentials } from '@/lib/api';
 
-export const useLogin = (options?: {
-  onSuccess?: (data: TokenResponse) => void;
-  onError?: (error: Error) => void;
-}) => {
-  return useMutation({
-    mutationFn: loginUser,
-    onSuccess: options?.onSuccess,
-    onError: options?.onError,
+export const useLogin = (
+  options?: UseMutationOptions<TokenResponse, ApiError, LoginCredentials>,
+) => {
+  const { useCreate } = useApi<TokenResponse, LoginCredentials>({
+    endpoint: '/authentication/login',
+    queryKey: ['login'],
   });
+
+  return useCreate(options);
 };
